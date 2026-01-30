@@ -1,5 +1,4 @@
 @use "./variables" as *;
-@use "./mixins" as *;
 
 *,
 *::before,
@@ -15,8 +14,22 @@ body {
 }
 
 body {
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 200px;
+  min-height: 100vh;
 }

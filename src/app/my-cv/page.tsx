@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button/button";
 import styles from "./page.module.scss";
 
-export default function Home() {
+export default function MyCVPage() {
   return (
     <div className={styles.container}>
       <h1>My CV</h1>

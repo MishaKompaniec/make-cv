@@ -1,3 +1,6 @@
+import "../styles/globals.scss";
+import { Sidebar } from "@/components/layout/sidebar/sidebar";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -5,7 +8,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="layout">
+        <Sidebar />
+        <main className="main-content">{children}</main>
+      </body>
     </html>
   );
 }

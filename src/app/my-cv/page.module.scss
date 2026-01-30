@@ -1,0 +1,110 @@
+@use "../../styles/variables" as *;
+
+.container {
+  padding: 2rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.createCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 320px;
+  border: 2px dashed #cbd5e1;
+  border-radius: $border-radius;
+  background: $secondary;
+  cursor: pointer;
+  transition: all $transition;
+  color: $text;
+
+  &:hover {
+    border-color: $primary;
+    background: rgba($primary, 0.05);
+    color: $primary;
+  }
+
+  .plusIcon {
+    font-size: 3rem;
+    font-weight: 300;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    margin: 0;
+    font-weight: 500;
+  }
+}
+
+.cvCard {
+  background: $white;
+  border-radius: $border-radius;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: all $transition;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
+}
+
+.cvPreview {
+  height: 200px;
+  background: #f8fafc;
+  padding: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.previewHeader {
+  height: 20px;
+  background: #e2e8f0;
+  border-radius: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.previewContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.previewLine {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 0.25rem;
+  width: 100%;
+
+  &.short {
+    width: 60%;
+  }
+}
+
+.cvInfo {
+  padding: 1rem;
+}
+
+.cvInfo h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: $text-dark;
+}
+
+.updated {
+  margin: 0 0 1rem 0;
+  font-size: 0.875rem;
+  color: $text;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
