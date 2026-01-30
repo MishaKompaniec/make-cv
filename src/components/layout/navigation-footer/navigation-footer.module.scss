@@ -1,0 +1,32 @@
+@use "../../../styles/variables" as *;
+
+.footer {
+  background: $white;
+  border-top: 1px solid $border-light;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.container {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+.backButton,
+.nextButton {
+  text-decoration: none;
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.backButton button,
+.nextButton button {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+}

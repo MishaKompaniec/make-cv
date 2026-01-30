@@ -27,6 +27,7 @@
   cursor: pointer;
   transition: all $transition;
   color: $text;
+  text-decoration: none;
 
   &:hover {
     border-color: $accent;

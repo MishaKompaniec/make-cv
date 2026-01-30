@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button/button";
+import Link from "next/link";
 import styles from "./page.module.scss";
 
 export default function Home() {
@@ -7,10 +8,10 @@ export default function Home() {
       <h1 className={styles.title}>My CV</h1>
 
       <div className={styles.grid}>
-        <div className={styles.createCard}>
+        <Link href="/create-cv" className={styles.createCard}>
           <div className={styles.plusIcon}>+</div>
           <p>Create CV</p>
-        </div>
+        </Link>
 
         <div className={styles.cvCard}>
           <div className={styles.cvPreview}>

@@ -1,0 +1,54 @@
+import { Button } from "@/components/ui/button/button";
+import { Input } from "@/components/ui/input/input";
+import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
+import styles from "./page.module.scss";
+
+const stepTitle = "Summary";
+
+export default function SummaryPage() {
+  return (
+    <div className={styles.pageContainer}>
+      <section className={styles.wrapper}>
+        <header className={styles.header}>
+          <p className={styles.stepBadge}>Step 5</p>
+          <h1>{stepTitle}</h1>
+          <p className={styles.description}>
+            Write a compelling professional summary that captures your unique
+            value proposition.
+          </p>
+        </header>
+
+        <form className={styles.form}>
+          <label className={styles.fieldGroup}>
+            <span className={styles.label}>Professional summary</span>
+            <Input
+              placeholder="Experienced professional with X years of expertise in..."
+              fullWidth
+            />
+          </label>
+
+          <label className={styles.fieldGroup}>
+            <span className={styles.label}>Career objectives</span>
+            <Input
+              placeholder="Seeking to leverage my skills in a challenging role..."
+              fullWidth
+            />
+          </label>
+
+          <label className={styles.fieldGroup}>
+            <span className={styles.label}>Key achievements</span>
+            <Input
+              placeholder="Increased revenue by X%, led team of Y people, completed Z projects..."
+              fullWidth
+            />
+          </label>
+        </form>
+      </section>
+
+      <NavigationFooter
+        backHref="/create-cv/skills"
+        nextHref="/create-cv/other-sections"
+      />
+    </div>
+  );
+}

@@ -1,0 +1,90 @@
+@use "../../styles/variables" as *;
+
+.pageContainer {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.wrapper {
+  padding: 2rem;
+  max-width: 960px;
+  margin: 0 auto;
+  flex: 1;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+
+  h1 {
+    margin: 0;
+    font-size: 2.25rem;
+    color: $text-primary;
+  }
+}
+
+.stepBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: $accent;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  background: rgba($accent, 0.1);
+  width: fit-content;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.description {
+  margin: 0;
+  color: $text;
+  max-width: 520px;
+}
+
+.form {
+  background: $white;
+  padding: 2.5rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 25px 60px rgba(17, 32, 63, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-weight: 500;
+}
+
+.label {
+  font-size: 0.9rem;
+  color: $text;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(200px, 1fr));
+  gap: 1.25rem;
+}
+
+@media (max-width: 900px) {
+  .wrapper {
+    padding: 1.5rem;
+  }
+
+  .form {
+    padding: 2rem;
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+  }
+}
