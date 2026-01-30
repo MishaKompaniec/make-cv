@@ -4,10 +4,22 @@ import styles from "./input.module.scss";
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   error?: string;
   fullWidth?: boolean;
+  required?: boolean;
+  label?: string;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className = "", error, fullWidth = false, ...props }, ref) => {
+  (
+    {
+      className = "",
+      error,
+      fullWidth = false,
+      required = false,
+      label,
+      ...props
+    },
+    ref,
+  ) => {
     const classNames = [
       styles.input,
       fullWidth ? styles.fullWidth : "",
@@ -19,7 +31,19 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
     return (
       <div className={styles.inputWrapper}>
-        <input ref={ref} className={classNames} {...props} />
+        {label && (
+          <span
+            className={`${styles.label} ${required ? styles.required : ""}`}
+          >
+            {label}
+          </span>
+        )}
+        <input
+          ref={ref}
+          className={classNames}
+          {...props}
+          required={required}
+        />
         {error && <span className={styles.errorMessage}>{error}</span>}
       </div>
     );

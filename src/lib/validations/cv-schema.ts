@@ -8,8 +8,8 @@ export const contactDetailsSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   birthdate: z.string().optional(),
   postalCode: z.string().optional(),
-  linkedIn: z.string().url().optional().or(z.literal("")),
-  git: z.string().url().optional().or(z.literal("")),
+  linkedIn: z.string().optional(),
+  git: z.string().optional(),
   nationality: z.string().optional(),
   workPermit: z.string().optional(),
 });

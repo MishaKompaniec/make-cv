@@ -60,43 +60,6 @@
   min-height: 400px;
 }
 
-.header {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 2rem;
-
-  h1 {
-    margin: 0;
-    font-size: 2.25rem;
-    color: $text-primary;
-  }
-}
-
-.stepBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: $accent;
-  padding: 0.3rem 0.85rem;
-  border-radius: 999px;
-  background: rgba($accent, 0.1);
-  width: fit-content;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  position: absolute;
-  top: 2rem;
-  right: 2rem;
-}
-
-.description {
-  margin: 0;
-  color: $text;
-  max-width: 520px;
-}
-
 .form {
   background: $white;
   padding: 2.5rem;
@@ -114,11 +77,6 @@
   flex-direction: column;
   gap: 0.4rem;
   font-weight: 500;
-}
-
-.label {
-  font-size: 0.9rem;
-  color: $text;
 }
 
 .row {

@@ -2,6 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input/input";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { PageHeader } from "@/components/layout/page-header/page-header";
@@ -9,33 +10,48 @@ import {
   contactDetailsSchema,
   type ContactDetailsFormData,
 } from "@/lib/validations/cv-schema";
+import { useCvData } from "@/hooks/useCvData";
 import styles from "./page.module.scss";
 
 const stepTitle = "Contact details";
 
 export default function CreateCvPage() {
+  const { contactDetails, setContactDetails } = useCvData();
+
+  const didInitRef = useRef(false);
+
   const {
     register,
     handleSubmit,
-    trigger,
     formState: { errors },
+    reset,
+    watch,
   } = useForm<ContactDetailsFormData>({
     resolver: zodResolver(contactDetailsSchema),
     mode: "onChange",
+    defaultValues: contactDetails,
   });
 
-  const onSubmit = (data: ContactDetailsFormData) => {
-    console.log("Form data:", data);
-    // Here you would save the data and navigate to next step
-    window.location.href = "/create-cv/work-experience";
-  };
+  // Initialize form values from localStorage once.
+  // Avoid resetting on every localStorage write, because it can cancel browser autofill.
+  useEffect(() => {
+    if (didInitRef.current) return;
+    reset(contactDetails);
+    didInitRef.current = true;
+  }, [contactDetails, reset]);
 
-  const handleNextClick = async () => {
-    const isValid = await trigger();
-    if (isValid) {
-      handleSubmit(onSubmit)();
-    }
-  };
+  // Auto-save on field changes
+  useEffect(() => {
+    const subscription = watch((data) => {
+      setContactDetails(data as ContactDetailsFormData);
+    });
+    return () => subscription.unsubscribe();
+  }, [watch, setContactDetails]);
+
+  const handleNextClick = handleSubmit((data) => {
+    setContactDetails(data);
+    window.location.href = "/create-cv/work-experience";
+  });
 
   return (
     <div className={styles.pageContainer}>
@@ -47,119 +63,135 @@ export default function CreateCvPage() {
 
       <section className={styles.wrapper}>
         <div className={styles.content}>
-          <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-            <label className={styles.fieldGroup}>
-              <span className={styles.label}>Full name *</span>
+          <form className={styles.form} autoComplete="on">
+            <div className={styles.fieldGroup}>
               <Input
+                label="Full name"
                 placeholder="Jane Doe"
                 fullWidth
+                required
+                autoComplete="name"
                 {...register("fullName")}
                 error={errors.fullName?.message}
               />
-            </label>
-
-            <div className={styles.row}>
-              <label className={styles.fieldGroup}>
-                <span className={styles.label}>Job title *</span>
-                <Input
-                  placeholder="Product Designer"
-                  fullWidth
-                  {...register("jobTitle")}
-                  error={errors.jobTitle?.message}
-                />
-              </label>
-
-              <label className={styles.fieldGroup}>
-                <span className={styles.label}>City *</span>
-                <Input
-                  placeholder="Copenhagen, Denmark"
-                  fullWidth
-                  {...register("city")}
-                  error={errors.city?.message}
-                />
-              </label>
             </div>
 
             <div className={styles.row}>
-              <label className={styles.fieldGroup}>
-                <span className={styles.label}>Phone number *</span>
+              <div className={styles.fieldGroup}>
                 <Input
+                  label="Job title"
+                  placeholder="Product Designer"
+                  fullWidth
+                  required
+                  autoComplete="organization-title"
+                  {...register("jobTitle")}
+                  error={errors.jobTitle?.message}
+                />
+              </div>
+
+              <div className={styles.fieldGroup}>
+                <Input
+                  label="City"
+                  placeholder="Copenhagen, Denmark"
+                  fullWidth
+                  required
+                  autoComplete="address-level2"
+                  {...register("city")}
+                  error={errors.city?.message}
+                />
+              </div>
+            </div>
+
+            <div className={styles.row}>
+              <div className={styles.fieldGroup}>
+                <Input
+                  label="Phone number"
                   type="tel"
                   placeholder="(+45) 1234 5678"
                   fullWidth
+                  required
+                  autoComplete="tel"
                   {...register("phone")}
                   error={errors.phone?.message}
                 />
-              </label>
+              </div>
 
-              <label className={styles.fieldGroup}>
-                <span className={styles.label}>Email *</span>
+              <div className={styles.fieldGroup}>
                 <Input
+                  label="Email"
                   type="email"
                   placeholder="jane@email.com"
                   fullWidth
+                  required
+                  autoComplete="email"
                   {...register("email")}
                   error={errors.email?.message}
                 />
-              </label>
+              </div>
             </div>
 
             <div className={styles.divider}></div>
 
             <div className={styles.row}>
-              <label className={styles.fieldGroup}>
-                <span className={styles.label}>Birthdate</span>
-                <Input type="date" fullWidth {...register("birthdate")} />
-              </label>
-
-              <label className={styles.fieldGroup}>
-                <span className={styles.label}>Postal code</span>
+              <div className={styles.fieldGroup}>
                 <Input
+                  label="Birthdate"
+                  placeholder="DD/MM/YYYY"
+                  fullWidth
+                  autoComplete="bday"
+                  {...register("birthdate")}
+                />
+              </div>
+
+              <div className={styles.fieldGroup}>
+                <Input
+                  label="Postal code"
                   placeholder="1234"
                   fullWidth
+                  autoComplete="postal-code"
                   {...register("postalCode")}
                 />
-              </label>
+              </div>
             </div>
 
             <div className={styles.row}>
-              <label className={styles.fieldGroup}>
-                <span className={styles.label}>LinkedIn</span>
+              <div className={styles.fieldGroup}>
                 <Input
+                  label="LinkedIn"
                   placeholder="linkedin.com/in/janedoe"
                   fullWidth
                   {...register("linkedIn")}
                 />
-              </label>
+              </div>
 
-              <label className={styles.fieldGroup}>
-                <span className={styles.label}>Git</span>
+              <div className={styles.fieldGroup}>
                 <Input
+                  label="Git"
                   placeholder="github.com/janedoe"
                   fullWidth
                   {...register("git")}
                 />
-              </label>
+              </div>
             </div>
 
             <div className={styles.row}>
-              <label className={styles.fieldGroup}>
-                <span className={styles.label}>Nationality</span>
+              <div className={styles.fieldGroup}>
                 <Input
+                  label="Nationality"
                   placeholder="Danish"
                   fullWidth
                   {...register("nationality")}
                 />
-              </label>
+              </div>
 
-              <label className={styles.fieldGroup}>
-                <span className={styles.label}>Work permit</span>
+              <div className={styles.fieldGroup}>
                 <Input
+                  label="Work permit"
                   placeholder="EU Citizen"
                   fullWidth
                   {...register("workPermit")}
                 />
-              </label>
+              </div>
             </div>
           </form>
         </div>
