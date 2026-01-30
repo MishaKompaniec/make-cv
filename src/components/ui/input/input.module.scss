@@ -28,7 +28,7 @@
   background: $white;
   border: 1px solid $border-medium;
   border-radius: $border-radius;
-  transition: all $transition;
+  transition: all $transition-smooth;
   outline: none;
 
   &::placeholder {

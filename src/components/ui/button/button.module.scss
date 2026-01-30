@@ -12,7 +12,7 @@
   border: none;
   border-radius: $border-radius;
   cursor: pointer;
-  transition: all $transition;
+  transition: all $transition-smooth;
   text-decoration: none;
   outline: none;
 
@@ -37,11 +37,11 @@
   }
 
   &.primary {
-    background: linear-gradient(135deg, $primary, $primary-dark);
+    background: $primary;
     color: $white;
 
     &:hover {
-      background: linear-gradient(135deg, $primary-dark, $primary-darker);
+      background: $primary-dark;
     }
   }
 
