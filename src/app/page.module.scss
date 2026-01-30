@@ -4,6 +4,10 @@
   padding: 2rem;
 }
 
+.title {
+  margin: 0;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -17,17 +21,17 @@
   align-items: center;
   justify-content: center;
   height: 320px;
-  border: 2px dashed #cbd5e1;
+  border: 2px dashed $border-light;
   border-radius: $border-radius;
-  background: $secondary;
+  background: $bg-secondary;
   cursor: pointer;
   transition: all $transition;
   color: $text;
 
   &:hover {
-    border-color: $primary;
-    background: rgba($primary, 0.05);
-    color: $primary;
+    border-color: $accent;
+    background: $accent-light;
+    color: $accent;
   }
 
   .plusIcon {
@@ -57,14 +61,14 @@
 
 .cvPreview {
   height: 200px;
-  background: #f8fafc;
+  background: $bg-tertiary;
   padding: 1rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid $border-medium;
 }
 
 .previewHeader {
   height: 20px;
-  background: #e2e8f0;
+  background: $border-medium;
   border-radius: 0.25rem;
   margin-bottom: 1rem;
 }
@@ -77,7 +81,7 @@
 
 .previewLine {
   height: 8px;
-  background: #e2e8f0;
+  background: $border-medium;
   border-radius: 0.25rem;
   width: 100%;
 
@@ -94,7 +98,7 @@
   margin: 0 0 0.5rem 0;
   font-size: 1rem;
   font-weight: 600;
-  color: $text-dark;
+  color: $text-primary;
 }
 
 .updated {

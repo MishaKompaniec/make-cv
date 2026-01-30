@@ -3,7 +3,7 @@
 .sidebar {
   width: 200px;
   height: 100vh;
-  background: #1e293b;
+  background: $sidebar-bg;
   color: $white;
   display: flex;
   flex-direction: column;
@@ -42,7 +42,7 @@
 
   &.active {
     color: $white;
-    background: rgba(59, 130, 246, 0.1);
+    background: rgba($accent, 0.1);
 
     &::before {
       content: "";
@@ -51,7 +51,7 @@
       top: 0;
       bottom: 0;
       width: 3px;
-      background: $primary;
+      background: $accent;
     }
   }
 }

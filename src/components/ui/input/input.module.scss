@@ -8,36 +8,36 @@
   line-height: 1.25;
   color: $text;
   background: $white;
-  border: 1px solid #e2e8f0;
+  border: 1px solid $border-medium;
   border-radius: $border-radius;
   transition: all $transition;
   outline: none;
 
   &::placeholder {
-    color: #94a3b8;
+    color: $text-muted;
   }
 
   &:hover {
-    border-color: #cbd5e1;
+    border-color: $border-light;
   }
 
   &:focus {
-    border-color: $primary;
+    border-color: $accent;
     box-shadow: $shadow-focus;
   }
 
   &:disabled {
-    background: $secondary;
-    color: $text-dark;
+    background: $bg-secondary;
+    color: $text-muted;
     cursor: not-allowed;
-    border-color: #e2e8f0;
+    border-color: $border-medium;
   }
 
   &.error {
-    border-color: #ef4444;
+    border-color: $error;
 
     &:focus {
-      border-color: #ef4444;
+      border-color: $error;
       box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
     }
   }

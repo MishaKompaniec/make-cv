@@ -4,7 +4,7 @@ import styles from "./page.module.scss";
 export default function Home() {
   return (
     <div className={styles.container}>
-      <h1>My CV</h1>
+      <h1 className={styles.title}>My CV</h1>
 
       <div className={styles.grid}>
         <div className={styles.createCard}>
