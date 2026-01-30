@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button/button";
 import Link from "next/link";
 import styles from "./navigation-footer.module.scss";
@@ -8,6 +10,7 @@ interface NavigationFooterProps {
   showBack?: boolean;
   showNext?: boolean;
   nextText?: string;
+  onNextClick?: () => void;
 }
 
 export function NavigationFooter({
@@ -16,7 +19,16 @@ export function NavigationFooter({
   showBack = true,
   showNext = true,
   nextText = "Next",
+  onNextClick,
 }: NavigationFooterProps) {
+  const handleNextClick = () => {
+    if (onNextClick) {
+      onNextClick();
+    } else if (nextHref) {
+      window.location.href = nextHref;
+    }
+  };
+
   return (
     <footer className={styles.footer}>
       <div className={styles.container}>
@@ -26,10 +38,12 @@ export function NavigationFooter({
           </Link>
         )}
 
-        {showNext && nextHref && (
-          <Link href={nextHref} className={styles.nextButton}>
-            <Button>{nextText}</Button>
-          </Link>
+        {showNext && (
+          <div className={styles.nextButton}>
+            <Button variant="primary" onClick={handleNextClick} fullWidth>
+              {nextText}
+            </Button>
+          </div>
         )}
       </div>
     </footer>

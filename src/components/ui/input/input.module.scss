@@ -1,9 +1,15 @@
 @use "../../../styles/variables" as *;
 
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
 .input {
   display: block;
   width: 100%;
-  padding: 0.625rem 0.875rem;
+  padding: 0.75rem 1rem;
   font-size: 0.875rem;
   line-height: 1.25;
   color: $text;
@@ -59,4 +65,11 @@
   &.fullWidth {
     width: 100%;
   }
+}
+
+.errorMessage {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: $error;
+  line-height: 1.2;
 }

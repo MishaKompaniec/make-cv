@@ -1,38 +1,27 @@
 import { InputHTMLAttributes, forwardRef } from "react";
 import styles from "./input.module.scss";
 
-type InputSize = "sm" | "md" | "lg" | "xl";
-
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-  inputSize?: InputSize;
-  error?: boolean;
+  error?: string;
   fullWidth?: boolean;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  (
-    {
-      inputSize = "md",
-      error = false,
-      fullWidth = false,
-      className = "",
-      disabled = false,
-      ...props
-    },
-    ref,
-  ) => {
+  ({ className = "", error, fullWidth = false, ...props }, ref) => {
     const classNames = [
       styles.input,
-      inputSize !== "md" ? styles[inputSize] : "",
-      error ? styles.error : "",
       fullWidth ? styles.fullWidth : "",
+      error ? styles.error : "",
       className,
     ]
       .filter(Boolean)
       .join(" ");
 
     return (
-      <input className={classNames} disabled={disabled} ref={ref} {...props} />
+      <div className={styles.inputWrapper}>
+        <input ref={ref} className={classNames} {...props} />
+        {error && <span className={styles.errorMessage}>{error}</span>}
+      </div>
     );
   },
 );
