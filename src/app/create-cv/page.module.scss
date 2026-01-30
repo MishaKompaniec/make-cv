@@ -7,10 +7,57 @@
 }
 
 .wrapper {
-  padding: 2rem;
-  max-width: 960px;
-  margin: 0 auto;
   flex: 1;
+  display: flex;
+  gap: 1.5rem;
+  position: relative;
+  padding: 0 2rem 2rem;
+}
+
+.content {
+  flex: 0 0 calc(70% - 1rem);
+  display: flex;
+  flex-direction: column;
+}
+
+.preview {
+  flex: 0 0 calc(30% - 1rem);
+  background: $white;
+  border-radius: 1rem;
+  box-shadow:
+    0 25px 60px rgba(17, 32, 63, 0.08),
+    0 -5px 20px rgba(17, 32, 63, 0.03);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  margin-top: 0;
+  height: fit-content;
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+}
+
+.previewHeader {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid $border-light;
+}
+
+.previewContent {
+  flex: 1;
+  background: $bg-tertiary;
+  border-radius: $border-radius;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $text;
+  font-size: 0.9rem;
+  text-align: center;
+  min-height: 400px;
 }
 
 .header {
@@ -39,6 +86,9 @@
   width: fit-content;
   text-transform: uppercase;
   letter-spacing: 0.08em;
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
 }
 
 .description {
@@ -50,11 +100,13 @@
 .form {
   background: $white;
   padding: 2.5rem;
-  border-radius: 1.5rem;
-  box-shadow: 0 25px 60px rgba(17, 32, 63, 0.08);
+  border-radius: 1rem;
+  box-shadow:
+    0 25px 60px rgba(17, 32, 63, 0.08),
+    0 -5px 20px rgba(17, 32, 63, 0.03);
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .fieldGroup {
@@ -75,9 +127,27 @@
   gap: 1.25rem;
 }
 
+.divider {
+  height: 1px;
+  background: $border-light;
+  margin: 1rem 0;
+}
+
 @media (max-width: 900px) {
   .wrapper {
-    padding: 1.5rem;
+    flex-direction: column;
+    padding: 0 1.5rem 2rem;
+  }
+
+  .content {
+    flex: 1;
+  }
+
+  .preview {
+    flex: 0 0 auto;
+    position: static;
+    max-height: none;
+    min-height: 300px;
   }
 
   .form {

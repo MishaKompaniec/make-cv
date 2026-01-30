@@ -18,12 +18,11 @@
   }
 
   &:hover {
-    border-color: $border-light;
+    border-color: $border-hover;
   }
 
   &:focus {
     border-color: $accent;
-    box-shadow: $shadow-focus;
   }
 
   &:disabled {
