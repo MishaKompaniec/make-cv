@@ -58,7 +58,10 @@ export default function WorkExperiencePage() {
         </form>
       </section>
 
-      <NavigationFooter backHref="/create-cv" nextHref="/create-cv/education" />
+      <NavigationFooter
+        backHref="/create-cv/contact-details"
+        nextHref="/create-cv/education"
+      />
     </div>
   );
 }

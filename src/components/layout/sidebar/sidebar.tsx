@@ -9,7 +9,8 @@ export function Sidebar() {
   const isCreateFlow = pathname.startsWith("/create-cv");
 
   const steps = [
-    { title: "Contact details", path: "/create-cv" },
+    { title: "Choose template", path: "/create-cv" },
+    { title: "Contact details", path: "/create-cv/contact-details" },
     { title: "Work experience", path: "/create-cv/work-experience" },
     { title: "Education", path: "/create-cv/education" },
     { title: "Skills", path: "/create-cv/skills" },
