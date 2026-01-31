@@ -29,7 +29,8 @@
   cursor: pointer;
   transition: $transition-smooth;
   border: 2px solid transparent;
-  aspect-ratio: 210/297; /* A4 aspect ratio */
+  display: flex;
+  flex-direction: column;
 }
 
 .templateCard.selected {
@@ -39,7 +40,8 @@
 .templatePreview {
   background: $bg-tertiary;
   border-bottom: 1px solid $border-light;
-  height: calc(100% - 60px);
+  width: 100%;
+  aspect-ratio: 210/297; /* A4 aspect ratio */
   overflow: hidden;
   padding: 8px;
   display: flex;
@@ -54,7 +56,7 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
-  padding: 0 16px;
+  padding: 0 12px;
   border-top: 1px solid $border-light;
 }
 
@@ -67,32 +69,32 @@
   transition: $transition-smooth;
 }
 
+.colorOption.color--beige {
+  background: #eae3d9;
+}
+
+.colorOption.color--light-blue {
+  background: #e8f4f8;
+}
+
+.colorOption.color--light-gray {
+  background: #f5f5f5;
+}
+
+.colorOption.color--light-green {
+  background: #e8f5e8;
+}
+
+.colorOption.color--light-purple {
+  background: #f0ebf8;
+}
+
 .colorOption:hover {
   transform: scale(1.1);
 }
 
 .colorOption.selected {
   border: 1px solid $primary;
-}
-
-.templatePreview :global(iframe) {
-  border: none;
-  width: 100%;
-  height: 100%;
-}
-
-.templateMeta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.75rem 1rem;
-}
-
-.templateTitle {
-  font-weight: 600;
-  color: $text-primary;
-  font-size: 0.875rem;
 }
 
 @media (max-width: 900px) {

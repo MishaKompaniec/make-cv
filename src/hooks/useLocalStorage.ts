@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 
+const LOCAL_STORAGE_EVENT = "local-storage";
+
 export function useLocalStorage<T>(key: string, initialValue: T) {
   // Get from local storage then parse stored json or return initialValue
   const readValue = (): T => {
@@ -33,6 +35,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
       // Save to local storage
       if (typeof window !== "undefined") {
         window.localStorage.setItem(key, JSON.stringify(valueToStore));
+        window.dispatchEvent(new Event(LOCAL_STORAGE_EVENT));
       }
     } catch (error) {
       console.warn(`Error setting localStorage key "${key}":`, error);
@@ -46,7 +49,11 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
     };
 
     window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
+    window.addEventListener(LOCAL_STORAGE_EVENT, handleStorageChange);
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener(LOCAL_STORAGE_EVENT, handleStorageChange);
+    };
   }, []);
 
   return [storedValue, setValue] as const;

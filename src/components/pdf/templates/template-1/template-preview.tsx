@@ -1,176 +1,253 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { TEMPLATE_1_COLORS } from "@/components/pdf/templates/template-1/template-pdf";
 import styles from "./template-preview.module.scss";
+
+type ContactDetailsPreviewData = {
+  fullName?: string;
+  jobTitle?: string;
+  phone?: string;
+  email?: string;
+  city?: string;
+  birthdate?: string;
+  postalCode?: string;
+  linkedIn?: string;
+  git?: string;
+  nationality?: string;
+  workPermit?: string;
+};
 
 interface TemplatePreview1Props {
   sidebarColor?: string;
+  mode?: "placeholder" | "data";
+  contactDetails?: ContactDetailsPreviewData;
 }
 
 export function TemplatePreview1({
   sidebarColor = "#EAE3D9",
+  mode = "placeholder",
+  contactDetails,
 }: TemplatePreview1Props) {
-  const [isClient, setIsClient] = useState(false);
+  const isPlaceholder = mode === "placeholder";
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  const sidebarColorName =
+    TEMPLATE_1_COLORS.find((c) => c.value === sidebarColor)?.name ?? "beige";
+
+  const NBSP = "\u00A0";
+
+  const ghostClass = (value: string) => (value ? "" : ` ${styles.ghost}`);
+
+  const renderLine = (icon: string, value: string) => (
+    <div className={styles.contactRow}>
+      <span className={`${styles.icon}${ghostClass(value)}`}>{icon}</span>
+      <span className={`${styles.text}${ghostClass(value)}`}>
+        {value || NBSP}
+      </span>
+    </div>
+  );
+
+  const renderText = (
+    Tag: "div" | "span",
+    className: string,
+    value: string,
+  ) => {
+    const Comp = Tag;
+    return (
+      <Comp className={`${className}${ghostClass(value)}`}>
+        {value || NBSP}
+      </Comp>
+    );
+  };
+
+  const renderBulletRow = (value: string) => (
+    <div className={styles.bulletRow}>
+      <div className={`${styles.bullet}${ghostClass(value)}`} />
+      <div className={`${styles.bulletText}${ghostClass(value)}`}>
+        {value || NBSP}
+      </div>
+    </div>
+  );
+
+  const fullName = isPlaceholder
+    ? "John Doe"
+    : (contactDetails?.fullName ?? "");
+  const jobTitle = isPlaceholder
+    ? "Professional Title"
+    : (contactDetails?.jobTitle ?? "");
+  const phone = isPlaceholder
+    ? "+1 234 567 890"
+    : (contactDetails?.phone ?? "");
+  const email = isPlaceholder
+    ? "email@example.com"
+    : (contactDetails?.email ?? "");
+  const city = isPlaceholder ? "City, Country" : (contactDetails?.city ?? "");
+  const birthdate = isPlaceholder
+    ? "01/01/1990"
+    : (contactDetails?.birthdate ?? "");
+  const postalCode = isPlaceholder
+    ? "12345"
+    : (contactDetails?.postalCode ?? "");
+  const nationality = isPlaceholder
+    ? "Nationality"
+    : (contactDetails?.nationality ?? "");
+  const workPermit = isPlaceholder
+    ? "Work permit"
+    : (contactDetails?.workPermit ?? "");
+  const linkedIn = isPlaceholder
+    ? "linkedin.com/in/username"
+    : (contactDetails?.linkedIn ?? "");
+  const git = isPlaceholder
+    ? "github.com/username"
+    : (contactDetails?.git ?? "");
+
+  const addressLine = isPlaceholder
+    ? "Street, 1"
+    : postalCode || city
+      ? `${postalCode ? `${postalCode}, ` : ""}${city}`
+      : "";
+
+  const sidebarSkill1 = isPlaceholder ? "Skill 1" : "";
+  const sidebarSkill2 = isPlaceholder ? "Skill 2" : "";
+  const sidebarSkill3 = isPlaceholder ? "Skill 3" : "";
+
+  const language1 = isPlaceholder ? "Language 1" : "";
+  const language2 = isPlaceholder ? "Language 2" : "";
+  const language3 = isPlaceholder ? "Language 3" : "";
+
+  const summary = isPlaceholder
+    ? "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris."
+    : "";
+
+  const mainSkillsLabel = isPlaceholder ? "Skills:" : "";
+  const mainSkill1 = isPlaceholder
+    ? "Skill 1, Skill 2 with advanced knowledge"
+    : "";
+  const mainSkill2 = isPlaceholder ? "Skill 3 (intermediate level)" : "";
+  const mainSkill3 = isPlaceholder ? "Skill 4 with 2+ years experience" : "";
+  const mainSkill4 = isPlaceholder ? "Skill 5, certified professional" : "";
+
+  const workTitle = isPlaceholder ? "Work history" : "";
+  const workItem1Title = isPlaceholder ? "Job Title" : "";
+  const workItem1Date = isPlaceholder ? "Month Year - Month Year" : "";
+  const workItem1Subtitle = isPlaceholder ? "Company Name, City" : "";
+  const workItem1Body = isPlaceholder
+    ? "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+    : "";
+  const workItem2Title = isPlaceholder ? "Job Title" : "";
+  const workItem2Date = isPlaceholder ? "Month Year - Current" : "";
+  const workItem2Subtitle = isPlaceholder ? "Company Name, City" : "";
+  const workItem2Body = isPlaceholder
+    ? "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+    : "";
+
+  const educationTitle = isPlaceholder ? "Education" : "";
+  const eduItem1Title = isPlaceholder ? "Course Name" : "";
+  const eduItem1Date = isPlaceholder ? "Month Year - Month Year" : "";
+  const eduItem1Subtitle = isPlaceholder ? "Institution Name, City" : "";
+  const eduItem2Title = isPlaceholder ? "Course Name" : "";
+  const eduItem2Date = isPlaceholder ? "Month Year - Month Year" : "";
+  const eduItem2Subtitle = isPlaceholder ? "Institution Name, City" : "";
+  const eduItem2Body = isPlaceholder
+    ? "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+    : "";
 
   return (
     <div className={styles.preview}>
       <div
-        className={styles.sidebar}
-        style={isClient ? { backgroundColor: sidebarColor } : {}}
+        className={`${styles.sidebar}${
+          styles[`sidebar--${sidebarColorName}`]
+            ? ` ${styles[`sidebar--${sidebarColorName}`]}`
+            : ""
+        }`}
       >
         <div className={styles.avatar} />
-        <div className={styles.contactRow}>
-          <span className={styles.icon}>☎</span>
-          <span className={styles.text}>+380660536975</span>
-        </div>
-        <div className={styles.contactRow}>
-          <span className={styles.icon}>✉</span>
-          <span className={styles.text}>mishakompaniec@gmail.com</span>
-        </div>
-        <div className={styles.contactRow}>
-          <span className={styles.icon}>⌂</span>
-          <span className={styles.text}>Pola de Siero</span>
+        {renderLine("☎", phone)}
+        {renderLine("✉", email)}
+        {renderLine("⌂", addressLine)}
+        {renderLine("🎂", birthdate)}
+        {renderLine("🏳", nationality)}
+        {renderLine("🪪", workPermit)}
+        {renderLine("in", linkedIn)}
+        {renderLine("↗", git)}
+
+        <div className={styles.section}>
+          {renderText(
+            "div",
+            styles.sectionTitle,
+            isPlaceholder ? "Skills" : "",
+          )}
+          {renderText("div", styles.item, sidebarSkill1)}
+          {renderText("div", styles.item, sidebarSkill2)}
+          {renderText("div", styles.item, sidebarSkill3)}
         </div>
 
         <div className={styles.section}>
-          <div className={styles.sectionTitle}>Skills</div>
-          <div className={styles.item}>React</div>
-          <div className={styles.item}>Next</div>
-          <div className={styles.item}>Node.js</div>
-          <div className={styles.item}>Express</div>
-        </div>
-
-        <div className={styles.section}>
-          <div className={styles.sectionTitle}>Languages</div>
-          <div className={styles.item}>Ukrainian (native speaker)</div>
-          <div className={styles.item}>Russian (native speaker)</div>
-          <div className={styles.item}>English (B1)</div>
-          <div className={styles.item}>Spanish (A1)</div>
+          {renderText(
+            "div",
+            styles.sectionTitle,
+            isPlaceholder ? "Languages" : "",
+          )}
+          {renderText("div", styles.item, language1)}
+          {renderText("div", styles.item, language2)}
+          {renderText("div", styles.item, language3)}
         </div>
       </div>
 
       <div className={styles.main}>
-        <div className={styles.name}>Misha Kompaniec</div>
-        <div className={styles.jobTitle}>Fullstack Developer</div>
-        <div className={styles.summary}>
-          Due to life circumstances in my country, I decided to change my
-          profession and completely transform my life. I began developing skills
-          as a frontend developer. Later, the project required basic backend
-          knowledge, so I started to deepen my understanding of Node.js. I have
-          been building websites using React for almost 3 years, and for the
-          past six months, I have been using Node.js to handle backendrelated
-          tasks.
-        </div>
+        {renderText("div", styles.name, fullName)}
+        {renderText("div", styles.jobTitle, jobTitle)}
+        {renderText("div", styles.summary, summary)}
 
-        <div className={styles.label}>Skills:</div>
-        <div className={styles.bulletRow}>
-          <div className={styles.bullet} />
-          <div className={styles.bulletText}>React (TypeScript), Next</div>
-        </div>
-        <div className={styles.bulletRow}>
-          <div className={styles.bullet} />
-          <div className={styles.bulletText}>Node.js + Express</div>
-        </div>
-        <div className={styles.bulletRow}>
-          <div className={styles.bullet} />
-          <div className={styles.bulletText}>MongoDB</div>
-        </div>
-        <div className={styles.bulletRow}>
-          <div className={styles.bullet} />
-          <div className={styles.bulletText}>Redux, RTK</div>
-        </div>
-        <div className={styles.bulletRow}>
-          <div className={styles.bullet} />
-          <div className={styles.bulletText}>
-            JSS, Styled-Components, Tailwind
-          </div>
-        </div>
-        <div className={styles.bulletRow}>
-          <div className={styles.bullet} />
-          <div className={styles.bulletText}>Prettier, ESLint, Husky</div>
-        </div>
-        <div className={styles.bulletRow}>
-          <div className={styles.bullet} />
-          <div className={styles.bulletText}>Ant Design, Material UI</div>
-        </div>
-        <div className={styles.bulletRow}>
-          <div className={styles.bullet} />
-          <div className={styles.bulletText}>Git/GitHub</div>
-        </div>
-
-        <div className={styles.label}>Contacts:</div>
-        <div className={styles.contactItem}>Telegram: @MishaKompaniec</div>
-        <div className={styles.contactItem}>
-          GitHub: https://github.com/MishaKompaniec
-        </div>
-        <div className={styles.contactItem}>Instagram: misha_kompaniec</div>
-        <div className={styles.contactItem}>
-          Spanish phone number: +34657732224
-        </div>
+        {renderText("div", styles.label, mainSkillsLabel)}
+        {renderBulletRow(mainSkill1)}
+        {renderBulletRow(mainSkill2)}
+        {renderBulletRow(mainSkill3)}
+        {renderBulletRow(mainSkill4)}
 
         <div className={styles.section}>
           <div className={styles.sectionHeader}>
-            <div className={styles.sectionDot} />
-            <div className={styles.sectionTitle}>Work history</div>
+            <div className={`${styles.sectionDot}${ghostClass(workTitle)}`} />
+            {renderText("div", styles.sectionTitle, workTitle)}
           </div>
           <div className={styles.workItem}>
             <div className={styles.workHeader}>
-              <div className={styles.workTitle}>Frontend developer</div>
-              <div className={styles.workDate}>
-                September 2022 - February 2025
-              </div>
+              {renderText("div", styles.workTitle, workItem1Title)}
+              {renderText("div", styles.workDate, workItem1Date)}
             </div>
-            <div className={styles.workSubtitle}>
-              UniCode Software, Cherkassy
-            </div>
-            <div className={styles.workBody}>
-              Worked on a project for an American company related to health and
-              safety. Also worked on the company's internal website, UniCode.
-            </div>
+            {renderText("div", styles.workSubtitle, workItem1Subtitle)}
+            {renderText("div", styles.workBody, workItem1Body)}
           </div>
           <div className={styles.workItem}>
             <div className={styles.workHeader}>
-              <div className={styles.workTitle}>Full-stack developer</div>
-              <div className={styles.workDate}>February 2025 - Current</div>
+              {renderText("div", styles.workTitle, workItem2Title)}
+              {renderText("div", styles.workDate, workItem2Date)}
             </div>
-            <div className={styles.workSubtitle}>
-              UniCode Software, Cherkassy
-            </div>
-            <div className={styles.workBody}>
-              During my time working on the project, I started learning Node.js
-              and taking on backend tasks.
-            </div>
+            {renderText("div", styles.workSubtitle, workItem2Subtitle)}
+            {renderText("div", styles.workBody, workItem2Body)}
           </div>
         </div>
 
         <div className={styles.section}>
           <div className={styles.sectionHeader}>
-            <div className={styles.sectionDot} />
-            <div className={styles.sectionTitle}>Education</div>
+            <div
+              className={`${styles.sectionDot}${ghostClass(educationTitle)}`}
+            />
+            {renderText("div", styles.sectionTitle, educationTitle)}
           </div>
           <div className={styles.workItem}>
             <div className={styles.workHeader}>
-              <div className={styles.workTitle}>
-                JavaScript: Advanced Course
-              </div>
-              <div className={styles.workDate}>April 2022 - July 2022</div>
+              {renderText("div", styles.workTitle, eduItem1Title)}
+              {renderText("div", styles.workDate, eduItem1Date)}
             </div>
-            <div className={styles.workSubtitle}>ITVDN, Kiev</div>
+            {renderText("div", styles.workSubtitle, eduItem1Subtitle)}
           </div>
           <div className={styles.workItem}>
             <div className={styles.workHeader}>
-              <div className={styles.workTitle}>React: Advanced Course</div>
-              <div className={styles.workDate}>July 2022 - September 2022</div>
+              {renderText("div", styles.workTitle, eduItem2Title)}
+              {renderText("div", styles.workDate, eduItem2Date)}
             </div>
-            <div className={styles.workSubtitle}>UniCode, Cherkassy</div>
-            <div className={styles.workBody}>
-              Before working at the company, I completed the company's internal
-              courses on React and Next.
-            </div>
+            {renderText("div", styles.workSubtitle, eduItem2Subtitle)}
+            {renderText("div", styles.workBody, eduItem2Body)}
           </div>
         </div>
       </div>

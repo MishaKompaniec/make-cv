@@ -43,7 +43,10 @@ export default function ChooseTemplatePage() {
             onClick={() => setSelectedTemplateId(TEMPLATE_1_ID)}
           >
             <div className={styles.templatePreview}>
-              <TemplatePreview1 sidebarColor={selectedColor} />
+              <TemplatePreview1
+                sidebarColor={selectedColor}
+                mode="placeholder"
+              />
             </div>
 
             <div className={styles.colorPicker}>
@@ -51,17 +54,16 @@ export default function ChooseTemplatePage() {
                 <button
                   key={color.name}
                   className={`${styles.colorOption}${
+                    styles[`color--${color.name}`]
+                      ? ` ${styles[`color--${color.name}`]}`
+                      : ""
+                  }${
                     selectedColor === color.value ? ` ${styles.selected}` : ""
                   }`}
-                  style={{ backgroundColor: color.value }}
                   onClick={() => setSelectedColor(color.value)}
                   aria-label={`Select ${color.name} color`}
                 />
               ))}
-            </div>
-
-            <div className={styles.templateMeta}>
-              <div className={styles.templateTitle}>Beige sidebar</div>
             </div>
           </div>
         </div>

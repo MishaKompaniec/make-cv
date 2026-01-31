@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type FocusEvent } from "react";
 import { Input } from "@/components/ui/input/input";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { PageHeader } from "@/components/layout/page-header/page-header";
@@ -11,6 +11,7 @@ import {
   type ContactDetailsFormData,
 } from "@/lib/validations/cv-schema";
 import { useCvData } from "@/hooks/useCvData";
+import { CvPreview } from "@/components/cv-preview/cv-preview";
 import styles from "./page.module.scss";
 
 const stepTitle = "Contact details";
@@ -19,6 +20,7 @@ export default function ContactDetailsPage() {
   const { contactDetails, setContactDetails } = useCvData();
 
   const didInitRef = useRef(false);
+  const debounceTimerRef = useRef<number | null>(null);
 
   const {
     register,
@@ -26,6 +28,7 @@ export default function ContactDetailsPage() {
     formState: { errors },
     reset,
     watch,
+    getValues,
   } = useForm<ContactDetailsFormData>({
     resolver: zodResolver(contactDetailsSchema),
     mode: "onChange",
@@ -43,10 +46,40 @@ export default function ContactDetailsPage() {
   // Auto-save on field changes
   useEffect(() => {
     const subscription = watch((data) => {
-      setContactDetails(data as ContactDetailsFormData);
+      if (debounceTimerRef.current) {
+        window.clearTimeout(debounceTimerRef.current);
+      }
+
+      debounceTimerRef.current = window.setTimeout(() => {
+        setContactDetails(data as ContactDetailsFormData);
+      }, 1000);
     });
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      if (debounceTimerRef.current) {
+        window.clearTimeout(debounceTimerRef.current);
+      }
+    };
   }, [watch, setContactDetails]);
+
+  const flushSave = () => {
+    if (debounceTimerRef.current) {
+      window.clearTimeout(debounceTimerRef.current);
+      debounceTimerRef.current = null;
+    }
+    setContactDetails(getValues());
+  };
+
+  const registerWithFlush = (name: keyof ContactDetailsFormData) => {
+    const field = register(name);
+    return {
+      ...field,
+      onBlur: (e: FocusEvent<HTMLInputElement>) => {
+        field.onBlur(e);
+        flushSave();
+      },
+    };
+  };
 
   const handleNextClick = handleSubmit((data) => {
     setContactDetails(data);
@@ -71,7 +104,7 @@ export default function ContactDetailsPage() {
                 fullWidth
                 required
                 autoComplete="name"
-                {...register("fullName")}
+                {...registerWithFlush("fullName")}
                 error={errors.fullName?.message}
               />
             </div>
@@ -84,7 +117,7 @@ export default function ContactDetailsPage() {
                   fullWidth
                   required
                   autoComplete="organization-title"
-                  {...register("jobTitle")}
+                  {...registerWithFlush("jobTitle")}
                   error={errors.jobTitle?.message}
                 />
               </div>
@@ -96,7 +129,7 @@ export default function ContactDetailsPage() {
                   fullWidth
                   required
                   autoComplete="address-level2"
-                  {...register("city")}
+                  {...registerWithFlush("city")}
                   error={errors.city?.message}
                 />
               </div>
@@ -111,7 +144,7 @@ export default function ContactDetailsPage() {
                   fullWidth
                   required
                   autoComplete="tel"
-                  {...register("phone")}
+                  {...registerWithFlush("phone")}
                   error={errors.phone?.message}
                 />
               </div>
@@ -124,7 +157,7 @@ export default function ContactDetailsPage() {
                   fullWidth
                   required
                   autoComplete="email"
-                  {...register("email")}
+                  {...registerWithFlush("email")}
                   error={errors.email?.message}
                 />
               </div>
@@ -139,7 +172,7 @@ export default function ContactDetailsPage() {
                   placeholder="DD/MM/YYYY"
                   fullWidth
                   autoComplete="bday"
-                  {...register("birthdate")}
+                  {...registerWithFlush("birthdate")}
                 />
               </div>
 
@@ -149,7 +182,7 @@ export default function ContactDetailsPage() {
                   placeholder="1234"
                   fullWidth
                   autoComplete="postal-code"
-                  {...register("postalCode")}
+                  {...registerWithFlush("postalCode")}
                 />
               </div>
             </div>
@@ -160,7 +193,7 @@ export default function ContactDetailsPage() {
                   label="LinkedIn"
                   placeholder="linkedin.com/in/janedoe"
                   fullWidth
-                  {...register("linkedIn")}
+                  {...registerWithFlush("linkedIn")}
                 />
               </div>
 
@@ -169,7 +202,7 @@ export default function ContactDetailsPage() {
                   label="Git"
                   placeholder="github.com/janedoe"
                   fullWidth
-                  {...register("git")}
+                  {...registerWithFlush("git")}
                 />
               </div>
             </div>
@@ -180,7 +213,7 @@ export default function ContactDetailsPage() {
                   label="Nationality"
                   placeholder="Danish"
                   fullWidth
-                  {...register("nationality")}
+                  {...registerWithFlush("nationality")}
                 />
               </div>
 
@@ -189,7 +222,7 @@ export default function ContactDetailsPage() {
                   label="Work permit"
                   placeholder="EU Citizen"
                   fullWidth
-                  {...register("workPermit")}
+                  {...registerWithFlush("workPermit")}
                 />
               </div>
             </div>
@@ -197,10 +230,7 @@ export default function ContactDetailsPage() {
         </div>
 
         <div className={styles.preview}>
-          <div className={styles.previewHeader}>CV Preview</div>
-          <div className={styles.previewContent}>
-            Your CV preview will appear here as you fill in the details
-          </div>
+          <CvPreview />
         </div>
       </section>
 

@@ -22,42 +22,11 @@
 
 .preview {
   flex: 0 0 calc(30% - 1rem);
-  background: $white;
-  border-radius: 1rem;
-  box-shadow:
-    0 25px 60px rgba(17, 32, 63, 0.08),
-    0 -5px 20px rgba(17, 32, 63, 0.03);
-  padding: 1rem;
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-self: center;
   margin-top: 0;
   height: fit-content;
-  max-height: calc(100vh - 4rem);
-  overflow-y: auto;
-}
-
-.previewHeader {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: $text-primary;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid $border-light;
-}
-
-.previewContent {
-  flex: 1;
-  background: $bg-tertiary;
-  border-radius: $border-radius;
-  padding: 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: $text;
-  font-size: 0.9rem;
-  text-align: center;
-  min-height: 400px;
 }
 
 .form {
