@@ -138,15 +138,30 @@
   }
 }
 
-.experienceRow {
+.experienceRowSingle {
   display: grid;
-  grid-template-columns: repeat(3, minmax(160px, 1fr));
+  grid-template-columns: 1fr;
   gap: 1rem;
   align-items: start;
 }
 
+.experienceRowTwoCols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(160px, 1fr));
+  gap: 1rem;
+  align-items: start;
+  margin-top: 1rem;
+}
+
 .experienceDescription {
   margin-top: 1rem;
+}
+
+.experienceDatesRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 @media (max-width: #{$breakpoint-desktop}) {
@@ -173,13 +188,24 @@
     padding: 1rem;
   }
 
-  .experienceRow {
-    grid-template-columns: repeat(3, minmax(120px, 1fr));
+  .experienceRowSingle {
     gap: 0.5rem;
+  }
+
+  .experienceRowTwoCols {
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+    gap: 0.5rem;
+    margin-top: 0.75rem;
   }
 
   .experienceDescription {
     margin-top: 0.75rem;
+  }
+
+  .experienceDatesRow {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
   }
 }
 
@@ -200,9 +226,15 @@
     width: 100%;
   }
 
-  .experienceRow {
+  .experienceRowSingle {
     grid-template-columns: 1fr;
     gap: 0.75rem;
+  }
+
+  .experienceRowTwoCols {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
   }
 
   .experienceDescription {

@@ -27,6 +27,8 @@ export default function WorkExperiencePage() {
         jobTitle: "",
         companyName: "",
         city: "",
+        startDate: undefined,
+        endDate: undefined,
         description: "",
       },
     ]);

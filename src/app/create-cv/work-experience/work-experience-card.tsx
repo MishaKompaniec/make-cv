@@ -1,6 +1,10 @@
 import { forwardRef } from "react";
 import { Input } from "@/components/ui/input/input";
 import { Textarea } from "@/components/ui/textarea/textarea";
+import {
+  DatePicker,
+  type DatePickerValue,
+} from "@/components/ui/date-picker/date-picker";
 import styles from "./page.module.scss";
 
 export type ExperienceItem = {
@@ -8,6 +12,8 @@ export type ExperienceItem = {
   jobTitle: string;
   companyName: string;
   city: string;
+  startDate?: DatePickerValue;
+  endDate?: DatePickerValue;
   description: string;
 };
 
@@ -68,7 +74,7 @@ export const WorkExperienceCard = forwardRef<
           </button>
         </div>
 
-        <div className={styles.experienceRow}>
+        <div className={styles.experienceRowSingle}>
           <Input
             label="Job title"
             placeholder="Senior Product Designer"
@@ -76,6 +82,9 @@ export const WorkExperienceCard = forwardRef<
             value={experience.jobTitle}
             onChange={(e) => onChange({ jobTitle: e.target.value })}
           />
+        </div>
+
+        <div className={styles.experienceRowTwoCols}>
           <Input
             label="Company name"
             placeholder="Tech Company Inc."
@@ -93,6 +102,23 @@ export const WorkExperienceCard = forwardRef<
         </div>
 
         <div className={styles.experienceDescription}>
+          <div className={styles.experienceDatesRow}>
+            <DatePicker
+              label="Start date"
+              placeholder="MM/YYYY"
+              fullWidth
+              value={experience.startDate}
+              onChange={(v) => onChange({ startDate: v })}
+            />
+            <DatePicker
+              label="End date"
+              placeholder="MM/YYYY"
+              fullWidth
+              value={experience.endDate}
+              onChange={(v) => onChange({ endDate: v })}
+            />
+          </div>
+
           <Textarea
             label="Description"
             placeholder="Add 3–5 bullet points about your role and achievements"
