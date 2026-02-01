@@ -12,20 +12,22 @@
   gap: 1.5rem;
   position: relative;
   padding: 0 2rem 2rem;
+  justify-content: center;
+  align-items: center;
 }
 
 .content {
-  flex: 0 0 calc(70% - 1rem);
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
 }
 
 .preview {
-  flex: 0 0 calc(30% - 1rem);
-  display: flex;
-  justify-content: center;
+  flex: 0 0 auto;
+  min-width: 330px;
+  max-width: 400px;
   align-self: center;
-  margin-top: 0;
   height: fit-content;
 }
 
@@ -58,4 +60,45 @@
   height: 1px;
   background: $border-light;
   margin: 1rem 0;
+}
+
+@media (max-width: #{$breakpoint-desktop}) {
+  .pageContainer {
+    min-height: calc(100vh - 72px);
+  }
+
+  .form {
+    padding: 1rem;
+    gap: 0.5rem;
+  }
+
+  .wrapper {
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .row {
+    grid-template-columns: repeat(2, minmax(150px, 1fr));
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: #{$breakpoint-tablet}) {
+  .wrapper {
+    flex-direction: column;
+    gap: 2rem;
+    justify-content: center;
+    align-items: center;
+    padding: 0px 1rem 1rem;
+  }
+
+  .content {
+    width: 100%;
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 }
