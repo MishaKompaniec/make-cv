@@ -59,29 +59,3 @@
   background: $border-light;
   margin: 1rem 0;
 }
-
-@media (max-width: 900px) {
-  .wrapper {
-    flex-direction: column;
-    padding: 0 1.5rem 2rem;
-  }
-
-  .content {
-    flex: 1;
-  }
-
-  .preview {
-    flex: 0 0 auto;
-    position: static;
-    max-height: none;
-    min-height: 300px;
-  }
-
-  .form {
-    padding: 2rem;
-  }
-
-  .row {
-    grid-template-columns: 1fr;
-  }
-}

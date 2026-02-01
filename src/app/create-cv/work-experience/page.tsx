@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button/button";
 import { Input } from "@/components/ui/input/input";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
+import { CreateCvHeader } from "@/components/layout/create-cv-header/create-cv-header";
 import styles from "./page.module.scss";
 
 const stepTitle = "Work experience";
@@ -8,16 +9,13 @@ const stepTitle = "Work experience";
 export default function WorkExperiencePage() {
   return (
     <div className={styles.pageContainer}>
-      <section className={styles.wrapper}>
-        <header className={styles.header}>
-          <p className={styles.stepBadge}>Step 2</p>
-          <h1>{stepTitle}</h1>
-          <p className={styles.description}>
-            Add your work experience to show employers your career progression
-            and achievements.
-          </p>
-        </header>
+      <CreateCvHeader
+        stepNumber="Step 3"
+        title={stepTitle}
+        description="Add your work experience to show employers your career progression and achievements."
+      />
 
+      <section className={styles.wrapper}>
         <form className={styles.form}>
           <label className={styles.fieldGroup}>
             <span className={styles.label}>Job title</span>

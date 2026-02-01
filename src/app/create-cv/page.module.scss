@@ -99,8 +99,8 @@
   border: 1px solid $primary;
 }
 
-@media (max-width: 900px) {
+@media (max-width: $breakpoint-tablet) {
   .content {
-    padding: 0 1.5rem 2rem;
+    padding: 0 1rem 1rem;
   }
 }

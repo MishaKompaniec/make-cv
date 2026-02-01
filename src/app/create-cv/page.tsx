@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { PageHeader } from "@/components/layout/page-header/page-header";
+import { CreateCvHeader } from "@/components/layout/create-cv-header/create-cv-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import dynamic from "next/dynamic";
@@ -95,7 +95,7 @@ export default function ChooseTemplatePage() {
 
   return (
     <div className={styles.pageContainer}>
-      <PageHeader
+      <CreateCvHeader
         stepNumber="Step 1"
         title={stepTitle}
         description="Choose a template to start building your CV."

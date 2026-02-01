@@ -6,7 +6,7 @@ import { useEffect, useRef, useState, type FocusEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input/input";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
-import { PageHeader } from "@/components/layout/page-header/page-header";
+import { CreateCvHeader } from "@/components/layout/create-cv-header/create-cv-header";
 import {
   contactDetailsSchema,
   type ContactDetailsFormData,
@@ -91,7 +91,7 @@ export default function ContactDetailsPage() {
 
   return (
     <div className={styles.pageContainer}>
-      <PageHeader
+      <CreateCvHeader
         stepNumber="Step 2"
         title={stepTitle}
         description="Tell us who you are so we can place your contact details prominently in every template."

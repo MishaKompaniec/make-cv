@@ -143,35 +143,3 @@
 .nextButton {
   text-decoration: none;
 }
-
-@media (max-width: 900px) {
-  .wrapper {
-    padding: 1.5rem;
-  }
-
-  .form {
-    padding: 2rem;
-  }
-
-  .preview {
-    min-height: 300px;
-    padding: 2rem;
-  }
-
-  .actions {
-    flex-direction: column;
-
-    button {
-      width: 100%;
-    }
-  }
-
-  .navigation {
-    flex-direction: column;
-    gap: 1rem;
-
-    button {
-      width: 100%;
-    }
-  }
-}

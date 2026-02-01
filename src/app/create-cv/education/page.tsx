@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button/button";
 import { Input } from "@/components/ui/input/input";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
+import { CreateCvHeader } from "@/components/layout/create-cv-header/create-cv-header";
 import styles from "./page.module.scss";
 
 const stepTitle = "Education";
@@ -8,16 +9,13 @@ const stepTitle = "Education";
 export default function EducationPage() {
   return (
     <div className={styles.pageContainer}>
-      <section className={styles.wrapper}>
-        <header className={styles.header}>
-          <p className={styles.stepBadge}>Step 3</p>
-          <h1>{stepTitle}</h1>
-          <p className={styles.description}>
-            Add your educational background to showcase your qualifications and
-            knowledge.
-          </p>
-        </header>
+      <CreateCvHeader
+        stepNumber="Step 4"
+        title={stepTitle}
+        description="Add your educational background to showcase your qualifications and knowledge."
+      />
 
+      <section className={styles.wrapper}>
         <form className={styles.form}>
           <label className={styles.fieldGroup}>
             <span className={styles.label}>Degree</span>

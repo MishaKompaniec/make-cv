@@ -74,17 +74,3 @@
   grid-template-columns: repeat(2, minmax(200px, 1fr));
   gap: 1.25rem;
 }
-
-@media (max-width: 900px) {
-  .wrapper {
-    padding: 1.5rem;
-  }
-
-  .form {
-    padding: 2rem;
-  }
-
-  .row {
-    grid-template-columns: 1fr;
-  }
-}
