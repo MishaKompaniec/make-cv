@@ -19,7 +19,6 @@ const stepTitle = "Contact details";
 
 export default function ContactDetailsPage() {
   const router = useRouter();
-  const [isClient, setIsClient] = useState(false);
   const { contactDetails, setContactDetails } = useCvData();
 
   const didInitRef = useRef(false);

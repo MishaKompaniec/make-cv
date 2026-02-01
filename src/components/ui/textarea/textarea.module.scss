@@ -1,0 +1,75 @@
+@use "../../../styles/variables" as *;
+
+.textareaWrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.label {
+  font-size: 0.9rem;
+  color: $text;
+  margin-bottom: 0.4rem;
+  font-weight: 500;
+
+  &.required::after {
+    content: " *";
+    color: $accent;
+  }
+}
+
+.textarea {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25;
+  color: $text;
+  background: $white;
+  border: 1px solid $border-medium;
+  border-radius: $border-radius;
+  transition: all $transition-smooth;
+  outline: none;
+  resize: vertical;
+  min-height: 120px;
+
+  &::placeholder {
+    color: rgba($text-muted, 0.6);
+    font-family: inherit;
+  }
+
+  &:hover {
+    border-color: $border-hover;
+  }
+
+  &:focus {
+    border-color: $accent;
+  }
+
+  &:disabled {
+    background: $bg-secondary;
+    color: $text-muted;
+    cursor: not-allowed;
+    border-color: $border-medium;
+  }
+
+  &.error {
+    border-color: $error;
+
+    &:focus {
+      border-color: $error;
+      box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+    }
+  }
+
+  &.fullWidth {
+    width: 100%;
+  }
+}
+
+.errorMessage {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: $error;
+  line-height: 1.2;
+}

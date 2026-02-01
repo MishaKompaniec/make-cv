@@ -7,7 +7,7 @@
   gap: 0.5rem;
   padding: 0.625rem 1.25rem;
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.25;
   border: none;
   border-radius: $border-radius;
@@ -39,6 +39,8 @@
   &.primary {
     background: $primary;
     color: $white;
+    font-weight: 600;
+    letter-spacing: 0.025em;
 
     &:hover {
       background: $primary-dark;
