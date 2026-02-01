@@ -154,11 +154,11 @@ export function TemplatePreview1({
   return (
     <div className={styles.preview}>
       <div
-        className={`${styles.sidebar}${
-          styles[`sidebar--${sidebarColorName}`]
-            ? ` ${styles[`sidebar--${sidebarColorName}`]}`
-            : ""
-        }`}
+        className={`${styles.sidebar}${(() => {
+          const colorClass =
+            sidebarColorName && styles[`sidebar--${sidebarColorName}`];
+          return colorClass ? ` ${colorClass}` : "";
+        })()}`}
       >
         <div className={styles.avatar} />
         {renderLine("☎", phone)}
