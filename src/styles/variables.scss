@@ -37,6 +37,10 @@ $border-radius: 0.5rem;
 $transition: 0.2s ease-in-out;
 $transition-smooth: 0.3s ease;
 
+// Breakpoints
+$breakpoint-tablet: 768px;
+$breakpoint-desktop: 1024px;
+
 // Shadows
 $shadow-sm: 0 2px 6px rgba($primary, 0.2);
 $shadow-md: 0 4px 12px rgba($primary, 0.3);

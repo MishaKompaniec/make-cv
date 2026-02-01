@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button/button";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import styles from "./navigation-footer.module.scss";
 
 interface NavigationFooterProps {
@@ -21,11 +22,13 @@ export function NavigationFooter({
   nextText = "Next",
   onNextClick,
 }: NavigationFooterProps) {
+  const router = useRouter();
+
   const handleNextClick = () => {
     if (onNextClick) {
       onNextClick();
     } else if (nextHref) {
-      window.location.href = nextHref;
+      router.push(nextHref);
     }
   };
 

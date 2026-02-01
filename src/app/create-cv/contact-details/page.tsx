@@ -2,7 +2,8 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useRef, type FocusEvent } from "react";
+import { useEffect, useRef, useState, type FocusEvent } from "react";
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input/input";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { PageHeader } from "@/components/layout/page-header/page-header";
@@ -17,6 +18,8 @@ import styles from "./page.module.scss";
 const stepTitle = "Contact details";
 
 export default function ContactDetailsPage() {
+  const router = useRouter();
+  const [isClient, setIsClient] = useState(false);
   const { contactDetails, setContactDetails } = useCvData();
 
   const didInitRef = useRef(false);
@@ -83,7 +86,7 @@ export default function ContactDetailsPage() {
 
   const handleNextClick = handleSubmit((data) => {
     setContactDetails(data);
-    window.location.href = "/create-cv/work-experience";
+    router.push("/create-cv/work-experience");
   });
 
   return (

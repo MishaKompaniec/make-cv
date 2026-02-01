@@ -22,10 +22,6 @@ export default function ChooseTemplatePage() {
     TEMPLATE_1_COLORS[0].value,
   );
 
-  const handleNextClick = () => {
-    window.location.href = "/create-cv/contact-details";
-  };
-
   return (
     <div className={styles.pageContainer}>
       <PageHeader
@@ -73,7 +69,6 @@ export default function ChooseTemplatePage() {
         showBack={false}
         nextText="Next"
         nextHref="/create-cv/contact-details"
-        onNextClick={handleNextClick}
       />
     </div>
   );
