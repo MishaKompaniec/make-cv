@@ -15,40 +15,30 @@ import { TEMPLATE_4_ID } from "@/components/pdf/templates/template-4/template-pd
 import { TEMPLATE_5_ID } from "@/components/pdf/templates/template-5/template-pdf";
 import styles from "./page.module.scss";
 
-const TemplatePreview1 = dynamic(
-  () =>
-    import("@/components/pdf/templates/template-1/template-preview").then(
-      (mod) => ({ default: mod.TemplatePreview1 }),
-    ),
-  { ssr: false },
+const TemplatePreview1 = dynamic(() =>
+  import("@/components/pdf/templates/template-1/template-preview").then(
+    (mod) => ({ default: mod.TemplatePreview1 }),
+  ),
 );
-const TemplatePreview2 = dynamic(
-  () =>
-    import("@/components/pdf/templates/template-2/template-preview").then(
-      (mod) => ({ default: mod.TemplatePreview2 }),
-    ),
-  { ssr: false },
+const TemplatePreview2 = dynamic(() =>
+  import("@/components/pdf/templates/template-2/template-preview").then(
+    (mod) => ({ default: mod.TemplatePreview2 }),
+  ),
 );
-const TemplatePreview3 = dynamic(
-  () =>
-    import("@/components/pdf/templates/template-3/template-preview").then(
-      (mod) => ({ default: mod.TemplatePreview3 }),
-    ),
-  { ssr: false },
+const TemplatePreview3 = dynamic(() =>
+  import("@/components/pdf/templates/template-3/template-preview").then(
+    (mod) => ({ default: mod.TemplatePreview3 }),
+  ),
 );
-const TemplatePreview4 = dynamic(
-  () =>
-    import("@/components/pdf/templates/template-4/template-preview").then(
-      (mod) => ({ default: mod.TemplatePreview4 }),
-    ),
-  { ssr: false },
+const TemplatePreview4 = dynamic(() =>
+  import("@/components/pdf/templates/template-4/template-preview").then(
+    (mod) => ({ default: mod.TemplatePreview4 }),
+  ),
 );
-const TemplatePreview5 = dynamic(
-  () =>
-    import("@/components/pdf/templates/template-5/template-preview").then(
-      (mod) => ({ default: mod.TemplatePreview5 }),
-    ),
-  { ssr: false },
+const TemplatePreview5 = dynamic(() =>
+  import("@/components/pdf/templates/template-5/template-preview").then(
+    (mod) => ({ default: mod.TemplatePreview5 }),
+  ),
 );
 
 const stepTitle = "Choose template";

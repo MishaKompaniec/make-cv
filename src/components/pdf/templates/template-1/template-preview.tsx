@@ -1,6 +1,5 @@
 "use client";
 
-import { TEMPLATE_1_COLORS } from "@/components/pdf/templates/template-1/template-pdf";
 import styles from "./template-preview.module.scss";
 
 type ContactDetailsPreviewData = {
@@ -29,9 +28,6 @@ export function TemplatePreview1({
   contactDetails,
 }: TemplatePreview1Props) {
   const isPlaceholder = mode === "placeholder";
-
-  const sidebarColorName =
-    TEMPLATE_1_COLORS.find((c) => c.value === sidebarColor)?.name ?? "beige";
 
   const NBSP = "\u00A0";
 
@@ -153,13 +149,7 @@ export function TemplatePreview1({
 
   return (
     <div className={styles.preview}>
-      <div
-        className={`${styles.sidebar}${(() => {
-          const colorClass =
-            sidebarColorName && styles[`sidebar--${sidebarColorName}`];
-          return colorClass ? ` ${colorClass}` : "";
-        })()}`}
-      >
+      <div className={styles.sidebar} style={{ backgroundColor: sidebarColor }}>
         <div className={styles.avatar} />
         {renderLine("☎", phone)}
         {renderLine("✉", email)}
