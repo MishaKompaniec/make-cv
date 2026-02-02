@@ -2,7 +2,6 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button/button";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { CreateCvHeader } from "@/components/layout/create-cv-header/create-cv-header";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
@@ -238,12 +237,6 @@ export default function WorkExperiencePage() {
         description="Add your work experience to show employers your career progression and achievements."
       />
 
-      <div className={styles.addExperienceRow}>
-        <Button type="button" onClick={handleAddExperience}>
-          Add work experience
-        </Button>
-      </div>
-
       <section className={styles.wrapper}>
         <div className={styles.content}>
           <div className={styles.form}>
@@ -265,6 +258,17 @@ export default function WorkExperiencePage() {
                 onChange={(patch) => updateExperience(exp.id, patch)}
               />
             ))}
+
+            <button
+              type="button"
+              className={styles.addExperienceTile}
+              onClick={handleAddExperience}
+            >
+              <div className={styles.addExperienceTileIcon}>+</div>
+              <p className={styles.addExperienceTileText}>
+                Add work experience
+              </p>
+            </button>
           </div>
         </div>
       </section>

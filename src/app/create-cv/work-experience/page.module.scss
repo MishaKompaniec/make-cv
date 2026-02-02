@@ -6,10 +6,39 @@
   min-height: 100vh;
 }
 
-.addExperienceRow {
+.addExperienceTile {
+  width: 100%;
+  border: 2px dashed $border-light;
+  border-radius: 0.75rem;
+  background: $bg-secondary;
+  cursor: pointer;
+  transition: all $transition;
+  color: $text;
   display: flex;
-  justify-content: flex-start;
-  padding: 0 2rem 1rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+}
+
+.addExperienceTile:hover {
+  border-color: $accent;
+  background: $accent-light;
+  color: $accent;
+}
+
+.addExperienceTileIcon {
+  font-size: 3rem;
+  font-weight: 300;
+  margin-bottom: 0.5rem;
+  line-height: 1;
+}
+
+.addExperienceTileText {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25;
 }
 
 .wrapper {
@@ -161,10 +190,6 @@
     min-height: calc(100vh - 72px);
   }
 
-  .addExperienceRow {
-    padding: 0 2rem 0.75rem;
-  }
-
   .form {
     padding: 1rem;
     gap: 0.5rem;
@@ -178,6 +203,7 @@
 
   .experienceCard {
     padding: 1rem;
+    padding: 2.5rem 1rem 1rem 1rem;
   }
 
   .experienceRowSingle {
@@ -202,16 +228,15 @@
 }
 
 @media (max-width: #{$breakpoint-tablet}) {
-  .addExperienceRow {
-    padding: 0 1rem 1rem;
+  .addExperienceTile {
+    padding: 1rem;
   }
-
   .wrapper {
     flex-direction: column;
     gap: 2rem;
     justify-content: center;
     align-items: center;
-    padding: 0px 1rem 1rem;
+    padding: 0 1rem 1rem;
   }
 
   .content {
