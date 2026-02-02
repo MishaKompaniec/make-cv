@@ -77,7 +77,6 @@
   font-weight: 700;
   font-size: 7px;
   color: #111111;
-  margin-bottom: 4px;
 }
 
 .item {
@@ -151,6 +150,7 @@
   height: 3px;
   border-radius: 2px;
   background: #b59d7b;
+  // flex-shrink: 0;
 }
 
 .workItem {
