@@ -15,7 +15,7 @@ export type DatePickerProps = {
   error?: string;
   fullWidth?: boolean;
   value?: DatePickerValue;
-  onChange?: (value: DatePickerValue) => void;
+  onChange?: (value: DatePickerValue | undefined) => void;
   placeholder?: string;
   disabled?: boolean;
   name?: string;
@@ -101,6 +101,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
       styles.input,
       fullWidth ? styles.fullWidth : "",
       error ? styles.error : "",
+      value ? styles.hasValue : "",
       className,
     ]
       .filter(Boolean)
@@ -114,6 +115,11 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
       if (!canChange) return;
       onChange?.({ month: monthIndex + 1, year: viewYear });
       setIsOpen(false);
+    };
+
+    const clearValue = () => {
+      if (!canChange) return;
+      onChange?.(undefined);
     };
 
     return (
@@ -149,6 +155,17 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
             }}
           />
 
+          {value && !disabled && (
+            <button
+              type="button"
+              className={styles.clearButton}
+              aria-label="Clear date"
+              onClick={clearValue}
+            >
+              ×
+            </button>
+          )}
+
           {isOpen && !disabled && (
             <div
               className={styles.popover}
@@ -158,19 +175,15 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
               <div className={styles.popoverHeader}>
                 <button
                   type="button"
-                  className={styles.navButton}
+                  className={`${styles.navButton} ${styles.right}`}
                   onClick={() => setViewYear((y) => y - 1)}
-                >
-                  ‹
-                </button>
+                />
                 <div className={styles.yearLabel}>{viewYear}</div>
                 <button
                   type="button"
                   className={styles.navButton}
                   onClick={() => setViewYear((y) => y + 1)}
-                >
-                  ›
-                </button>
+                />
               </div>
 
               <div className={styles.monthGrid}>
