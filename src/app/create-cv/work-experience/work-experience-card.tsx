@@ -19,6 +19,12 @@ export type ExperienceItem = {
 
 type WorkExperienceCardProps = {
   experience: ExperienceItem;
+  errors?: {
+    jobTitle?: string;
+    companyName?: string;
+    startDate?: string;
+    endDate?: string;
+  };
   canMoveUp: boolean;
   canMoveDown: boolean;
   onMoveUp: () => void;
@@ -34,6 +40,7 @@ export const WorkExperienceCard = forwardRef<
   (
     {
       experience,
+      errors,
       canMoveUp,
       canMoveDown,
       onMoveUp,
@@ -81,6 +88,8 @@ export const WorkExperienceCard = forwardRef<
             fullWidth
             value={experience.jobTitle}
             onChange={(e) => onChange({ jobTitle: e.target.value })}
+            error={errors?.jobTitle}
+            required
           />
         </div>
 
@@ -91,6 +100,8 @@ export const WorkExperienceCard = forwardRef<
             fullWidth
             value={experience.companyName}
             onChange={(e) => onChange({ companyName: e.target.value })}
+            error={errors?.companyName}
+            required
           />
           <Input
             label="City"
@@ -109,6 +120,8 @@ export const WorkExperienceCard = forwardRef<
               fullWidth
               value={experience.startDate}
               onChange={(v) => onChange({ startDate: v })}
+              error={errors?.startDate}
+              required
             />
             <DatePicker
               label="End date"
@@ -116,6 +129,7 @@ export const WorkExperienceCard = forwardRef<
               fullWidth
               value={experience.endDate}
               onChange={(v) => onChange({ endDate: v })}
+              error={errors?.endDate}
             />
           </div>
 
