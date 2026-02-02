@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button/button";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { CreateCvHeader } from "@/components/layout/create-cv-header/create-cv-header";
-import { CvPreview } from "@/components/cv-preview/cv-preview";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import {
   WorkExperienceCard,
@@ -267,10 +266,6 @@ export default function WorkExperiencePage() {
               />
             ))}
           </div>
-        </div>
-
-        <div className={styles.preview}>
-          <CvPreview />
         </div>
       </section>
 

@@ -35,12 +35,10 @@ interface TemplatePreview1Props {
 
 export function TemplatePreview1({
   sidebarColor = "#EAE3D9",
-  mode = "placeholder",
+  mode,
   contactDetails,
   workExperience,
 }: TemplatePreview1Props) {
-  const isPlaceholder = mode === "placeholder";
-
   const NBSP = "\u00A0";
 
   const ghostClass = (value: string) => (value ? "" : ` ${styles.ghost}`);
@@ -97,83 +95,48 @@ export function TemplatePreview1({
     return label ? `${label} ${d.year}` : "";
   };
 
-  const fullName = isPlaceholder
-    ? "John Doe"
-    : (contactDetails?.fullName ?? "");
-  const jobTitle = isPlaceholder
-    ? "Professional Title"
-    : (contactDetails?.jobTitle ?? "");
-  const phone = isPlaceholder
-    ? "+1 234 567 890"
-    : (contactDetails?.phone ?? "");
-  const email = isPlaceholder
-    ? "email@example.com"
-    : (contactDetails?.email ?? "");
-  const city = isPlaceholder ? "City, Country" : (contactDetails?.city ?? "");
-  const birthdate = isPlaceholder
-    ? "01/01/1990"
-    : (contactDetails?.birthdate ?? "");
-  const postalCode = isPlaceholder
-    ? "12345"
-    : (contactDetails?.postalCode ?? "");
-  const nationality = isPlaceholder
-    ? "Nationality"
-    : (contactDetails?.nationality ?? "");
-  const workPermit = isPlaceholder
-    ? "Work permit"
-    : (contactDetails?.workPermit ?? "");
-  const linkedIn = isPlaceholder
-    ? "linkedin.com/in/username"
-    : (contactDetails?.linkedIn ?? "");
-  const git = isPlaceholder
-    ? "github.com/username"
-    : (contactDetails?.git ?? "");
+  const fullName = "John Doe";
+  const jobTitle = "Fullstack Developer";
+  const phone = "+1 234 567 890";
+  const email = "email@example.com";
+  const city = "City, Country";
+  const birthdate = "01/01/1990";
+  const postalCode = "12345";
+  const nationality = "Nationality";
+  const workPermit = "Work permit";
+  const linkedIn = "linkedin.com/in/johndoe";
+  const git = "github.com/johndoe";
 
-  const addressLine = isPlaceholder
-    ? "Street, 1"
-    : postalCode || city
-      ? `${postalCode ? `${postalCode}, ` : ""}${city}`
-      : "";
+  const addressLine =
+    postalCode || city ? `${postalCode ? `${postalCode}, ` : ""}${city}` : "";
 
-  const sidebarSkill1 = isPlaceholder ? "Skill 1" : "";
-  const sidebarSkill2 = isPlaceholder ? "Skill 2" : "";
-  const sidebarSkill3 = isPlaceholder ? "Skill 3" : "";
+  const sidebarSkill1 = "Skill 1";
+  const sidebarSkill2 = "Skill 2";
+  const sidebarSkill3 = "Skill 3";
 
-  const showSidebarSkills =
-    isPlaceholder || Boolean(sidebarSkill1 || sidebarSkill2 || sidebarSkill3);
+  const showSidebarSkills = true;
 
-  const language1 = isPlaceholder ? "Language 1" : "";
-  const language2 = isPlaceholder ? "Language 2" : "";
-  const language3 = isPlaceholder ? "Language 3" : "";
+  const language1 = "Language 1";
+  const language2 = "Language 2";
+  const language3 = "Language 3";
 
-  const showLanguages =
-    isPlaceholder || Boolean(language1 || language2 || language3);
+  const showLanguages = true;
 
-  const summary = isPlaceholder
-    ? "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris."
-    : "";
+  const summary =
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.";
 
-  const showSummary = isPlaceholder || Boolean(summary.trim());
+  const showSummary = true;
 
-  const mainSkillsLabel = isPlaceholder ? "Skills:" : "";
-  const mainSkill1 = isPlaceholder
-    ? "Skill 1, Skill 2 with advanced knowledge"
-    : "";
-  const mainSkill2 = isPlaceholder ? "Skill 3 (intermediate level)" : "";
-  const mainSkill3 = isPlaceholder ? "Skill 4 with 2+ years experience" : "";
-  const mainSkill4 = isPlaceholder ? "Skill 5, certified professional" : "";
+  const mainSkillsLabel = "Skills:";
+  const mainSkill1 = "Skill 1, Skill 2 with advanced knowledge";
+  const mainSkill2 = "Skill 3 (intermediate level)";
+  const mainSkill3 = "Skill 4 with 2+ years experience";
+  const mainSkill4 = "Skill 5, certified professional";
 
-  const showMainSkills =
-    isPlaceholder ||
-    Boolean(
-      mainSkill1 || mainSkill2 || mainSkill3 || mainSkill4 || mainSkillsLabel,
-    );
+  const showMainSkills = true;
 
-  const workTitle =
-    isPlaceholder || (workExperience && workExperience.length > 0)
-      ? "Work history"
-      : "";
-  const placeholderWork = [
+  const workTitle = "Work history";
+  const workItems = [
     {
       id: "p1",
       jobTitle: "Job Title",
@@ -196,33 +159,19 @@ export function TemplatePreview1({
     },
   ];
 
-  const workItems = isPlaceholder ? placeholderWork : (workExperience ?? []);
+  const showWorkHistory = true;
 
-  const showWorkHistory = isPlaceholder || workItems.length > 0;
+  const educationTitle = "Education";
+  const eduItem1Title = "Course Name";
+  const eduItem1Date = "Month Year - Month Year";
+  const eduItem1Subtitle = "Institution Name, City";
+  const eduItem2Title = "Course Name";
+  const eduItem2Date = "Month Year - Month Year";
+  const eduItem2Subtitle = "Institution Name, City";
+  const eduItem2Body =
+    "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.";
 
-  const educationTitle = isPlaceholder ? "Education" : "";
-  const eduItem1Title = isPlaceholder ? "Course Name" : "";
-  const eduItem1Date = isPlaceholder ? "Month Year - Month Year" : "";
-  const eduItem1Subtitle = isPlaceholder ? "Institution Name, City" : "";
-  const eduItem2Title = isPlaceholder ? "Course Name" : "";
-  const eduItem2Date = isPlaceholder ? "Month Year - Month Year" : "";
-  const eduItem2Subtitle = isPlaceholder ? "Institution Name, City" : "";
-  const eduItem2Body = isPlaceholder
-    ? "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-    : "";
-
-  const showEducation =
-    isPlaceholder ||
-    Boolean(
-      educationTitle ||
-      eduItem1Title ||
-      eduItem1Date ||
-      eduItem1Subtitle ||
-      eduItem2Title ||
-      eduItem2Date ||
-      eduItem2Subtitle ||
-      eduItem2Body,
-    );
+  const showEducation = true;
 
   return (
     <div className={styles.preview}>
@@ -239,11 +188,7 @@ export function TemplatePreview1({
 
         {showSidebarSkills && (
           <div className={styles.section}>
-            {renderText(
-              "div",
-              styles.sectionTitle,
-              isPlaceholder ? "Skills" : "",
-            )}
+            {renderText("div", styles.sectionTitle, "Skills")}
             {renderText("div", styles.item, sidebarSkill1)}
             {renderText("div", styles.item, sidebarSkill2)}
             {renderText("div", styles.item, sidebarSkill3)}
@@ -252,11 +197,7 @@ export function TemplatePreview1({
 
         {showLanguages && (
           <div className={styles.section}>
-            {renderText(
-              "div",
-              styles.sectionTitle,
-              isPlaceholder ? "Languages" : "",
-            )}
+            {renderText("div", styles.sectionTitle, "Languages")}
             {renderText("div", styles.item, language1)}
             {renderText("div", styles.item, language2)}
             {renderText("div", styles.item, language3)}
@@ -283,17 +224,13 @@ export function TemplatePreview1({
         {showWorkHistory && (
           <div className={styles.section}>
             <div className={styles.sectionHeader}>
-              <div className={`${styles.sectionDot}${ghostClass(workTitle)}`} />
+              <div className={`${styles.sectionDot}`} />
               {renderText("div", styles.sectionTitle, workTitle)}
             </div>
             {workItems.map((item) => {
-              const title = isPlaceholder
-                ? item.jobTitle
-                : (item.jobTitle ?? "");
-              const company = isPlaceholder
-                ? item.companyName
-                : (item.companyName ?? "");
-              const cityLine = isPlaceholder ? item.city : (item.city ?? "");
+              const title = item.jobTitle;
+              const company = item.companyName;
+              const cityLine = item.city;
 
               const subtitle =
                 cityLine.trim().length > 0
@@ -304,28 +241,16 @@ export function TemplatePreview1({
               const endLabel = item.endDate
                 ? formatMonthYear(item.endDate)
                 : "Current";
-              const body = isPlaceholder
-                ? item.description
-                : (item.description ?? "");
+              const body = item.description;
 
               return (
                 <div key={item.id} className={styles.workItem}>
                   <div className={styles.workHeader}>
                     {renderText("div", styles.workTitle, title)}
-                    {isPlaceholder ? (
-                      renderText(
-                        "div",
-                        styles.workDate,
-                        `${startLabel} - ${endLabel}`,
-                      )
-                    ) : (
-                      <div
-                        className={`${styles.workDate}${ghostClass(startLabel)}`}
-                      >
-                        <div>{startLabel || NBSP}</div>
-                        <div>{endLabel || NBSP}</div>
-                      </div>
-                    )}
+                    <div className={styles.workDate}>
+                      <div>{startLabel}</div>
+                      <div>{endLabel}</div>
+                    </div>
                   </div>
 
                   {subtitle ? (

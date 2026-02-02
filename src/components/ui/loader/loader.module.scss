@@ -1,0 +1,16 @@
+@use "../../../styles/variables" as *;
+
+.loader {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 3px solid rgba($accent, 0.25);
+  border-top-color: $accent;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

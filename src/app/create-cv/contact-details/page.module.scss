@@ -23,14 +23,6 @@
   flex-direction: column;
 }
 
-.preview {
-  flex: 0 0 auto;
-  min-width: 330px;
-  max-width: 400px;
-  align-self: center;
-  height: fit-content;
-}
-
 .form {
   background: $white;
   padding: 2.5rem;

@@ -94,13 +94,14 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   sidebarInfoLabel: {
-    width: 14,
-    fontSize: 9,
+    width: 26,
+    fontSize: 7,
+    fontWeight: 700,
     color: "#2B2B2B",
   },
   sidebarInfoText: {
     flex: 1,
-    fontSize: 9,
+    fontSize: 8,
     color: "#2B2B2B",
   },
   sidebarSection: {
@@ -169,173 +170,175 @@ const styles = StyleSheet.create({
 });
 
 type Template1Props = {
-  fullName?: string;
-  email?: string;
+  sidebarColor?: string;
+  contactDetails?: {
+    fullName?: string;
+    jobTitle?: string;
+    phone?: string;
+    email?: string;
+    city?: string;
+    postalCode?: string;
+    linkedIn?: string;
+    git?: string;
+    birthdate?: string;
+    nationality?: string;
+    workPermit?: string;
+  };
+  workExperience?: {
+    id: string;
+    jobTitle: string;
+    companyName: string;
+    city: string;
+    startDate?: { month: number; year: number };
+    endDate?: { month: number; year: number };
+    description: string;
+  }[];
 };
 
 export function TemplatePdf1({
-  fullName = "Misha Kompaniec",
-  email = "mishakompaniec@gmail.com",
+  sidebarColor = "#EAE3D9",
+  contactDetails,
+  workExperience = [],
 }: Template1Props) {
-  const fakeSummary =
-    "Due to life circumstances in my country, I decided to change my profession and completely transform my life. I began developing skills as a frontend developer. Later, the project required basic backend knowledge, so I started to deepen my understanding of Node.js. I have been building websites using React for almost 3 years, and for the past six months, I have been using Node.js to handle backendrelated tasks.";
+  const fullName = contactDetails?.fullName || "";
+  const email = contactDetails?.email || "";
+  const phone = contactDetails?.phone || "";
+  const jobTitle = contactDetails?.jobTitle || "";
+  const city = contactDetails?.city || "";
+  const postalCode = contactDetails?.postalCode || "";
+  const addressLine =
+    postalCode || city ? `${postalCode ? `${postalCode}, ` : ""}${city}` : "";
+  const linkedIn = contactDetails?.linkedIn || "";
+  const git = contactDetails?.git || "";
+  const birthdate = contactDetails?.birthdate || "";
+  const nationality = contactDetails?.nationality || "";
+  const workPermit = contactDetails?.workPermit || "";
+
+  const monthLong = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  const formatMonthYear = (d?: { month: number; year: number }) => {
+    if (!d) return "";
+    const label = monthLong[d.month - 1] ?? "";
+    return label ? `${label} ${d.year}` : "";
+  };
+
+  const hasSidebarInfo = Boolean(
+    phone ||
+    email ||
+    addressLine ||
+    birthdate ||
+    nationality ||
+    workPermit ||
+    linkedIn ||
+    git,
+  );
+
+  const hasHeader = Boolean(fullName || jobTitle);
+  const hasWorkExperience = workExperience.some(
+    (w) => w.jobTitle?.trim() || w.companyName?.trim() || w.description?.trim(),
+  );
+
+  const renderSidebarRow = (icon: string, value: string) => {
+    if (!value) return null;
+    return (
+      <View style={styles.sidebarInfoRow}>
+        <Text style={styles.sidebarInfoLabel}>{icon}</Text>
+        <Text style={styles.sidebarInfoText}>{value}</Text>
+      </View>
+    );
+  };
+
+  const wrapUrl = (value: string) => value.replaceAll("/", "/ ");
+  const linkedInSafe = linkedIn ? wrapUrl(linkedIn) : "";
+  const gitSafe = git ? wrapUrl(git) : "";
 
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        <View style={styles.sidebar}>
-          <View style={styles.avatarWrap}>
-            <View style={styles.avatar} />
-          </View>
-
-          <View style={styles.sidebarInfoRow}>
-            <Text style={styles.sidebarInfoLabel}>☎</Text>
-            <Text style={styles.sidebarInfoText}>+380660536975</Text>
-          </View>
-          <View style={styles.sidebarInfoRow}>
-            <Text style={styles.sidebarInfoLabel}>✉</Text>
-            <Text style={styles.sidebarInfoText}>{email}</Text>
-          </View>
-          <View style={styles.sidebarInfoRow}>
-            <Text style={styles.sidebarInfoLabel}>⌂</Text>
-            <Text style={styles.sidebarInfoText}>Pola de Siero</Text>
-          </View>
-
-          <View style={styles.sidebarSection}>
-            <Text style={styles.sidebarSectionTitle}>Skills</Text>
-            <Text style={styles.sidebarItem}>React</Text>
-            <Text style={styles.sidebarItem}>Next</Text>
-            <Text style={styles.sidebarItem}>Node.js</Text>
-            <Text style={styles.sidebarItem}>Express</Text>
-          </View>
-
-          <View style={styles.sidebarSection}>
-            <Text style={styles.sidebarSectionTitle}>Languages</Text>
-            <Text style={styles.sidebarItem}>Ukrainian (native speaker)</Text>
-            <Text style={styles.sidebarItem}>Russian (native speaker)</Text>
-            <Text style={styles.sidebarItem}>English (B1)</Text>
-            <Text style={styles.sidebarItem}>Spanish (A1)</Text>
-          </View>
+        <View style={[styles.sidebar, { backgroundColor: sidebarColor }]}>
+          {hasSidebarInfo ? (
+            <>
+              {renderSidebarRow("TEL", phone)}
+              {renderSidebarRow("MAIL", email)}
+              {renderSidebarRow("ADDR", addressLine)}
+              {renderSidebarRow("BORN", birthdate)}
+              {renderSidebarRow("NAT", nationality)}
+              {renderSidebarRow("PERM", workPermit)}
+              {renderSidebarRow("in", linkedInSafe)}
+              {renderSidebarRow("GIT", gitSafe)}
+            </>
+          ) : null}
         </View>
 
         <View style={styles.main}>
-          <Text style={styles.name}>{fullName}</Text>
-          <Text style={styles.jobTitle}>Fullstack Developer</Text>
+          {hasHeader ? (
+            <>
+              {fullName ? <Text style={styles.name}>{fullName}</Text> : null}
+              {jobTitle ? (
+                <Text style={styles.jobTitle}>{jobTitle}</Text>
+              ) : null}
+            </>
+          ) : null}
 
-          <Text style={styles.paragraph}>{fakeSummary}</Text>
-
-          <Text style={styles.label}>Skills:</Text>
-          <View style={styles.bulletRow}>
-            <View style={styles.bulletDot} />
-            <Text style={styles.bulletText}>React (TypeScript), Next</Text>
-          </View>
-          <View style={styles.bulletRow}>
-            <View style={styles.bulletDot} />
-            <Text style={styles.bulletText}>Node.js + Express</Text>
-          </View>
-          <View style={styles.bulletRow}>
-            <View style={styles.bulletDot} />
-            <Text style={styles.bulletText}>MongoDB</Text>
-          </View>
-          <View style={styles.bulletRow}>
-            <View style={styles.bulletDot} />
-            <Text style={styles.bulletText}>Redux, RTK</Text>
-          </View>
-          <View style={styles.bulletRow}>
-            <View style={styles.bulletDot} />
-            <Text style={styles.bulletText}>
-              JSS, Styled-Components, Tailwind
-            </Text>
-          </View>
-          <View style={styles.bulletRow}>
-            <View style={styles.bulletDot} />
-            <Text style={styles.bulletText}>Prettier, ESLint, Husky</Text>
-          </View>
-          <View style={styles.bulletRow}>
-            <View style={styles.bulletDot} />
-            <Text style={styles.bulletText}>Ant Design, Material UI</Text>
-          </View>
-          <View style={styles.bulletRow}>
-            <View style={styles.bulletDot} />
-            <Text style={styles.bulletText}>Git/GitHub</Text>
-          </View>
-
-          <Text style={styles.label}>Contacts:</Text>
-          <Text style={styles.paragraph}>Telegram: @MishaKompaniec</Text>
-          <Text style={styles.paragraph}>
-            GitHub: https://github.com/MishaKompaniec
-          </Text>
-          <Text style={styles.paragraph}>Instagram: misha_kompaniec</Text>
-          <Text style={styles.paragraph}>
-            Spanish phone number: +34657732224
-          </Text>
-
-          <View style={styles.mainSection}>
-            <View style={styles.sectionTitleRow}>
-              <View style={styles.sectionDot} />
-              <Text style={styles.sectionTitle}>Work history</Text>
-            </View>
-
-            <View style={styles.item}>
-              <View style={styles.itemHeader}>
-                <Text style={styles.itemTitle}>Frontend developer</Text>
-                <Text style={styles.itemDate}>
-                  September 2022\nFebruary 2025
-                </Text>
+          {hasWorkExperience ? (
+            <View style={styles.mainSection}>
+              <View style={styles.sectionTitleRow}>
+                <View style={styles.sectionDot} />
+                <Text style={styles.sectionTitle}>Work history</Text>
               </View>
-              <Text style={styles.itemSubtitle}>
-                UniCode Software, Cherkassy
-              </Text>
-              <Text style={styles.itemBody}>
-                Worked on a project for an American company related to health
-                and safety. Also worked on the company's internal website,
-                UniCode.
-              </Text>
-            </View>
 
-            <View style={styles.item}>
-              <View style={styles.itemHeader}>
-                <Text style={styles.itemTitle}>Full-stack developer</Text>
-                <Text style={styles.itemDate}>February 2025\nCurrent</Text>
-              </View>
-              <Text style={styles.itemSubtitle}>
-                UniCode Software, Cherkassy
-              </Text>
-              <Text style={styles.itemBody}>
-                During my time working on the project, I started learning
-                Node.js and taking on backend tasks.
-              </Text>
-            </View>
-          </View>
+              {workExperience.map((item) => {
+                const title = item.jobTitle?.trim() ?? "";
+                const company = item.companyName?.trim() ?? "";
+                const itemCity = item.city?.trim() ?? "";
+                const body = item.description?.trim() ?? "";
 
-          <View style={styles.mainSection}>
-            <View style={styles.sectionTitleRow}>
-              <View style={styles.sectionDot} />
-              <Text style={styles.sectionTitle}>Education</Text>
-            </View>
+                const start = formatMonthYear(item.startDate);
+                const end = item.endDate
+                  ? formatMonthYear(item.endDate)
+                  : item.startDate
+                    ? "Current"
+                    : "";
+                const dateText = start || end ? `${start}\n${end}` : "";
 
-            <View style={styles.item}>
-              <View style={styles.itemHeader}>
-                <Text style={styles.itemTitle}>
-                  JavaScript: Advanced Course
-                </Text>
-                <Text style={styles.itemDate}>April 2022\nJuly 2022</Text>
-              </View>
-              <Text style={styles.itemSubtitle}>ITVDN, Kiev</Text>
-            </View>
+                const subtitle = itemCity ? `${company}, ${itemCity}` : company;
+                const hasItem = Boolean(title || subtitle || body || dateText);
+                if (!hasItem) return null;
 
-            <View style={styles.item}>
-              <View style={styles.itemHeader}>
-                <Text style={styles.itemTitle}>React: Advanced Course</Text>
-                <Text style={styles.itemDate}>July 2022\nSeptember 2022</Text>
-              </View>
-              <Text style={styles.itemSubtitle}>UniCode, Cherkassy</Text>
-              <Text style={styles.itemBody}>
-                Before working at the company, I completed the company's
-                internal courses on React and Next.
-              </Text>
+                return (
+                  <View key={item.id} style={styles.item}>
+                    <View style={styles.itemHeader}>
+                      {title ? (
+                        <Text style={styles.itemTitle}>{title}</Text>
+                      ) : (
+                        <Text style={styles.itemTitle} />
+                      )}
+                      {dateText ? (
+                        <Text style={styles.itemDate}>{dateText}</Text>
+                      ) : null}
+                    </View>
+                    {subtitle ? (
+                      <Text style={styles.itemSubtitle}>{subtitle}</Text>
+                    ) : null}
+                    {body ? <Text style={styles.itemBody}>{body}</Text> : null}
+                  </View>
+                );
+              })}
             </View>
-          </View>
+          ) : null}
         </View>
       </Page>
     </Document>

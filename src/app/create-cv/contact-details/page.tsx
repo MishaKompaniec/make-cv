@@ -12,7 +12,6 @@ import {
   type ContactDetailsFormData,
 } from "@/lib/validations/cv-schema";
 import { useCvData } from "@/hooks/useCvData";
-import { CvPreview } from "@/components/cv-preview/cv-preview";
 import styles from "./page.module.scss";
 
 const stepTitle = "Contact details";
@@ -229,10 +228,6 @@ export default function ContactDetailsPage() {
               </div>
             </div>
           </form>
-        </div>
-
-        <div className={styles.preview}>
-          <CvPreview />
         </div>
       </section>
 
