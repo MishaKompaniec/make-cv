@@ -10,9 +10,6 @@ import {
   TEMPLATE_1_COLORS,
 } from "@/components/pdf/templates/template-1/template-pdf";
 import { TEMPLATE_2_ID } from "@/components/pdf/templates/template-2/template-pdf";
-import { TEMPLATE_3_ID } from "@/components/pdf/templates/template-3/template-pdf";
-import { TEMPLATE_4_ID } from "@/components/pdf/templates/template-4/template-pdf";
-import { TEMPLATE_5_ID } from "@/components/pdf/templates/template-5/template-pdf";
 import styles from "./page.module.scss";
 
 const TemplatePreview1 = dynamic(() =>
@@ -23,21 +20,6 @@ const TemplatePreview1 = dynamic(() =>
 const TemplatePreview2 = dynamic(() =>
   import("@/components/pdf/templates/template-2/template-preview").then(
     (mod) => ({ default: mod.TemplatePreview2 }),
-  ),
-);
-const TemplatePreview3 = dynamic(() =>
-  import("@/components/pdf/templates/template-3/template-preview").then(
-    (mod) => ({ default: mod.TemplatePreview3 }),
-  ),
-);
-const TemplatePreview4 = dynamic(() =>
-  import("@/components/pdf/templates/template-4/template-preview").then(
-    (mod) => ({ default: mod.TemplatePreview4 }),
-  ),
-);
-const TemplatePreview5 = dynamic(() =>
-  import("@/components/pdf/templates/template-5/template-preview").then(
-    (mod) => ({ default: mod.TemplatePreview5 }),
   ),
 );
 
@@ -74,9 +56,6 @@ export default function ChooseTemplatePage() {
   const templates = [
     { id: TEMPLATE_1_ID, Preview: TemplatePreview1 },
     { id: TEMPLATE_2_ID, Preview: TemplatePreview2 },
-    { id: TEMPLATE_3_ID, Preview: TemplatePreview3 },
-    { id: TEMPLATE_4_ID, Preview: TemplatePreview4 },
-    { id: TEMPLATE_5_ID, Preview: TemplatePreview5 },
   ];
 
   const colorClassByName: Record<

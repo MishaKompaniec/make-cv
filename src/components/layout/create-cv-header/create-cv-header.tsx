@@ -15,18 +15,7 @@ import {
   TEMPLATE_2_ID,
   TemplatePdf2,
 } from "@/components/pdf/templates/template-2/template-pdf";
-import {
-  TEMPLATE_3_ID,
-  TemplatePdf3,
-} from "@/components/pdf/templates/template-3/template-pdf";
-import {
-  TEMPLATE_4_ID,
-  TemplatePdf4,
-} from "@/components/pdf/templates/template-4/template-pdf";
-import {
-  TEMPLATE_5_ID,
-  TemplatePdf5,
-} from "@/components/pdf/templates/template-5/template-pdf";
+
 import styles from "./create-cv-header.module.scss";
 
 const BlobProvider = dynamic(
@@ -82,15 +71,7 @@ export function CreateCvHeader({
     templateColors?.[templateId] ?? TEMPLATE_1_COLORS[0].value;
 
   const PdfDocument =
-    templateId === TEMPLATE_2_ID
-      ? TemplatePdf2
-      : templateId === TEMPLATE_3_ID
-        ? TemplatePdf3
-        : templateId === TEMPLATE_4_ID
-          ? TemplatePdf4
-          : templateId === TEMPLATE_5_ID
-            ? TemplatePdf5
-            : TemplatePdf1;
+    templateId === TEMPLATE_2_ID ? TemplatePdf2 : TemplatePdf1;
 
   useEffect(() => {
     if (!isPreviewOpen) return;

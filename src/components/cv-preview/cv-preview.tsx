@@ -10,12 +10,6 @@ import {
 import { TemplatePreview1 } from "@/components/pdf/templates/template-1/template-preview";
 import { TEMPLATE_2_ID } from "@/components/pdf/templates/template-2/template-pdf";
 import { TemplatePreview2 } from "@/components/pdf/templates/template-2/template-preview";
-import { TEMPLATE_3_ID } from "@/components/pdf/templates/template-3/template-pdf";
-import { TemplatePreview3 } from "@/components/pdf/templates/template-3/template-preview";
-import { TEMPLATE_4_ID } from "@/components/pdf/templates/template-4/template-pdf";
-import { TemplatePreview4 } from "@/components/pdf/templates/template-4/template-preview";
-import { TEMPLATE_5_ID } from "@/components/pdf/templates/template-5/template-pdf";
-import { TemplatePreview5 } from "@/components/pdf/templates/template-5/template-preview";
 import styles from "./cv-preview.module.scss";
 
 type WorkExperiencePreviewItem = {
@@ -61,15 +55,7 @@ export function CvPreview() {
   const previewWorkExperience = mounted ? workExperience : undefined;
 
   const Preview =
-    templateId === TEMPLATE_2_ID
-      ? TemplatePreview2
-      : templateId === TEMPLATE_3_ID
-        ? TemplatePreview3
-        : templateId === TEMPLATE_4_ID
-          ? TemplatePreview4
-          : templateId === TEMPLATE_5_ID
-            ? TemplatePreview5
-            : TemplatePreview1;
+    templateId === TEMPLATE_2_ID ? TemplatePreview2 : TemplatePreview1;
 
   return (
     <div className={styles.previewWrapper}>

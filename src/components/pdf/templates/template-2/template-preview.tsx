@@ -1,5 +1,316 @@
 "use client";
 
-import { TemplatePreview1 } from "@/components/pdf/templates/template-1/template-preview";
+import styles from "./template-preview.module.scss";
 
-export const TemplatePreview2 = TemplatePreview1;
+type ContactDetailsPreviewData = {
+  fullName?: string;
+  jobTitle?: string;
+  phone?: string;
+  email?: string;
+  city?: string;
+  birthdate?: string;
+  postalCode?: string;
+  linkedIn?: string;
+  git?: string;
+  nationality?: string;
+  workPermit?: string;
+};
+
+type WorkExperiencePreviewItem = {
+  id: string;
+  jobTitle: string;
+  companyName: string;
+  city: string;
+  startDate?: { month: number; year: number };
+  endDate?: { month: number; year: number };
+  description: string;
+};
+
+interface TemplatePreview2Props {
+  sidebarColor?: string;
+  mode?: "placeholder" | "data";
+  contactDetails?: ContactDetailsPreviewData;
+  workExperience?: WorkExperiencePreviewItem[];
+}
+
+export function TemplatePreview2({
+  sidebarColor = "#EFEAE2",
+  mode,
+  contactDetails,
+  workExperience,
+}: TemplatePreview2Props) {
+  const NBSP = "\u00A0";
+
+  const ghostClass = (value: string) => (value ? "" : ` ${styles.ghost}`);
+
+  const renderLine = (icon: string, value: string) => (
+    <div className={styles.contactRow}>
+      <span className={`${styles.icon}${ghostClass(value)}`}>{icon}</span>
+      <span className={`${styles.text}${ghostClass(value)}`}>
+        {value || NBSP}
+      </span>
+    </div>
+  );
+
+  const renderText = (
+    Tag: "div" | "span",
+    className: string,
+    value: string,
+  ) => {
+    const Comp = Tag;
+    return (
+      <Comp className={`${className}${ghostClass(value)}`}>
+        {value || NBSP}
+      </Comp>
+    );
+  };
+
+  const renderBulletRow = (value: string) => (
+    <div className={styles.bulletRow}>
+      <div className={`${styles.bullet}${ghostClass(value)}`} />
+      <div className={`${styles.bulletText}${ghostClass(value)}`}>
+        {value || NBSP}
+      </div>
+    </div>
+  );
+
+  const monthLong = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  const formatMonthYear = (d?: { month: number; year: number }) => {
+    if (!d) return "";
+    const label = monthLong[d.month - 1] ?? "";
+    return label ? `${label} ${d.year}` : "";
+  };
+
+  const placeholderContactDetails: ContactDetailsPreviewData = {
+    fullName: "John Doe",
+    jobTitle: "Fullstack Developer",
+    phone: "+1 234 567 890",
+    email: "email@example.com",
+    city: "City, Country",
+    birthdate: "01/01/1990",
+    postalCode: "12345",
+    nationality: "Nationality",
+    workPermit: "Work permit",
+    linkedIn: "linkedin.com/in/johndoe",
+    git: "github.com/johndoe",
+  };
+
+  const dataContactDetails =
+    mode === "data" ? (contactDetails ?? {}) : placeholderContactDetails;
+
+  const fullName = dataContactDetails.fullName ?? "";
+  const jobTitle = dataContactDetails.jobTitle ?? "";
+  const phone = dataContactDetails.phone ?? "";
+  const email = dataContactDetails.email ?? "";
+  const city = dataContactDetails.city ?? "";
+  const birthdate = dataContactDetails.birthdate ?? "";
+  const postalCode = dataContactDetails.postalCode ?? "";
+  const nationality = dataContactDetails.nationality ?? "";
+  const workPermit = dataContactDetails.workPermit ?? "";
+  const linkedIn = dataContactDetails.linkedIn ?? "";
+  const git = dataContactDetails.git ?? "";
+
+  const addressLine =
+    postalCode || city ? `${postalCode ? `${postalCode}, ` : ""}${city}` : "";
+
+  const sidebarSkill1 = "Skill 1";
+  const sidebarSkill2 = "Skill 2";
+  const sidebarSkill3 = "Skill 3";
+
+  const showSidebarSkills = true;
+
+  const language1 = "Language 1";
+  const language2 = "Language 2";
+  const language3 = "Language 3";
+
+  const showLanguages = true;
+
+  const summary =
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.";
+
+  const showSummary = true;
+
+  const mainSkillsLabel = "Skills:";
+  const mainSkill1 = "Skill 1, Skill 2 with advanced knowledge";
+  const mainSkill2 = "Skill 3 (intermediate level)";
+  const mainSkill3 = "Skill 4 with 2+ years experience";
+  const mainSkill4 = "Skill 5, certified professional";
+
+  const showMainSkills = true;
+
+  const workTitle = "Work history";
+  const workItems = [
+    {
+      id: "p1",
+      jobTitle: "Job Title",
+      companyName: "Company Name",
+      city: "City",
+      startDate: { month: 9, year: 2022 },
+      endDate: { month: 2, year: 2025 },
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    },
+    {
+      id: "p2",
+      jobTitle: "Job Title",
+      companyName: "Company Name",
+      city: "City",
+      startDate: { month: 2, year: 2025 },
+      endDate: undefined,
+      description:
+        "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    },
+  ];
+
+  const dataWorkItems = mode === "data" ? (workExperience ?? []) : workItems;
+
+  const showWorkHistory = true;
+
+  const educationTitle = "Education";
+  const eduItem1Title = "Course Name";
+  const eduItem1Date = "Month Year - Month Year";
+  const eduItem1Subtitle = "Institution Name, City";
+  const eduItem2Title = "Course Name";
+  const eduItem2Date = "Month Year - Month Year";
+  const eduItem2Subtitle = "Institution Name, City";
+  const eduItem2Body =
+    "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.";
+
+  const showEducation = true;
+
+  return (
+    <div className={styles.preview}>
+      <div className={styles.main}>
+        {renderText("div", styles.name, fullName)}
+        {renderText("div", styles.jobTitle, jobTitle)}
+
+        {showSummary && renderText("div", styles.summary, summary)}
+
+        {showMainSkills && (
+          <>
+            {renderText("div", styles.label, mainSkillsLabel)}
+            {renderBulletRow(mainSkill1)}
+            {renderBulletRow(mainSkill2)}
+            {renderBulletRow(mainSkill3)}
+            {renderBulletRow(mainSkill4)}
+          </>
+        )}
+
+        {showWorkHistory && (
+          <div className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <div className={`${styles.sectionDot}`} />
+              {renderText("div", styles.sectionTitle, workTitle)}
+            </div>
+            {dataWorkItems.map((item: WorkExperiencePreviewItem) => {
+              const title = item.jobTitle;
+              const company = item.companyName;
+              const cityLine = item.city;
+
+              const subtitle =
+                cityLine.trim().length > 0
+                  ? `${company}${company ? ", " : ""}${cityLine}`
+                  : company;
+
+              const startLabel = formatMonthYear(item.startDate);
+              const endLabel = item.endDate
+                ? formatMonthYear(item.endDate)
+                : "Current";
+              const body = item.description;
+
+              return (
+                <div key={item.id} className={styles.workItem}>
+                  <div className={styles.workHeader}>
+                    {renderText("div", styles.workTitle, title)}
+                    <div className={styles.workDate}>
+                      <div>{startLabel}</div>
+                      <div>{endLabel}</div>
+                    </div>
+                  </div>
+
+                  {subtitle ? (
+                    <div className={styles.workSubtitle}>{subtitle}</div>
+                  ) : null}
+
+                  {body.trim() ? (
+                    <div className={styles.workBody}>{body}</div>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {showEducation && (
+          <div className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <div
+                className={`${styles.sectionDot}${ghostClass(educationTitle)}`}
+              />
+              {renderText("div", styles.sectionTitle, educationTitle)}
+            </div>
+            <div className={styles.workItem}>
+              <div className={styles.workHeader}>
+                {renderText("div", styles.workTitle, eduItem1Title)}
+                {renderText("div", styles.workDate, eduItem1Date)}
+              </div>
+              {renderText("div", styles.workSubtitle, eduItem1Subtitle)}
+            </div>
+            <div className={styles.workItem}>
+              <div className={styles.workHeader}>
+                {renderText("div", styles.workTitle, eduItem2Title)}
+                {renderText("div", styles.workDate, eduItem2Date)}
+              </div>
+              {renderText("div", styles.workSubtitle, eduItem2Subtitle)}
+              {renderText("div", styles.workBody, eduItem2Body)}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className={styles.sidebar} style={{ backgroundColor: sidebarColor }}>
+        <div className={styles.avatar} />
+        {renderLine("☎", phone)}
+        {renderLine("✉", email)}
+        {renderLine("⌂", addressLine)}
+        {renderLine("🎂", birthdate)}
+        {renderLine("🏳", nationality)}
+        {renderLine("🪪", workPermit)}
+        {renderLine("in", linkedIn)}
+        {renderLine("↗", git)}
+
+        {showSidebarSkills && (
+          <div className={styles.section}>
+            {renderText("div", styles.sectionTitle, "Skills")}
+            {renderText("div", styles.item, sidebarSkill1)}
+            {renderText("div", styles.item, sidebarSkill2)}
+            {renderText("div", styles.item, sidebarSkill3)}
+          </div>
+        )}
+
+        {showLanguages && (
+          <div className={styles.section}>
+            {renderText("div", styles.sectionTitle, "Languages")}
+            {renderText("div", styles.item, language1)}
+            {renderText("div", styles.item, language2)}
+            {renderText("div", styles.item, language3)}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
