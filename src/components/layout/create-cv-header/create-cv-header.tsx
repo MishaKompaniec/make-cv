@@ -56,12 +56,14 @@ interface CreateCvHeaderProps {
   stepNumber: string;
   title: string;
   description: string;
+  hidePreviewButton?: boolean;
 }
 
 export function CreateCvHeader({
   stepNumber,
   title,
   description,
+  hidePreviewButton,
 }: CreateCvHeaderProps) {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
@@ -115,14 +117,16 @@ export function CreateCvHeader({
       </div>
       <p className={styles.description}>{description}</p>
 
-      <div className={styles.actions}>
-        <Button
-          variant="outline"
-          type="button"
-          onClick={() => setIsPreviewOpen(true)}
-        >
-          Preview CV
-        </Button>
+      <div>
+        {!hidePreviewButton && (
+          <Button
+            variant="outline"
+            type="button"
+            onClick={() => setIsPreviewOpen(true)}
+          >
+            Preview CV
+          </Button>
+        )}
       </div>
 
       {isPreviewOpen && (

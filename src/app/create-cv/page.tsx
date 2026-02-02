@@ -99,6 +99,7 @@ export default function ChooseTemplatePage() {
         stepNumber="Step 1"
         title={stepTitle}
         description="Choose a template to start building your CV."
+        hidePreviewButton
       />
 
       <div className={styles.content}>

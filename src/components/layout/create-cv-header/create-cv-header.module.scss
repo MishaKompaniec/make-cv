@@ -57,17 +57,11 @@
   color: $text;
 }
 
-.actions {
-  margin-top: 0.75rem;
-  display: flex;
-  justify-content: flex-end;
-}
-
 .previewModalOverlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.55);
-  z-index: 50;
+  z-index: 9999;
   padding: 1.25rem;
   display: flex;
   justify-content: center;
