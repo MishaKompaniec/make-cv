@@ -1,11 +1,12 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button/button";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { CreateCvHeader } from "@/components/layout/create-cv-header/create-cv-header";
 import { CvPreview } from "@/components/cv-preview/cv-preview";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import {
   WorkExperienceCard,
   type ExperienceItem,
@@ -64,13 +65,45 @@ const validateExperience = (exp: ExperienceItem): ExperienceErrors => {
 
 export default function WorkExperiencePage() {
   const router = useRouter();
+  const [storedExperiences, setStoredExperiences] = useLocalStorage<
+    ExperienceItem[]
+  >("cv-work-experience", []);
+
   const [experiences, setExperiences] = useState<ExperienceItem[]>([]);
   const [experienceErrors, setExperienceErrors] = useState<
     Record<string, ExperienceErrors>
   >({});
+  const didInitRef = useRef(false);
+  const debounceTimerRef = useRef<number | null>(null);
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const prevPositionsRef = useRef<Record<string, DOMRect>>({});
   const shouldAnimateRef = useRef(false);
+
+  // Initialize once from localStorage.
+  useEffect(() => {
+    if (didInitRef.current) return;
+    setExperiences(storedExperiences);
+    didInitRef.current = true;
+  }, [storedExperiences]);
+
+  // Auto-save on changes (preserve order).
+  useEffect(() => {
+    if (!didInitRef.current) return;
+
+    if (debounceTimerRef.current) {
+      window.clearTimeout(debounceTimerRef.current);
+    }
+
+    debounceTimerRef.current = window.setTimeout(() => {
+      setStoredExperiences(experiences);
+    }, 600);
+
+    return () => {
+      if (debounceTimerRef.current) {
+        window.clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [experiences, setStoredExperiences]);
 
   const handleAddExperience = () => {
     setExperiences((prev) => [
