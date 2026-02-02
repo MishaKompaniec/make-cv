@@ -13,31 +13,11 @@
 
 .sidebar {
   width: 30%;
-  background: #eae3d9;
+  background: #efeae2;
   padding: 8px 6px;
   display: flex;
   flex-direction: column;
   gap: 6px;
-}
-
-.sidebar.sidebar--beige {
-  background: #eae3d9;
-}
-
-.sidebar.sidebar--light-blue {
-  background: #e8f4f8;
-}
-
-.sidebar.sidebar--light-gray {
-  background: #f5f5f5;
-}
-
-.sidebar.sidebar--light-green {
-  background: #e8f5e8;
-}
-
-.sidebar.sidebar--light-purple {
-  background: #f0ebf8;
 }
 
 .avatar {

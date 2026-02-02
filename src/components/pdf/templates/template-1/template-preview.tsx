@@ -34,7 +34,7 @@ interface TemplatePreview1Props {
 }
 
 export function TemplatePreview1({
-  sidebarColor = "#EAE3D9",
+  sidebarColor = "#EFEAE2",
   mode,
   contactDetails,
   workExperience,
@@ -95,17 +95,34 @@ export function TemplatePreview1({
     return label ? `${label} ${d.year}` : "";
   };
 
-  const fullName = "John Doe";
-  const jobTitle = "Fullstack Developer";
-  const phone = "+1 234 567 890";
-  const email = "email@example.com";
-  const city = "City, Country";
-  const birthdate = "01/01/1990";
-  const postalCode = "12345";
-  const nationality = "Nationality";
-  const workPermit = "Work permit";
-  const linkedIn = "linkedin.com/in/johndoe";
-  const git = "github.com/johndoe";
+  const placeholderContactDetails: ContactDetailsPreviewData = {
+    fullName: "John Doe",
+    jobTitle: "Fullstack Developer",
+    phone: "+1 234 567 890",
+    email: "email@example.com",
+    city: "City, Country",
+    birthdate: "01/01/1990",
+    postalCode: "12345",
+    nationality: "Nationality",
+    workPermit: "Work permit",
+    linkedIn: "linkedin.com/in/johndoe",
+    git: "github.com/johndoe",
+  };
+
+  const dataContactDetails =
+    mode === "data" ? (contactDetails ?? {}) : placeholderContactDetails;
+
+  const fullName = dataContactDetails.fullName ?? "";
+  const jobTitle = dataContactDetails.jobTitle ?? "";
+  const phone = dataContactDetails.phone ?? "";
+  const email = dataContactDetails.email ?? "";
+  const city = dataContactDetails.city ?? "";
+  const birthdate = dataContactDetails.birthdate ?? "";
+  const postalCode = dataContactDetails.postalCode ?? "";
+  const nationality = dataContactDetails.nationality ?? "";
+  const workPermit = dataContactDetails.workPermit ?? "";
+  const linkedIn = dataContactDetails.linkedIn ?? "";
+  const git = dataContactDetails.git ?? "";
 
   const addressLine =
     postalCode || city ? `${postalCode ? `${postalCode}, ` : ""}${city}` : "";
@@ -158,6 +175,8 @@ export function TemplatePreview1({
         "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
     },
   ];
+
+  const dataWorkItems = mode === "data" ? (workExperience ?? []) : workItems;
 
   const showWorkHistory = true;
 
@@ -227,7 +246,7 @@ export function TemplatePreview1({
               <div className={`${styles.sectionDot}`} />
               {renderText("div", styles.sectionTitle, workTitle)}
             </div>
-            {workItems.map((item) => {
+            {dataWorkItems.map((item: WorkExperiencePreviewItem) => {
               const title = item.jobTitle;
               const company = item.companyName;
               const cityLine = item.city;
