@@ -129,17 +129,20 @@ export function CreateCvHeader({
           className={styles.previewModalOverlay}
           onClick={() => setIsPreviewOpen(false)}
         >
-          <div
-            className={styles.previewModalContent}
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className={styles.previewModalContent}>
             <button
               type="button"
               className={styles.previewModalClose}
               aria-label="Close"
-              onClick={() => setIsPreviewOpen(false)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsPreviewOpen(false);
+              }}
             />
-            <div className={styles.previewModalPage}>
+            <div
+              className={styles.previewModalPage}
+              onClick={(e) => e.stopPropagation()}
+            >
               <BlobProvider
                 document={
                   <PdfDocument

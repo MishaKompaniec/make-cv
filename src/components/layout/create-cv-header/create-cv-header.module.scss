@@ -126,8 +126,8 @@
   width: 32px;
   height: 32px;
   border-radius: 10px;
-  border: 1px solid rgba($error, 0.25);
-  background: rgba($error, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.1);
   cursor: pointer;
   transition: all $transition;
   display: inline-flex;
@@ -140,7 +140,7 @@
     position: absolute;
     width: 16px;
     height: 2px;
-    background: $error;
+    background: white;
     border-radius: 999px;
   }
 
@@ -153,12 +153,12 @@
   }
 
   &:hover {
-    background: rgba($error, 0.1);
-    border-color: rgba($error, 0.35);
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.35);
   }
 
   &:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 2px rgba($error, 0.25);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25);
   }
 }
