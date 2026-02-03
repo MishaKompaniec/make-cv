@@ -1,35 +1,20 @@
 @use "../../../styles/variables" as *;
 
 .footer {
-  background: $white;
-  border-top: 1px solid $border-light;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  width: 100%;
+  padding: 1rem 2rem 1rem 2rem;
+
+  @media (max-width: $breakpoint-tablet) {
+    padding: 1rem;
+  }
 }
 
 .container {
   display: flex;
-  height: 100%;
-  width: 100%;
-}
-
-.backButton,
-.nextButton {
-  text-decoration: none;
-  flex: 1;
-  height: 100%;
-  display: flex;
+  justify-content: space-between;
   align-items: center;
-}
+  gap: 1rem;
 
-.backButton button,
-.nextButton button {
-  width: 100%;
-  height: 100%;
-  border-radius: 0 !important;
-  font-weight: 600;
-  font-size: 1rem;
-  text-transform: uppercase;
+  button {
+    min-width: 120px;
+  }
 }

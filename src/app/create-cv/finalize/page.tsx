@@ -61,7 +61,7 @@ export default function FinalizePage() {
         </form>
       </section>
 
-      <NavigationFooter backHref="/create-cv/other-sections" showNext={false} />
+      <NavigationFooter backHref="/create-cv/other-sections" />
     </div>
   );
 }

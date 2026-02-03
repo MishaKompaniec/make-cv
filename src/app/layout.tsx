@@ -18,7 +18,9 @@ export default function RootLayout({
     <html lang="en" className={inter.variable}>
       <body className="layout">
         <Sidebar />
-        <main className="main-content">{children}</main>
+        <main className="main-content">
+          <div className="create-flow-container">{children}</div>
+        </main>
       </body>
     </html>
   );

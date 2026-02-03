@@ -127,11 +127,7 @@ export default function ChooseTemplatePage() {
         </div>
       </div>
 
-      <NavigationFooter
-        showBack={false}
-        nextText="Next"
-        nextHref="/create-cv/contact-details"
-      />
+      <NavigationFooter nextHref="/create-cv/contact-details" />
     </div>
   );
 }

@@ -232,9 +232,7 @@ export default function ContactDetailsPage() {
       </section>
 
       <NavigationFooter
-        showBack={true}
         backHref="/create-cv"
-        nextText="Next"
         nextHref="/create-cv/summary"
         onNextClick={handleNextClick}
       />

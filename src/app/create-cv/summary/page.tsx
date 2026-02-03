@@ -120,9 +120,7 @@ export default function SummaryPage() {
       </section>
 
       <NavigationFooter
-        showBack={true}
         backHref="/create-cv/contact-details"
-        nextText="Next"
         nextHref="/create-cv/work-experience"
         onNextClick={handleNextClick}
       />
