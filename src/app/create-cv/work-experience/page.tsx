@@ -232,7 +232,7 @@ export default function WorkExperiencePage() {
   return (
     <div className={styles.pageContainer}>
       <CreateCvHeader
-        stepNumber="Step 3"
+        stepNumber="Step 4"
         title={stepTitle}
         description="Add your work experience to show employers your career progression and achievements."
       />
@@ -274,7 +274,7 @@ export default function WorkExperiencePage() {
       </section>
 
       <NavigationFooter
-        backHref="/create-cv/contact-details"
+        backHref="/create-cv/summary"
         nextHref="/create-cv/education"
         onNextClick={handleNextClick}
       />

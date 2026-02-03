@@ -84,7 +84,7 @@ export default function ContactDetailsPage() {
 
   const handleNextClick = handleSubmit((data) => {
     setContactDetails(data);
-    router.push("/create-cv/work-experience");
+    router.push("/create-cv/summary");
   });
 
   return (
@@ -235,7 +235,7 @@ export default function ContactDetailsPage() {
         showBack={true}
         backHref="/create-cv"
         nextText="Next"
-        nextHref="/create-cv/work-experience"
+        nextHref="/create-cv/summary"
         onNextClick={handleNextClick}
       />
     </div>

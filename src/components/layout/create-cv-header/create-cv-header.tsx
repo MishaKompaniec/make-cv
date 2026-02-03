@@ -56,7 +56,7 @@ export function CreateCvHeader({
 }: CreateCvHeaderProps) {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
-  const { contactDetails } = useCvData();
+  const { contactDetails, summary } = useCvData();
   const [templateId] = useLocalStorage("cv-template-id", TEMPLATE_1_ID);
   const [templateColors] = useLocalStorage<Record<string, string>>(
     "cv-template-colors",
@@ -132,6 +132,7 @@ export function CreateCvHeader({
                     sidebarColor={selectedColor}
                     contactDetails={contactDetails}
                     workExperience={workExperience}
+                    summary={summary}
                   />
                 }
               >

@@ -10,7 +10,7 @@ export default function EducationPage() {
   return (
     <div className={styles.pageContainer}>
       <CreateCvHeader
-        stepNumber="Step 4"
+        stepNumber="Step 5"
         title={stepTitle}
         description="Add your educational background to showcase your qualifications and knowledge."
       />

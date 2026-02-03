@@ -95,7 +95,7 @@ export default function ChooseTemplatePage() {
                 onClick={() => setSelectedTemplateId(id)}
               >
                 <div className={styles.templatePreview}>
-                  <Preview sidebarColor={cardColor} mode="placeholder" />
+                  <Preview sidebarColor={cardColor} />
                 </div>
 
                 <div className={styles.colorPicker}>

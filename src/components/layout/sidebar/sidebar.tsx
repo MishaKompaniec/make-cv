@@ -13,10 +13,10 @@ export function Sidebar() {
   const steps = [
     { title: "Choose template", path: "/create-cv" },
     { title: "Contact details", path: "/create-cv/contact-details" },
+    { title: "Summary", path: "/create-cv/summary" },
     { title: "Work experience", path: "/create-cv/work-experience" },
     { title: "Education", path: "/create-cv/education" },
     { title: "Skills", path: "/create-cv/skills" },
-    { title: "Summary", path: "/create-cv/summary" },
     { title: "Other sections", path: "/create-cv/other-sections" },
     { title: "Finalize", path: "/create-cv/finalize" },
   ];

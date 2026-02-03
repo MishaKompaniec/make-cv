@@ -57,6 +57,12 @@ const styles = StyleSheet.create({
     fontWeight: 600,
     marginBottom: 14,
   },
+  summary: {
+    fontSize: 10,
+    color: "#2B2B2B",
+    marginBottom: 20,
+    lineHeight: 1.4,
+  },
   label: {
     fontSize: 9,
     fontWeight: 700,
@@ -164,12 +170,14 @@ type Template1Props = {
     endDate?: { month: number; year: number };
     description: string;
   }[];
+  summary?: string;
 };
 
 export function TemplatePdf1({
   sidebarColor = "#EFEAE2",
   contactDetails,
   workExperience = [],
+  summary,
 }: Template1Props) {
   const fullName = contactDetails?.fullName || "";
   const email = contactDetails?.email || "";
@@ -337,6 +345,7 @@ export function TemplatePdf1({
                   {jobTitle}
                 </Text>
               ) : null}
+              {summary ? <Text style={styles.summary}>{summary}</Text> : null}
             </>
           ) : null}
 

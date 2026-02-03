@@ -60,7 +60,7 @@ export default function OtherSectionsPage() {
       </section>
 
       <NavigationFooter
-        backHref="/create-cv/summary"
+        backHref="/create-cv/skills"
         nextHref="/create-cv/finalize"
       />
     </div>

@@ -10,7 +10,7 @@ export default function SkillsPage() {
   return (
     <div className={styles.pageContainer}>
       <CreateCvHeader
-        stepNumber="Step 5"
+        stepNumber="Step 6"
         title={stepTitle}
         description="Highlight your key skills and competencies that make you stand out to employers."
       />
@@ -53,7 +53,7 @@ export default function SkillsPage() {
 
       <NavigationFooter
         backHref="/create-cv/education"
-        nextHref="/create-cv/summary"
+        nextHref="/create-cv/other-sections"
       />
     </div>
   );

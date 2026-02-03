@@ -28,17 +28,9 @@ type WorkExperiencePreviewItem = {
 
 interface TemplatePreview1Props {
   sidebarColor?: string;
-  mode?: "placeholder" | "data";
-  contactDetails?: ContactDetailsPreviewData;
-  workExperience?: WorkExperiencePreviewItem[];
 }
 
-export function TemplatePreview1({
-  sidebarColor = "#EFEAE2",
-  mode,
-  contactDetails,
-  workExperience,
-}: TemplatePreview1Props) {
+export function TemplatePreview1({ sidebarColor }: TemplatePreview1Props) {
   const NBSP = "\u00A0";
 
   const ghostClass = (value: string) => (value ? "" : ` ${styles.ghost}`);
@@ -109,8 +101,7 @@ export function TemplatePreview1({
     git: "github.com/johndoe",
   };
 
-  const dataContactDetails =
-    mode === "data" ? (contactDetails ?? {}) : placeholderContactDetails;
+  const dataContactDetails = placeholderContactDetails;
 
   const fullName = dataContactDetails.fullName ?? "";
   const jobTitle = dataContactDetails.jobTitle ?? "";
@@ -140,7 +131,7 @@ export function TemplatePreview1({
   const showLanguages = true;
 
   const summary =
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.";
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.";
 
   const showSummary = true;
 
@@ -176,7 +167,7 @@ export function TemplatePreview1({
     },
   ];
 
-  const dataWorkItems = mode === "data" ? (workExperience ?? []) : workItems;
+  const dataWorkItems = workItems;
 
   const showWorkHistory = true;
 

@@ -25,14 +25,18 @@ export function useCvData() {
       defaultContactDetails,
     );
 
+  const [summary, setSummary] = useLocalStorage<string>("cv-summary", "");
+
   const clearAllData = () => {
     setContactDetails(defaultContactDetails);
+    setSummary("");
     // Здесь будем добавлять очистку других шагов
   };
 
   const exportData = () => {
     const data = {
       contactDetails,
+      summary,
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], {
       type: "application/json",
@@ -56,6 +60,9 @@ export function useCvData() {
           ...data.contactDetails,
         });
       }
+      if (data.summary !== undefined) {
+        setSummary(data.summary);
+      }
       return true;
     } catch (error) {
       console.error("Error importing CV data:", error);
@@ -66,6 +73,8 @@ export function useCvData() {
   return {
     contactDetails,
     setContactDetails,
+    summary,
+    setSummary,
     clearAllData,
     exportData,
     importData,
