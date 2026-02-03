@@ -170,6 +170,15 @@ type Template1Props = {
     endDate?: { month: number; year: number };
     description: string;
   }[];
+  education?: {
+    id: string;
+    diploma: string;
+    schoolName: string;
+    schoolLocation: string;
+    startDate?: { month: number; year: number };
+    endDate?: { month: number; year: number };
+    description: string;
+  }[];
   summary?: string;
 };
 
@@ -177,6 +186,7 @@ export function TemplatePdf1({
   sidebarColor = "#EFEAE2",
   contactDetails,
   workExperience = [],
+  education = [],
   summary,
 }: Template1Props) {
   const fullName = contactDetails?.fullName || "";
@@ -228,6 +238,13 @@ export function TemplatePdf1({
   const hasHeader = Boolean(fullName || jobTitle);
   const hasWorkExperience = workExperience.some(
     (w) => w.jobTitle?.trim() || w.companyName?.trim() || w.description?.trim(),
+  );
+  const hasEducation = education.some(
+    (e) =>
+      e.diploma?.trim() ||
+      e.schoolName?.trim() ||
+      e.schoolLocation?.trim() ||
+      e.description?.trim(),
   );
 
   const renderSidebarRow = (icon: ReactNode, value: string) => {
@@ -398,16 +415,81 @@ export function TemplatePdf1({
                         ) : null}
                       </View>
                       <View style={styles.itemSubtitleRow}>
-                        {subtitle ? (
-                          <Text
-                            style={[
-                              styles.itemSubtitle,
-                              { color: accentColor },
-                            ]}
-                          >
-                            {subtitle}
-                          </Text>
+                        <Text
+                          style={[styles.itemSubtitle, { color: accentColor }]}
+                        >
+                          {subtitle || " "}
+                        </Text>
+                        {end ? (
+                          <Text style={styles.itemDate}>{end}</Text>
                         ) : null}
+                      </View>
+                    </View>
+                    {body ? <Text style={styles.itemBody}>{body}</Text> : null}
+                  </View>
+                );
+              })}
+            </View>
+          ) : null}
+
+          {hasEducation ? (
+            <View style={styles.mainSection}>
+              <View style={styles.sectionTitleRow}>
+                <View
+                  style={[
+                    styles.sectionDot,
+                    {
+                      backgroundColor: accentColor,
+                      position: "absolute",
+                      left: -15,
+                    },
+                  ]}
+                />
+                <Text style={styles.sectionTitle}>Education</Text>
+              </View>
+
+              {education.map((item) => {
+                const title = item.diploma?.trim() ?? "";
+                const school = item.schoolName?.trim() ?? "";
+                const location = item.schoolLocation?.trim() ?? "";
+                const body = item.description?.trim() ?? "";
+
+                const start = formatMonthYear(item.startDate);
+                const end = item.endDate
+                  ? formatMonthYear(item.endDate)
+                  : item.startDate
+                    ? "Current"
+                    : "";
+
+                const subtitle =
+                  school && location
+                    ? `${school}, ${location}`
+                    : school || location;
+
+                const hasItem = Boolean(
+                  title || subtitle || body || start || end,
+                );
+                if (!hasItem) return null;
+
+                return (
+                  <View key={item.id} style={styles.item}>
+                    <View style={styles.itemHeader}>
+                      <View style={styles.itemTitleRow}>
+                        {title ? (
+                          <Text style={styles.itemTitle}>{title}</Text>
+                        ) : (
+                          <Text style={styles.itemTitle} />
+                        )}
+                        {start ? (
+                          <Text style={styles.itemDate}>{start}</Text>
+                        ) : null}
+                      </View>
+                      <View style={styles.itemSubtitleRow}>
+                        <Text
+                          style={[styles.itemSubtitle, { color: accentColor }]}
+                        >
+                          {subtitle || " "}
+                        </Text>
                         {end ? (
                           <Text style={styles.itemDate}>{end}</Text>
                         ) : null}

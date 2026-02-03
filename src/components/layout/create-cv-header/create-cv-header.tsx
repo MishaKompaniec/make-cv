@@ -41,6 +41,16 @@ type WorkExperiencePreviewItem = {
   description: string;
 };
 
+type EducationPreviewItem = {
+  id: string;
+  diploma: string;
+  schoolName: string;
+  schoolLocation: string;
+  startDate?: { month: number; year: number };
+  endDate?: { month: number; year: number };
+  description: string;
+};
+
 interface CreateCvHeaderProps {
   stepNumber: string;
   title: string;
@@ -64,6 +74,10 @@ export function CreateCvHeader({
   );
   const [workExperience] = useLocalStorage<WorkExperiencePreviewItem[]>(
     "cv-work-experience",
+    [],
+  );
+  const [education] = useLocalStorage<EducationPreviewItem[]>(
+    "cv-education",
     [],
   );
 
@@ -132,6 +146,7 @@ export function CreateCvHeader({
                     sidebarColor={selectedColor}
                     contactDetails={contactDetails}
                     workExperience={workExperience}
+                    education={education}
                     summary={summary}
                   />
                 }
