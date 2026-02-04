@@ -56,6 +56,19 @@ type SkillPreviewItem = {
   title: string;
 };
 
+type LanguagePreviewItem = {
+  id: string;
+  name: string;
+  level: string;
+};
+
+type SelectedSectionsPreview = {
+  languages: boolean;
+  interests: boolean;
+  references: boolean;
+  customSection: boolean;
+};
+
 interface CreateCvHeaderProps {
   stepNumber: string;
   title: string;
@@ -86,6 +99,19 @@ export function CreateCvHeader({
     [],
   );
   const [skills] = useLocalStorage<SkillPreviewItem[]>("cv-skills", []);
+  const [languages] = useLocalStorage<LanguagePreviewItem[]>(
+    "cv-languages",
+    [],
+  );
+  const [selectedSections] = useLocalStorage<SelectedSectionsPreview>(
+    "cv-selected-sections",
+    {
+      languages: false,
+      interests: false,
+      references: false,
+      customSection: false,
+    },
+  );
 
   const selectedColor =
     templateColors?.[templateId] ?? TEMPLATE_1_COLORS[0].value;
@@ -157,6 +183,8 @@ export function CreateCvHeader({
                     workExperience={workExperience}
                     education={education}
                     skills={skills}
+                    languages={languages}
+                    selectedSections={selectedSections}
                     summary={summary}
                   />
                 }
