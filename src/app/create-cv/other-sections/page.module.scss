@@ -217,41 +217,6 @@
   align-items: start;
 }
 
-.selectField {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-.selectLabel {
-  font-size: 0.9rem;
-  color: $text;
-  margin-bottom: 0.4rem;
-  font-weight: 500;
-}
-
-.select {
-  display: block;
-  width: 100%;
-  padding: 0.75rem 1rem;
-  font-size: 0.875rem;
-  line-height: 1.25;
-  color: $text;
-  background: $white;
-  border: 1px solid $border-medium;
-  border-radius: $border-radius;
-  transition: all $transition-smooth;
-  outline: none;
-
-  &:hover {
-    border-color: $border-hover;
-  }
-
-  &:focus {
-    border-color: $accent;
-  }
-}
-
 @media (max-width: #{$breakpoint-tablet}) {
   .wrapper {
     padding: 1rem;
@@ -263,9 +228,5 @@
 
   .sectionCard {
     padding: 1.25rem;
-  }
-
-  .row2 {
-    grid-template-columns: 1fr;
   }
 }

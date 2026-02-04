@@ -1,6 +1,7 @@
 import { forwardRef } from "react";
 
 import { Input } from "@/components/ui/input/input";
+import { Select } from "@/components/ui/select/select";
 import styles from "./page.module.scss";
 
 export type LanguageLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2" | "Native";
@@ -35,6 +36,8 @@ const LEVEL_OPTIONS: LanguageLevel[] = [
   "C2",
   "Native",
 ];
+
+const LEVEL_SELECT_OPTIONS = LEVEL_OPTIONS.map((v) => ({ value: v, label: v }));
 
 export const LanguagesCard = forwardRef<HTMLDivElement, LanguagesCardProps>(
   (
@@ -92,22 +95,14 @@ export const LanguagesCard = forwardRef<HTMLDivElement, LanguagesCardProps>(
               fullWidth
             />
 
-            <div className={styles.selectField}>
-              <span className={styles.selectLabel}>Level</span>
-              <select
-                className={styles.select}
-                value={language.level}
-                onChange={(e) =>
-                  onChange({ level: e.target.value as LanguageLevel })
-                }
-              >
-                {LEVEL_OPTIONS.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <Select
+              label="Level"
+              value={language.level}
+              onChange={(nextValue) =>
+                onChange({ level: nextValue as LanguageLevel })
+              }
+              options={LEVEL_SELECT_OPTIONS}
+            />
           </div>
         </div>
       </div>
