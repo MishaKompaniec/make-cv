@@ -51,6 +51,11 @@ type EducationPreviewItem = {
   description: string;
 };
 
+type SkillPreviewItem = {
+  id: string;
+  title: string;
+};
+
 interface CreateCvHeaderProps {
   stepNumber: string;
   title: string;
@@ -80,6 +85,7 @@ export function CreateCvHeader({
     "cv-education",
     [],
   );
+  const [skills] = useLocalStorage<SkillPreviewItem[]>("cv-skills", []);
 
   const selectedColor =
     templateColors?.[templateId] ?? TEMPLATE_1_COLORS[0].value;
@@ -150,6 +156,7 @@ export function CreateCvHeader({
                     contactDetails={contactDetails}
                     workExperience={workExperience}
                     education={education}
+                    skills={skills}
                     summary={summary}
                   />
                 }

@@ -69,6 +69,12 @@ const styles = StyleSheet.create({
     color: "#2B2B2B",
     marginBottom: 4,
   },
+  skillLabel: {
+    fontSize: 11,
+    fontWeight: 600,
+    color: "#2B2B2B",
+    marginBottom: 4,
+  },
   sidebarInfoRow: {
     flexDirection: "row",
     marginBottom: 6,
@@ -89,6 +95,7 @@ const styles = StyleSheet.create({
     fontSize: 8,
     color: "#2B2B2B",
   },
+  skillItem: { marginBottom: "4px", fontSize: 10, color: "#2B2B2B" },
   mainSection: {
     marginTop: 14,
   },
@@ -178,6 +185,10 @@ type Template2Props = {
     endDate?: { month: number; year: number };
     description: string;
   }[];
+  skills?: {
+    id: string;
+    title: string;
+  }[];
   summary?: string;
 };
 
@@ -186,6 +197,7 @@ export function TemplatePdf2({
   contactDetails,
   workExperience = [],
   education = [],
+  skills = [],
   summary,
 }: Template2Props) {
   const fullName = contactDetails?.fullName || "";
@@ -233,6 +245,11 @@ export function TemplatePdf2({
     linkedIn ||
     git,
   );
+
+  const cleanedSkills = skills
+    .map((s) => ({ ...s, title: s.title?.trim?.() ?? "" }))
+    .filter((s) => s.title);
+  const hasSkills = cleanedSkills.length > 0;
 
   const hasHeader = Boolean(fullName || jobTitle);
   const hasWorkExperience = workExperience.some(
@@ -499,6 +516,17 @@ export function TemplatePdf2({
                 gitSafe,
               )}
             </>
+          ) : null}
+
+          {hasSkills ? (
+            <View style={{ marginTop: hasSidebarInfo ? 12 : 0 }}>
+              <Text style={styles.skillLabel}>Skills</Text>
+              {cleanedSkills.map((s) => (
+                <Text key={s.id} style={[styles.skillItem]}>
+                  {s.title}
+                </Text>
+              ))}
+            </View>
           ) : null}
         </View>
       </Page>
