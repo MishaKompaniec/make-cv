@@ -7,15 +7,17 @@
 }
 
 .wrapper {
-  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  padding: 0 2rem 2rem;
   flex: 1;
+  gap: 1.5rem;
 }
 
 .sectionsGrid {
   display: grid;
   grid-auto-flow: column;
   gap: 1rem;
-  margin-bottom: 1.5rem;
 }
 
 .sectionToggle {
@@ -77,6 +79,7 @@
 
 .addItemTile {
   width: 100%;
+  height: 135.5px;
   border: 2px dashed $border-light;
   border-radius: 0.75rem;
   background: $bg-secondary;

@@ -62,6 +62,11 @@ type LanguagePreviewItem = {
   level: string;
 };
 
+type InterestPreviewItem = {
+  id: string;
+  title: string;
+};
+
 type SelectedSectionsPreview = {
   languages: boolean;
   interests: boolean;
@@ -101,6 +106,10 @@ export function CreateCvHeader({
   const [skills] = useLocalStorage<SkillPreviewItem[]>("cv-skills", []);
   const [languages] = useLocalStorage<LanguagePreviewItem[]>(
     "cv-languages",
+    [],
+  );
+  const [interests] = useLocalStorage<InterestPreviewItem[]>(
+    "cv-interests",
     [],
   );
   const [selectedSections] = useLocalStorage<SelectedSectionsPreview>(
@@ -184,6 +193,7 @@ export function CreateCvHeader({
                     education={education}
                     skills={skills}
                     languages={languages}
+                    interests={interests}
                     selectedSections={selectedSections}
                     summary={summary}
                   />

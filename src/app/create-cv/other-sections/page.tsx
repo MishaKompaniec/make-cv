@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { CreateCvHeader } from "@/components/layout/create-cv-header/create-cv-header";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useSectionList } from "@/hooks/useSectionList";
 import { Checkbox } from "@/components/ui/checkbox/checkbox";
 import { LanguagesCard, type LanguageItem } from "./languages-card";
+import { InterestsCard, type InterestItem } from "./interests-card";
 import styles from "./page.module.scss";
 
 const stepTitle = "Other sections";
@@ -25,12 +27,10 @@ const DEFAULT_SELECTED_SECTIONS: SelectedSections = {
   customSection: false,
 };
 
+const MAX_TEXT_LENGTH = 25;
+
 export default function OtherSectionsPage() {
   const router = useRouter();
-  const [storedLanguages, setStoredLanguages] = useLocalStorage<LanguageItem[]>(
-    "cv-languages",
-    [],
-  );
   const [storedSelectedSections, setStoredSelectedSections] =
     useLocalStorage<SelectedSections>(
       "cv-selected-sections",
@@ -41,18 +41,41 @@ export default function OtherSectionsPage() {
     DEFAULT_SELECTED_SECTIONS,
   );
 
-  const didInitRef = useRef(false);
   const sectionsDidInitRef = useRef(false);
   const sectionsDebounceTimerRef = useRef<number | null>(null);
 
-  const [languages, setLanguages] = useState<LanguageItem[]>([]);
-  const [languageErrors, setLanguageErrors] = useState<
-    Record<string, { name?: string }>
-  >({});
-  const debounceTimerRef = useRef<number | null>(null);
-  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const prevPositionsRef = useRef<Record<string, DOMRect>>({});
-  const shouldAnimateRef = useRef(false);
+  const languagesList = useSectionList<LanguageItem, { name?: string }>({
+    storageKey: "cv-languages",
+    validateItem: (item) => {
+      const errors: { name?: string } = {};
+      const name = item.name.trim();
+      if (!name) errors.name = "Language name is required";
+      else if (name.length > MAX_TEXT_LENGTH)
+        errors.name = "Language name is too long";
+      return errors;
+    },
+    createItem: () => ({
+      id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      name: "",
+      level: "A1",
+    }),
+  });
+
+  const interestsList = useSectionList<InterestItem, { title?: string }>({
+    storageKey: "cv-interests",
+    validateItem: (item) => {
+      const errors: { title?: string } = {};
+      const title = item.title.trim();
+      if (!title) errors.title = "Interest is required";
+      else if (title.length > MAX_TEXT_LENGTH)
+        errors.title = "Interest is too long";
+      return errors;
+    },
+    createItem: () => ({
+      id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      title: "",
+    }),
+  });
 
   // Initialize selectedSections once from localStorage.
   useEffect(() => {
@@ -80,160 +103,13 @@ export default function OtherSectionsPage() {
     };
   }, [selectedSections, setStoredSelectedSections]);
 
-  useEffect(() => {
-    if (didInitRef.current) return;
-    setLanguages(storedLanguages);
-    didInitRef.current = true;
-  }, [storedLanguages]);
-
-  useEffect(() => {
-    if (!didInitRef.current) return;
-
-    if (debounceTimerRef.current) {
-      window.clearTimeout(debounceTimerRef.current);
-    }
-
-    debounceTimerRef.current = window.setTimeout(() => {
-      setStoredLanguages(languages);
-    }, 250);
-
-    return () => {
-      if (debounceTimerRef.current) {
-        window.clearTimeout(debounceTimerRef.current);
-      }
-    };
-  }, [languages, setStoredLanguages]);
-
-  const validateLanguage = (item: LanguageItem) => {
-    const errors: { name?: string } = {};
-    const name = item.name.trim();
-    if (!name) errors.name = "Language name is required";
-    return errors;
-  };
-
-  const addLanguage = () => {
-    setLanguages((prev) => [
-      ...prev,
-      {
-        id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-        name: "",
-        level: "A1",
-      },
-    ]);
-  };
-
-  const updateLanguage = (
-    id: string,
-    patch: Partial<Omit<LanguageItem, "id">>,
-  ) => {
-    setLanguages((prev) => {
-      const current = prev.find((l) => l.id === id);
-      if (!current) return prev;
-
-      const updated = { ...current, ...patch } as LanguageItem;
-      const nextLanguages = prev.map((l) => (l.id === id ? updated : l));
-
-      setLanguageErrors((prevErrs) => {
-        if (!prevErrs[id]) return prevErrs;
-        const nextErrs = { ...prevErrs };
-        const errs = validateLanguage(updated);
-        if (Object.keys(errs).length === 0) {
-          delete nextErrs[id];
-        } else {
-          nextErrs[id] = errs;
-        }
-        return nextErrs;
-      });
-
-      return nextLanguages;
-    });
-  };
-
-  const removeLanguage = (id: string) => {
-    setLanguages((prev) => prev.filter((l) => l.id !== id));
-    setLanguageErrors((prev) => {
-      if (!prev[id]) return prev;
-      const next = { ...prev };
-      delete next[id];
-      return next;
-    });
-  };
-
-  const moveLanguage = (fromIndex: number, toIndex: number) => {
-    setLanguages((prev) => {
-      if (toIndex < 0 || toIndex >= prev.length) return prev;
-
-      const positions: Record<string, DOMRect> = {};
-      for (const item of prev) {
-        const el = cardRefs.current[item.id];
-        if (el) positions[item.id] = el.getBoundingClientRect();
-      }
-      prevPositionsRef.current = positions;
-      shouldAnimateRef.current = true;
-
-      const next = [...prev];
-      const tmp = next[fromIndex];
-      next[fromIndex] = next[toIndex];
-      next[toIndex] = tmp;
-      return next;
-    });
-  };
-
-  useLayoutEffect(() => {
-    if (!shouldAnimateRef.current) return;
-    shouldAnimateRef.current = false;
-
-    const prevPositions = prevPositionsRef.current;
-    const animations: Array<() => void> = [];
-
-    for (const item of languages) {
-      const el = cardRefs.current[item.id];
-      const prevRect = prevPositions[item.id];
-      if (!el || !prevRect) continue;
-
-      const nextRect = el.getBoundingClientRect();
-      const dx = prevRect.left - nextRect.left;
-      const dy = prevRect.top - nextRect.top;
-      if (dx === 0 && dy === 0) continue;
-
-      animations.push(() => {
-        el.style.transform = `translate(${dx}px, ${dy}px)`;
-        el.style.transition = "transform 0s";
-        requestAnimationFrame(() => {
-          el.style.transition = "transform 200ms ease";
-          el.style.transform = "translate(0px, 0px)";
-        });
-
-        const cleanup = () => {
-          el.removeEventListener("transitionend", cleanup);
-          el.style.transition = "";
-          el.style.transform = "";
-        };
-        el.addEventListener("transitionend", cleanup);
-      });
-    }
-
-    for (const run of animations) run();
-  }, [languages]);
-
   const toggleSection = (key: keyof SelectedSections) => {
     setSelectedSections((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   const handleNextClick = () => {
-    // Validate Languages if enabled
-    if (selectedSections.languages) {
-      const nextErrors: Record<string, { name?: string }> = {};
-      for (const language of languages) {
-        const errs = validateLanguage(language);
-        if (Object.keys(errs).length > 0) {
-          nextErrors[language.id] = errs;
-        }
-      }
-
-      setLanguageErrors(nextErrors);
-      if (Object.keys(nextErrors).length > 0) return;
-    }
+    if (selectedSections.languages && !languagesList.validateAll()) return;
+    if (selectedSections.interests && !interestsList.validateAll()) return;
 
     router.push("/create-cv/finalize");
   };
@@ -302,32 +178,69 @@ export default function OtherSectionsPage() {
             <div className={styles.sectionCardTitle}>Languages</div>
 
             <div className={styles.itemsList}>
-              {languages.map((language, index) => (
+              {languagesList.items.map((language, index) => (
                 <LanguagesCard
                   key={language.id}
-                  ref={(el) => {
-                    cardRefs.current[language.id] = el;
-                  }}
+                  ref={languagesList.setCardRef(language.id)}
                   language={language}
-                  errors={languageErrors[language.id]}
-                  canMoveUp={languages.length > 1 && index > 0}
+                  errors={languagesList.errors[language.id]}
+                  canMoveUp={languagesList.items.length > 1 && index > 0}
                   canMoveDown={
-                    languages.length > 1 && index < languages.length - 1
+                    languagesList.items.length > 1 &&
+                    index < languagesList.items.length - 1
                   }
-                  onMoveUp={() => moveLanguage(index, index - 1)}
-                  onMoveDown={() => moveLanguage(index, index + 1)}
-                  onRemove={() => removeLanguage(language.id)}
-                  onChange={(patch) => updateLanguage(language.id, patch)}
+                  onMoveUp={() => languagesList.moveItem(index, index - 1)}
+                  onMoveDown={() => languagesList.moveItem(index, index + 1)}
+                  onRemove={() => languagesList.removeItem(language.id)}
+                  onChange={(patch) =>
+                    languagesList.updateItem(language.id, patch)
+                  }
+                />
+              ))}
+              <button
+                type="button"
+                className={styles.addItemTile}
+                onClick={languagesList.addItem}
+              >
+                <div className={styles.addItemTileIcon}>+</div>
+                <p className={styles.addItemTileText}>Add language</p>
+              </button>
+            </div>
+          </div>
+        ) : null}
+
+        {selectedSections.interests ? (
+          <div className={styles.sectionCard}>
+            <div className={styles.sectionCardTitle}>Interests</div>
+
+            <div className={styles.itemsList}>
+              {interestsList.items.map((interest, index) => (
+                <InterestsCard
+                  key={interest.id}
+                  ref={interestsList.setCardRef(interest.id)}
+                  interest={interest}
+                  errors={interestsList.errors[interest.id]}
+                  canMoveUp={interestsList.items.length > 1 && index > 0}
+                  canMoveDown={
+                    interestsList.items.length > 1 &&
+                    index < interestsList.items.length - 1
+                  }
+                  onMoveUp={() => interestsList.moveItem(index, index - 1)}
+                  onMoveDown={() => interestsList.moveItem(index, index + 1)}
+                  onRemove={() => interestsList.removeItem(interest.id)}
+                  onChange={(patch) =>
+                    interestsList.updateItem(interest.id, patch)
+                  }
                 />
               ))}
 
               <button
                 type="button"
                 className={styles.addItemTile}
-                onClick={addLanguage}
+                onClick={interestsList.addItem}
               >
                 <div className={styles.addItemTileIcon}>+</div>
-                <p className={styles.addItemTileText}>Add language</p>
+                <p className={styles.addItemTileText}>Add interest</p>
               </button>
             </div>
           </div>

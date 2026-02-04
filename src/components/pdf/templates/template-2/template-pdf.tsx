@@ -194,6 +194,10 @@ type Template2Props = {
     name: string;
     level: string;
   }[];
+  interests?: {
+    id: string;
+    title: string;
+  }[];
   selectedSections?: {
     languages: boolean;
     interests: boolean;
@@ -210,6 +214,7 @@ export function TemplatePdf2({
   education = [],
   skills = [],
   languages = [],
+  interests = [],
   selectedSections,
   summary,
 }: Template2Props) {
@@ -273,6 +278,15 @@ export function TemplatePdf2({
     .filter((l) => l.name);
   const shouldShowLanguages = selectedSections?.languages ?? true;
   const hasLanguages = shouldShowLanguages && cleanedLanguages.length > 0;
+
+  const cleanedInterests = interests
+    .map((i) => ({
+      ...i,
+      title: i.title?.trim?.() ?? "",
+    }))
+    .filter((i) => i.title);
+  const shouldShowInterests = selectedSections?.interests ?? true;
+  const hasInterests = shouldShowInterests && cleanedInterests.length > 0;
 
   const hasHeader = Boolean(fullName || jobTitle);
   const hasWorkExperience = workExperience.some(
@@ -563,6 +577,27 @@ export function TemplatePdf2({
                 <Text key={l.id} style={[styles.skillItem]}>
                   {l.name}
                   {l.level ? ` (${l.level})` : ""}
+                </Text>
+              ))}
+            </View>
+          ) : null}
+
+          {hasInterests ? (
+            <View
+              style={{
+                marginTop: hasLanguages
+                  ? 12
+                  : hasSkills
+                    ? 12
+                    : hasSidebarInfo
+                      ? 12
+                      : 0,
+              }}
+            >
+              <Text style={styles.skillLabel}>Interests</Text>
+              {cleanedInterests.map((i) => (
+                <Text key={i.id} style={[styles.skillItem]}>
+                  {i.title}
                 </Text>
               ))}
             </View>

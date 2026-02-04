@@ -93,6 +93,7 @@ export const LanguagesCard = forwardRef<HTMLDivElement, LanguagesCardProps>(
               error={errors?.name}
               required
               fullWidth
+              maxLength={25}
             />
 
             <Select

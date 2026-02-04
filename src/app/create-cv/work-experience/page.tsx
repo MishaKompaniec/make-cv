@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { CreateCvHeader } from "@/components/layout/create-cv-header/create-cv-header";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useSectionList } from "@/hooks/useSectionList";
 import {
   WorkExperienceCard,
   type ExperienceItem,
@@ -63,168 +62,24 @@ const validateExperience = (exp: ExperienceItem): ExperienceErrors => {
 
 export default function WorkExperiencePage() {
   const router = useRouter();
-  const [storedExperiences, setStoredExperiences] = useLocalStorage<
-    ExperienceItem[]
-  >("cv-work-experience", []);
 
-  const [experiences, setExperiences] = useState<ExperienceItem[]>([]);
-  const [experienceErrors, setExperienceErrors] = useState<
-    Record<string, ExperienceErrors>
-  >({});
-  const didInitRef = useRef(false);
-  const debounceTimerRef = useRef<number | null>(null);
-  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const prevPositionsRef = useRef<Record<string, DOMRect>>({});
-  const shouldAnimateRef = useRef(false);
-
-  // Initialize once from localStorage.
-  useEffect(() => {
-    if (didInitRef.current) return;
-    setExperiences(storedExperiences);
-    didInitRef.current = true;
-  }, [storedExperiences]);
-
-  // Auto-save on changes (preserve order).
-  useEffect(() => {
-    if (!didInitRef.current) return;
-
-    if (debounceTimerRef.current) {
-      window.clearTimeout(debounceTimerRef.current);
-    }
-
-    debounceTimerRef.current = window.setTimeout(() => {
-      setStoredExperiences(experiences);
-    }, 600);
-
-    return () => {
-      if (debounceTimerRef.current) {
-        window.clearTimeout(debounceTimerRef.current);
-      }
-    };
-  }, [experiences, setStoredExperiences]);
-
-  const handleAddExperience = () => {
-    setExperiences((prev) => [
-      ...prev,
-      {
-        id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-        jobTitle: "",
-        companyName: "",
-        city: "",
-        startDate: undefined,
-        endDate: undefined,
-        description: "",
-      },
-    ]);
-  };
-
-  const updateExperience = (
-    id: string,
-    patch: Partial<Omit<ExperienceItem, "id">>,
-  ) => {
-    setExperiences((prev) => {
-      const current = prev.find((e) => e.id === id);
-      if (!current) return prev;
-
-      const updated = { ...current, ...patch } as ExperienceItem;
-      const nextExperiences = prev.map((exp) =>
-        exp.id === id ? updated : exp,
-      );
-
-      setExperienceErrors((prevErrs) => {
-        if (!prevErrs[id]) return prevErrs;
-        const nextErrs = { ...prevErrs };
-        const errs = validateExperience(updated);
-        if (Object.keys(errs).length === 0) {
-          delete nextErrs[id];
-        } else {
-          nextErrs[id] = errs;
-        }
-        return nextErrs;
-      });
-
-      return nextExperiences;
-    });
-  };
-
-  const removeExperience = (id: string) => {
-    setExperiences((prev) => prev.filter((exp) => exp.id !== id));
-    setExperienceErrors((prev) => {
-      if (!prev[id]) return prev;
-      const next = { ...prev };
-      delete next[id];
-      return next;
-    });
-  };
-
-  const moveExperience = (fromIndex: number, toIndex: number) => {
-    setExperiences((prev) => {
-      if (toIndex < 0 || toIndex >= prev.length) return prev;
-
-      const positions: Record<string, DOMRect> = {};
-      for (const exp of prev) {
-        const el = cardRefs.current[exp.id];
-        if (el) positions[exp.id] = el.getBoundingClientRect();
-      }
-      prevPositionsRef.current = positions;
-      shouldAnimateRef.current = true;
-
-      const next = [...prev];
-      const tmp = next[fromIndex];
-      next[fromIndex] = next[toIndex];
-      next[toIndex] = tmp;
-      return next;
-    });
-  };
-
-  useLayoutEffect(() => {
-    if (!shouldAnimateRef.current) return;
-    shouldAnimateRef.current = false;
-
-    const prevPositions = prevPositionsRef.current;
-    const animations: Array<() => void> = [];
-
-    for (const exp of experiences) {
-      const el = cardRefs.current[exp.id];
-      const prevRect = prevPositions[exp.id];
-      if (!el || !prevRect) continue;
-
-      const nextRect = el.getBoundingClientRect();
-      const dx = prevRect.left - nextRect.left;
-      const dy = prevRect.top - nextRect.top;
-      if (dx === 0 && dy === 0) continue;
-
-      animations.push(() => {
-        el.style.transform = `translate(${dx}px, ${dy}px)`;
-        el.style.transition = "transform 0s";
-        requestAnimationFrame(() => {
-          el.style.transition = "transform 200ms ease";
-          el.style.transform = "translate(0px, 0px)";
-        });
-
-        const cleanup = () => {
-          el.removeEventListener("transitionend", cleanup);
-          el.style.transition = "";
-          el.style.transform = "";
-        };
-        el.addEventListener("transitionend", cleanup);
-      });
-    }
-
-    for (const run of animations) run();
-  }, [experiences]);
+  const experiencesList = useSectionList<ExperienceItem, ExperienceErrors>({
+    storageKey: "cv-work-experience",
+    validateItem: validateExperience,
+    createItem: () => ({
+      id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      jobTitle: "",
+      companyName: "",
+      city: "",
+      startDate: undefined,
+      endDate: undefined,
+      description: "",
+    }),
+    debounceMs: 600,
+  });
 
   const handleNextClick = () => {
-    const nextErrors: Record<string, ExperienceErrors> = {};
-    for (const exp of experiences) {
-      const errs = validateExperience(exp);
-      if (Object.keys(errs).length > 0) {
-        nextErrors[exp.id] = errs;
-      }
-    }
-
-    setExperienceErrors(nextErrors);
-    if (Object.keys(nextErrors).length > 0) return;
+    if (!experiencesList.validateAll()) return;
 
     router.push("/create-cv/education");
   };
@@ -240,29 +95,28 @@ export default function WorkExperiencePage() {
       <section className={styles.wrapper}>
         <div className={styles.content}>
           <div className={styles.form}>
-            {experiences.map((exp, index) => (
+            {experiencesList.items.map((exp, index) => (
               <WorkExperienceCard
                 key={exp.id}
-                ref={(el) => {
-                  cardRefs.current[exp.id] = el;
-                }}
+                ref={experiencesList.setCardRef(exp.id)}
                 experience={exp}
-                errors={experienceErrors[exp.id]}
-                canMoveUp={experiences.length > 1 && index > 0}
+                errors={experiencesList.errors[exp.id]}
+                canMoveUp={experiencesList.items.length > 1 && index > 0}
                 canMoveDown={
-                  experiences.length > 1 && index < experiences.length - 1
+                  experiencesList.items.length > 1 &&
+                  index < experiencesList.items.length - 1
                 }
-                onMoveUp={() => moveExperience(index, index - 1)}
-                onMoveDown={() => moveExperience(index, index + 1)}
-                onRemove={() => removeExperience(exp.id)}
-                onChange={(patch) => updateExperience(exp.id, patch)}
+                onMoveUp={() => experiencesList.moveItem(index, index - 1)}
+                onMoveDown={() => experiencesList.moveItem(index, index + 1)}
+                onRemove={() => experiencesList.removeItem(exp.id)}
+                onChange={(patch) => experiencesList.updateItem(exp.id, patch)}
               />
             ))}
 
             <button
               type="button"
               className={styles.addExperienceTile}
-              onClick={handleAddExperience}
+              onClick={experiencesList.addItem}
             >
               <div className={styles.addExperienceTileIcon}>+</div>
               <p className={styles.addExperienceTileText}>
