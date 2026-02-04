@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { CreateCvHeader } from "@/components/layout/create-cv-header/create-cv-header";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { Checkbox } from "@/components/ui/checkbox/checkbox";
 import { LanguagesCard, type LanguageItem } from "./languages-card";
 import styles from "./page.module.scss";
 
@@ -252,13 +253,10 @@ export default function OtherSectionsPage() {
             className={`${styles.sectionToggle} ${selectedSections.languages ? styles.sectionToggleActive : ""}`}
             onClick={() => toggleSection("languages")}
           >
-            <span className={styles.sectionToggleCheckbox}>
-              <input
-                type="checkbox"
-                checked={selectedSections.languages}
-                readOnly
-              />
-            </span>
+            <Checkbox
+              checked={selectedSections.languages}
+              onChange={() => toggleSection("languages")}
+            />
             <span className={styles.sectionToggleText}>Languages</span>
           </button>
 
@@ -267,13 +265,10 @@ export default function OtherSectionsPage() {
             className={`${styles.sectionToggle} ${selectedSections.interests ? styles.sectionToggleActive : ""}`}
             onClick={() => toggleSection("interests")}
           >
-            <span className={styles.sectionToggleCheckbox}>
-              <input
-                type="checkbox"
-                checked={selectedSections.interests}
-                readOnly
-              />
-            </span>
+            <Checkbox
+              checked={selectedSections.interests}
+              onChange={() => toggleSection("interests")}
+            />
             <span className={styles.sectionToggleText}>Interests</span>
           </button>
 
@@ -282,13 +277,10 @@ export default function OtherSectionsPage() {
             className={`${styles.sectionToggle} ${selectedSections.references ? styles.sectionToggleActive : ""}`}
             onClick={() => toggleSection("references")}
           >
-            <span className={styles.sectionToggleCheckbox}>
-              <input
-                type="checkbox"
-                checked={selectedSections.references}
-                readOnly
-              />
-            </span>
+            <Checkbox
+              checked={selectedSections.references}
+              onChange={() => toggleSection("references")}
+            />
             <span className={styles.sectionToggleText}>References</span>
           </button>
 
@@ -297,13 +289,10 @@ export default function OtherSectionsPage() {
             className={`${styles.sectionToggle} ${selectedSections.customSection ? styles.sectionToggleActive : ""}`}
             onClick={() => toggleSection("customSection")}
           >
-            <span className={styles.sectionToggleCheckbox}>
-              <input
-                type="checkbox"
-                checked={selectedSections.customSection}
-                readOnly
-              />
-            </span>
+            <Checkbox
+              checked={selectedSections.customSection}
+              onChange={() => toggleSection("customSection")}
+            />
             <span className={styles.sectionToggleText}>Custom section</span>
           </button>
         </div>
