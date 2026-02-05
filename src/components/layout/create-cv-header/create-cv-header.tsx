@@ -67,10 +67,15 @@ type InterestPreviewItem = {
   title: string;
 };
 
+type CustomSectionPreviewItem = {
+  id: string;
+  title: string;
+  description: string;
+};
+
 type SelectedSectionsPreview = {
   languages: boolean;
   interests: boolean;
-  references: boolean;
   customSection: boolean;
 };
 
@@ -112,12 +117,15 @@ export function CreateCvHeader({
     "cv-interests",
     [],
   );
+  const [customSections] = useLocalStorage<CustomSectionPreviewItem[]>(
+    "cv-custom-sections",
+    [],
+  );
   const [selectedSections] = useLocalStorage<SelectedSectionsPreview>(
     "cv-selected-sections",
     {
       languages: false,
       interests: false,
-      references: false,
       customSection: false,
     },
   );
@@ -194,6 +202,7 @@ export function CreateCvHeader({
                     skills={skills}
                     languages={languages}
                     interests={interests}
+                    customSections={customSections}
                     selectedSections={selectedSections}
                     summary={summary}
                   />

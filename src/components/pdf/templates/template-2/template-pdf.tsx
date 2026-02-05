@@ -198,10 +198,14 @@ type Template2Props = {
     id: string;
     title: string;
   }[];
+  customSections?: {
+    id: string;
+    title: string;
+    description: string;
+  }[];
   selectedSections?: {
     languages: boolean;
     interests: boolean;
-    references: boolean;
     customSection: boolean;
   };
   summary?: string;
@@ -215,6 +219,7 @@ export function TemplatePdf2({
   skills = [],
   languages = [],
   interests = [],
+  customSections = [],
   selectedSections,
   summary,
 }: Template2Props) {
@@ -287,6 +292,17 @@ export function TemplatePdf2({
     .filter((i) => i.title);
   const shouldShowInterests = selectedSections?.interests ?? true;
   const hasInterests = shouldShowInterests && cleanedInterests.length > 0;
+
+  const cleanedCustomSections = customSections
+    .map((s) => ({
+      ...s,
+      title: s.title?.trim?.() ?? "",
+      description: s.description?.trim?.() ?? "",
+    }))
+    .filter((s) => s.title);
+  const shouldShowCustomSections = selectedSections?.customSection ?? true;
+  const hasCustomSections =
+    shouldShowCustomSections && cleanedCustomSections.length > 0;
 
   const hasHeader = Boolean(fullName || jobTitle);
   const hasWorkExperience = workExperience.some(
@@ -532,6 +548,29 @@ export function TemplatePdf2({
               })}
             </View>
           ) : null}
+
+          {hasCustomSections
+            ? cleanedCustomSections.map((section) => (
+                <View key={section.id} style={styles.mainSection}>
+                  <View style={styles.sectionTitleRow}>
+                    <View
+                      style={[
+                        styles.sectionDot,
+                        {
+                          backgroundColor: accentColor,
+                          position: "absolute",
+                          left: -15,
+                        },
+                      ]}
+                    />
+                    <Text style={styles.sectionTitle}>{section.title}</Text>
+                  </View>
+                  {section.description ? (
+                    <Text style={styles.itemBody}>{section.description}</Text>
+                  ) : null}
+                </View>
+              ))
+            : null}
         </View>
 
         <View style={[styles.sidebar, { backgroundColor: sidebarColor }]}>

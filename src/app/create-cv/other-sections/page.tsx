@@ -9,6 +9,10 @@ import { useSectionList } from "@/hooks/useSectionList";
 import { Checkbox } from "@/components/ui/checkbox/checkbox";
 import { LanguagesCard, type LanguageItem } from "./languages-card";
 import { InterestsCard, type InterestItem } from "./interests-card";
+import {
+  CustomSectionCard,
+  type CustomSectionItem,
+} from "./custom-section-card";
 import styles from "./page.module.scss";
 
 const stepTitle = "Other sections";
@@ -16,14 +20,12 @@ const stepTitle = "Other sections";
 type SelectedSections = {
   languages: boolean;
   interests: boolean;
-  references: boolean;
   customSection: boolean;
 };
 
 const DEFAULT_SELECTED_SECTIONS: SelectedSections = {
   languages: false,
   interests: false,
-  references: false,
   customSection: false,
 };
 
@@ -58,6 +60,24 @@ export default function OtherSectionsPage() {
       id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
       name: "",
       level: "A1",
+    }),
+  });
+
+  const customSectionsList = useSectionList<
+    CustomSectionItem,
+    { title?: string }
+  >({
+    storageKey: "cv-custom-sections",
+    validateItem: (item) => {
+      const errors: { title?: string } = {};
+      const title = item.title.trim();
+      if (!title) errors.title = "Section title is required";
+      return errors;
+    },
+    createItem: () => ({
+      id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      title: "",
+      description: "",
     }),
   });
 
@@ -110,6 +130,8 @@ export default function OtherSectionsPage() {
   const handleNextClick = () => {
     if (selectedSections.languages && !languagesList.validateAll()) return;
     if (selectedSections.interests && !interestsList.validateAll()) return;
+    if (selectedSections.customSection && !customSectionsList.validateAll())
+      return;
 
     router.push("/create-cv/finalize");
   };
@@ -146,18 +168,6 @@ export default function OtherSectionsPage() {
               onChange={() => toggleSection("interests")}
             />
             <span className={styles.sectionToggleText}>Interests</span>
-          </button>
-
-          <button
-            type="button"
-            className={`${styles.sectionToggle} ${selectedSections.references ? styles.sectionToggleActive : ""}`}
-            onClick={() => toggleSection("references")}
-          >
-            <Checkbox
-              checked={selectedSections.references}
-              onChange={() => toggleSection("references")}
-            />
-            <span className={styles.sectionToggleText}>References</span>
           </button>
 
           <button
@@ -241,6 +251,45 @@ export default function OtherSectionsPage() {
               >
                 <div className={styles.addItemTileIcon}>+</div>
                 <p className={styles.addItemTileText}>Add interest</p>
+              </button>
+            </div>
+          </div>
+        ) : null}
+
+        {selectedSections.customSection ? (
+          <div className={styles.sectionCard}>
+            <div className={styles.sectionCardTitle}>Custom section</div>
+
+            <div className={styles.itemsList}>
+              {customSectionsList.items.map((section, index) => (
+                <CustomSectionCard
+                  key={section.id}
+                  ref={customSectionsList.setCardRef(section.id)}
+                  section={section}
+                  errors={customSectionsList.errors[section.id]}
+                  canMoveUp={customSectionsList.items.length > 1 && index > 0}
+                  canMoveDown={
+                    customSectionsList.items.length > 1 &&
+                    index < customSectionsList.items.length - 1
+                  }
+                  onMoveUp={() => customSectionsList.moveItem(index, index - 1)}
+                  onMoveDown={() =>
+                    customSectionsList.moveItem(index, index + 1)
+                  }
+                  onRemove={() => customSectionsList.removeItem(section.id)}
+                  onChange={(patch) =>
+                    customSectionsList.updateItem(section.id, patch)
+                  }
+                />
+              ))}
+
+              <button
+                type="button"
+                className={styles.addItemTile}
+                onClick={customSectionsList.addItem}
+              >
+                <div className={styles.addItemTileIcon}>+</div>
+                <p className={styles.addItemTileText}>Add custom section</p>
               </button>
             </div>
           </div>
