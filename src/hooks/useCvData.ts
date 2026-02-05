@@ -14,6 +14,10 @@ const defaultContactDetails: ContactDetailsFormData = {
   postalCode: "",
   linkedIn: "",
   git: "",
+  linkedInTitle: "",
+  linkedInUrl: "",
+  gitTitle: "",
+  gitUrl: "",
   nationality: "",
   workPermit: "",
 };

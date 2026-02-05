@@ -191,26 +191,6 @@ export default function ContactDetailsPage() {
             <div className={styles.row}>
               <div className={styles.fieldGroup}>
                 <Input
-                  label="LinkedIn"
-                  placeholder="linkedin.com/in/janedoe"
-                  fullWidth
-                  {...registerWithFlush("linkedIn")}
-                />
-              </div>
-
-              <div className={styles.fieldGroup}>
-                <Input
-                  label="Git"
-                  placeholder="github.com/janedoe"
-                  fullWidth
-                  {...registerWithFlush("git")}
-                />
-              </div>
-            </div>
-
-            <div className={styles.row}>
-              <div className={styles.fieldGroup}>
-                <Input
                   label="Nationality"
                   placeholder="Danish"
                   fullWidth
@@ -224,6 +204,53 @@ export default function ContactDetailsPage() {
                   placeholder="EU Citizen"
                   fullWidth
                   {...registerWithFlush("workPermit")}
+                />
+              </div>
+            </div>
+
+            <div className={styles.divider}></div>
+
+            <p className={styles.hint}>
+              In the PDF, the title is shown as clickable text, and it will open
+              the URL you provide.
+            </p>
+
+            <div className={styles.row}>
+              <div className={styles.fieldGroup}>
+                <Input
+                  label="LinkedIn title"
+                  placeholder="LinkedIn"
+                  fullWidth
+                  {...registerWithFlush("linkedInTitle")}
+                />
+              </div>
+
+              <div className={styles.fieldGroup}>
+                <Input
+                  label="LinkedIn URL"
+                  placeholder="https://linkedin.com/in/janedoe"
+                  fullWidth
+                  {...registerWithFlush("linkedInUrl")}
+                />
+              </div>
+            </div>
+
+            <div className={styles.row}>
+              <div className={styles.fieldGroup}>
+                <Input
+                  label="Git title"
+                  placeholder="GitHub"
+                  fullWidth
+                  {...registerWithFlush("gitTitle")}
+                />
+              </div>
+
+              <div className={styles.fieldGroup}>
+                <Input
+                  label="Git URL"
+                  placeholder="https://github.com/janedoe"
+                  fullWidth
+                  {...registerWithFlush("gitUrl")}
                 />
               </div>
             </div>

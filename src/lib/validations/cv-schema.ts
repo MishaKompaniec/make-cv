@@ -10,6 +10,10 @@ export const contactDetailsSchema = z.object({
   postalCode: z.string().optional(),
   linkedIn: z.string().optional(),
   git: z.string().optional(),
+  linkedInTitle: z.string().optional(),
+  linkedInUrl: z.string().optional(),
+  gitTitle: z.string().optional(),
+  gitUrl: z.string().optional(),
   nationality: z.string().optional(),
   workPermit: z.string().optional(),
 });

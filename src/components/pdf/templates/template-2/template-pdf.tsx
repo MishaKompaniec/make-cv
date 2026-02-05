@@ -6,6 +6,7 @@ import {
   Path,
   Svg,
   Text,
+  Link,
   View,
 } from "@react-pdf/renderer";
 
@@ -95,6 +96,10 @@ const styles = StyleSheet.create({
     fontSize: 8,
     color: "#2B2B2B",
   },
+  sidebarInfoValue: {
+    flex: 1,
+    justifyContent: "center",
+  },
   skillItem: { marginBottom: "4px", fontSize: 10, color: "#2B2B2B" },
   mainSection: {
     marginTop: 14,
@@ -163,6 +168,10 @@ type Template2Props = {
     postalCode?: string;
     linkedIn?: string;
     git?: string;
+    linkedInTitle?: string;
+    linkedInUrl?: string;
+    gitTitle?: string;
+    gitUrl?: string;
     birthdate?: string;
     nationality?: string;
     workPermit?: string;
@@ -231,8 +240,11 @@ export function TemplatePdf2({
   const postalCode = contactDetails?.postalCode || "";
   const addressLine =
     postalCode || city ? `${postalCode ? `${postalCode}, ` : ""}${city}` : "";
-  const linkedIn = contactDetails?.linkedIn || "";
-  const git = contactDetails?.git || "";
+  const linkedInTitleRaw = contactDetails?.linkedInTitle || "";
+  const linkedInUrlRaw =
+    contactDetails?.linkedInUrl || contactDetails?.linkedIn || "";
+  const gitTitleRaw = contactDetails?.gitTitle || "";
+  const gitUrlRaw = contactDetails?.gitUrl || contactDetails?.git || "";
   const birthdate = contactDetails?.birthdate || "";
   const nationality = contactDetails?.nationality || "";
   const workPermit = contactDetails?.workPermit || "";
@@ -265,8 +277,8 @@ export function TemplatePdf2({
     birthdate ||
     nationality ||
     workPermit ||
-    linkedIn ||
-    git,
+    linkedInUrlRaw ||
+    gitUrlRaw,
   );
 
   const cleanedSkills = skills
@@ -316,12 +328,16 @@ export function TemplatePdf2({
       e.description?.trim(),
   );
 
-  const renderSidebarRow = (icon: ReactNode, value: string) => {
+  const renderSidebarRow = (icon: ReactNode, value: ReactNode) => {
     if (!value) return null;
     return (
       <View style={styles.sidebarInfoRow}>
         <View style={styles.sidebarInfoLabel}>{icon}</View>
-        <Text style={styles.sidebarInfoText}>{value}</Text>
+        {typeof value === "string" ? (
+          <Text style={styles.sidebarInfoText}>{value}</Text>
+        ) : (
+          <View style={styles.sidebarInfoValue}>{value}</View>
+        )}
       </View>
     );
   };
@@ -393,9 +409,26 @@ export function TemplatePdf2({
     </Svg>
   );
 
-  const wrapUrl = (value: string) => value.replaceAll("/", "/ ");
-  const linkedInSafe = linkedIn ? wrapUrl(linkedIn) : "";
-  const gitSafe = git ? wrapUrl(git) : "";
+  const normalizeUrl = (value: string) => {
+    const raw = value.trim();
+    if (!raw) return "";
+    if (/^https?:\/\//i.test(raw)) return raw;
+    return `https://${raw}`;
+  };
+
+  const linkedInTitle = linkedInTitleRaw.trim();
+  const linkedInUrl = linkedInUrlRaw.trim();
+  const gitTitle = gitTitleRaw.trim();
+  const gitUrl = gitUrlRaw.trim();
+
+  const linkedInText = (linkedInTitle || linkedInUrl) as string;
+  const gitText = (gitTitle || gitUrl) as string;
+
+  const linkedInHref = normalizeUrl(linkedInUrl);
+  const gitHref = normalizeUrl(gitUrl);
+
+  const linkedInSafe = linkedInText;
+  const gitSafe = gitText;
 
   return (
     <Document>
@@ -643,11 +676,41 @@ export function TemplatePdf2({
               <View style={{ marginBottom: 12 }} />
               {renderSidebarRow(
                 <Text style={[styles.label, { color: accentColor }]}>In</Text>,
-                linkedInSafe,
+                linkedInHref ? (
+                  <Link
+                    src={linkedInHref}
+                    style={{
+                      fontSize: 8,
+                      lineHeight: 1.35,
+                      color: "#000000",
+                      textDecoration: "underline",
+                      textDecorationColor: "#000000",
+                    }}
+                  >
+                    {linkedInSafe}
+                  </Link>
+                ) : (
+                  linkedInSafe
+                ),
               )}
               {renderSidebarRow(
                 <Text style={[styles.label, { color: accentColor }]}>Git</Text>,
-                gitSafe,
+                gitHref ? (
+                  <Link
+                    src={gitHref}
+                    style={{
+                      fontSize: 8,
+                      lineHeight: 1.35,
+                      color: "#000000",
+                      textDecoration: "underline",
+                      textDecorationColor: "#000000",
+                    }}
+                  >
+                    {gitSafe}
+                  </Link>
+                ) : (
+                  gitSafe
+                ),
               )}
             </>
           ) : null}

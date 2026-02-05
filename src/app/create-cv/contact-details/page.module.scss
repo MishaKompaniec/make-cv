@@ -54,6 +54,16 @@
   margin: 1rem 0;
 }
 
+.hint {
+  font-size: 0.85rem;
+  color: $text-secondary;
+  margin: 0;
+}
+
+.rowGap {
+  margin-top: 1rem;
+}
+
 @media (max-width: #{$breakpoint-desktop}) {
   .pageContainer {
     min-height: calc(100vh - 72px);
