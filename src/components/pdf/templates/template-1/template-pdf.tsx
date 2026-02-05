@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import {
+  Font,
   StyleSheet,
   Document,
   Page,
@@ -24,9 +25,17 @@ const TEMPLATE_1_ACCENT_BY_SIDEBAR_COLOR: Record<string, string> = {
   "#efeae2": "#bfac8c",
   "#e8f4f8": "#297b96",
   "#f5f5f5": "#6e6565",
-  "#e8f5e8": "#2a5c2a",
-  "#f0ebf8": "#604f7d",
+  "#e8f5e8": "#357a38",
+  "#f0ebf8": "#725ea8",
 };
+
+Font.register({
+  family: "Inter",
+  src: new URL(
+    "../../../../assets/fonts/Inter.ttf",
+    import.meta.url,
+  ).toString(),
+});
 
 const normalizeHex = (value: string) => value.trim().toLowerCase();
 
@@ -34,6 +43,7 @@ const styles = StyleSheet.create({
   page: {
     flexDirection: "row",
     backgroundColor: "#FFFFFF",
+    fontFamily: "Inter",
   },
   sidebar: {
     width: "30%",
@@ -57,23 +67,24 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 600,
     marginBottom: 14,
+    color: "#111111",
   },
   summary: {
     fontSize: 10,
-    color: "#2B2B2B",
+    color: "#111111",
     marginBottom: 20,
     lineHeight: 1.4,
   },
   label: {
     fontSize: 9,
     fontWeight: 700,
-    color: "#2B2B2B",
+    color: "#111111",
     marginBottom: 4,
   },
   skillLabel: {
     fontSize: 11,
     fontWeight: 600,
-    color: "#2B2B2B",
+    color: "#111111",
     marginBottom: 4,
   },
   sidebarInfoRow: {
@@ -94,13 +105,13 @@ const styles = StyleSheet.create({
   sidebarInfoText: {
     flex: 1,
     fontSize: 8,
-    color: "#2B2B2B",
+    color: "#111111",
   },
   sidebarInfoValue: {
     flex: 1,
     justifyContent: "center",
   },
-  skillItem: { marginBottom: "4px", fontSize: 10, color: "#2B2B2B" },
+  skillItem: { marginBottom: "4px", fontSize: 10, color: "#111111" },
   mainSection: {
     marginTop: 14,
   },
@@ -139,7 +150,7 @@ const styles = StyleSheet.create({
   },
   itemDate: {
     fontSize: 9,
-    color: "#2B2B2B",
+    color: "#111111",
     textAlign: "right",
   },
   itemSubtitleRow: {
@@ -149,10 +160,11 @@ const styles = StyleSheet.create({
   itemSubtitle: {
     fontSize: 9,
     marginBottom: 4,
+    color: "#111111",
   },
   itemBody: {
     fontSize: 9,
-    color: "#2B2B2B",
+    color: "#111111",
     lineHeight: 1.35,
   },
 });

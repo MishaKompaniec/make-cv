@@ -1,12 +1,12 @@
 import "../styles/globals.scss";
 import { Sidebar } from "@/components/layout/sidebar/sidebar";
-import { Inter } from "next/font/google";
+import localFont from "next/font/local";
 
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+const inter = localFont({
+  src: "../assets/fonts/Inter.ttf",
   display: "swap",
   variable: "--font-inter",
+  weight: "100 900",
 });
 
 export default function RootLayout({
