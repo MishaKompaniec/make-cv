@@ -9,12 +9,17 @@ interface NavigationFooterProps {
   nextHref?: string;
 
   onNextClick?: () => void;
+
+  nextLabel?: string;
+  nextDisabled?: boolean;
 }
 
 export function NavigationFooter({
   backHref,
   nextHref,
   onNextClick,
+  nextLabel = "Next Step",
+  nextDisabled = false,
 }: NavigationFooterProps) {
   const router = useRouter();
 
@@ -41,8 +46,12 @@ export function NavigationFooter({
           Back
         </Button>
 
-        <Button variant="primary" onClick={handleNextClick}>
-          Next Step
+        <Button
+          variant="primary"
+          onClick={handleNextClick}
+          disabled={nextDisabled}
+        >
+          {nextLabel}
         </Button>
       </div>
     </footer>
