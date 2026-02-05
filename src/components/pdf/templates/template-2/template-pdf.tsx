@@ -415,143 +415,201 @@ export function TemplatePdf2({
 
           {hasWorkExperience ? (
             <View style={styles.mainSection}>
-              <View style={styles.sectionTitleRow}>
-                <View
-                  style={[
-                    styles.sectionDot,
-                    {
-                      backgroundColor: accentColor,
-                      position: "absolute",
-                      left: -15,
-                    },
-                  ]}
-                />
-                <Text style={styles.sectionTitle}>Work history</Text>
-              </View>
+              {(() => {
+                const items = workExperience
+                  .map((item) => {
+                    const title = item.jobTitle?.trim() ?? "";
+                    const company = item.companyName?.trim() ?? "";
+                    const itemCity = item.city?.trim() ?? "";
+                    const body = item.description?.trim() ?? "";
 
-              {workExperience.map((item) => {
-                const title = item.jobTitle?.trim() ?? "";
-                const company = item.companyName?.trim() ?? "";
-                const itemCity = item.city?.trim() ?? "";
-                const body = item.description?.trim() ?? "";
+                    const start = formatMonthYear(item.startDate);
+                    const end = item.endDate
+                      ? formatMonthYear(item.endDate)
+                      : item.startDate
+                        ? "Current"
+                        : "";
 
-                const start = formatMonthYear(item.startDate);
-                const end = item.endDate
-                  ? formatMonthYear(item.endDate)
-                  : item.startDate
-                    ? "Current"
-                    : "";
+                    const subtitle = itemCity
+                      ? `${company}, ${itemCity}`
+                      : company;
+                    const hasItem = Boolean(
+                      title || subtitle || body || start || end,
+                    );
 
-                const subtitle = itemCity ? `${company}, ${itemCity}` : company;
-                const hasItem = Boolean(
-                  title || subtitle || body || start || end,
-                );
-                if (!hasItem) return null;
+                    if (!hasItem) return null;
 
-                return (
-                  <View key={item.id} style={styles.item}>
+                    return {
+                      id: item.id,
+                      title,
+                      subtitle,
+                      start,
+                      end,
+                      body,
+                    };
+                  })
+                  .filter(Boolean);
+
+                if (items.length === 0) return null;
+
+                const [first, ...rest] = items;
+
+                const renderItem = (item: any) => (
+                  <View key={item.id} style={styles.item} wrap={false}>
                     <View style={styles.itemHeader}>
                       <View style={styles.itemTitleRow}>
-                        {title ? (
-                          <Text style={styles.itemTitle}>{title}</Text>
+                        {item.title ? (
+                          <Text style={styles.itemTitle}>{item.title}</Text>
                         ) : (
                           <Text style={styles.itemTitle} />
                         )}
-                        {start ? (
-                          <Text style={styles.itemDate}>{start}</Text>
+                        {item.start ? (
+                          <Text style={styles.itemDate}>{item.start}</Text>
                         ) : null}
                       </View>
                       <View style={styles.itemSubtitleRow}>
                         <Text
                           style={[styles.itemSubtitle, { color: accentColor }]}
                         >
-                          {subtitle || " "}
+                          {item.subtitle || " "}
                         </Text>
-                        {end ? (
-                          <Text style={styles.itemDate}>{end}</Text>
+                        {item.end ? (
+                          <Text style={styles.itemDate}>{item.end}</Text>
                         ) : null}
                       </View>
                     </View>
-                    {body ? <Text style={styles.itemBody}>{body}</Text> : null}
+                    {item.body ? (
+                      <Text style={styles.itemBody}>{item.body}</Text>
+                    ) : null}
                   </View>
                 );
-              })}
+
+                return (
+                  <>
+                    <View wrap={false}>
+                      <View style={styles.sectionTitleRow}>
+                        <View
+                          style={[
+                            styles.sectionDot,
+                            {
+                              backgroundColor: accentColor,
+                              position: "absolute",
+                              left: -15,
+                            },
+                          ]}
+                        />
+                        <Text style={styles.sectionTitle}>Work history</Text>
+                      </View>
+                      {renderItem(first)}
+                    </View>
+                    {rest.map(renderItem)}
+                  </>
+                );
+              })()}
             </View>
           ) : null}
 
           {hasEducation ? (
             <View style={styles.mainSection}>
-              <View style={styles.sectionTitleRow}>
-                <View
-                  style={[
-                    styles.sectionDot,
-                    {
-                      backgroundColor: accentColor,
-                      position: "absolute",
-                      left: -15,
-                    },
-                  ]}
-                />
-                <Text style={styles.sectionTitle}>Education</Text>
-              </View>
+              {(() => {
+                const items = education
+                  .map((item) => {
+                    const title = item.diploma?.trim() ?? "";
+                    const school = item.schoolName?.trim() ?? "";
+                    const location = item.schoolLocation?.trim() ?? "";
+                    const body = item.description?.trim() ?? "";
 
-              {education.map((item) => {
-                const title = item.diploma?.trim() ?? "";
-                const school = item.schoolName?.trim() ?? "";
-                const location = item.schoolLocation?.trim() ?? "";
-                const body = item.description?.trim() ?? "";
+                    const start = formatMonthYear(item.startDate);
+                    const end = item.endDate
+                      ? formatMonthYear(item.endDate)
+                      : item.startDate
+                        ? "Current"
+                        : "";
 
-                const start = formatMonthYear(item.startDate);
-                const end = item.endDate
-                  ? formatMonthYear(item.endDate)
-                  : item.startDate
-                    ? "Current"
-                    : "";
+                    const subtitle =
+                      school && location
+                        ? `${school}, ${location}`
+                        : school || location;
 
-                const subtitle =
-                  school && location
-                    ? `${school}, ${location}`
-                    : school || location;
+                    const hasItem = Boolean(
+                      title || subtitle || body || start || end,
+                    );
 
-                const hasItem = Boolean(
-                  title || subtitle || body || start || end,
-                );
-                if (!hasItem) return null;
+                    if (!hasItem) return null;
 
-                return (
-                  <View key={item.id} style={styles.item}>
+                    return {
+                      id: item.id,
+                      title,
+                      subtitle,
+                      start,
+                      end,
+                      body,
+                    };
+                  })
+                  .filter(Boolean);
+
+                if (items.length === 0) return null;
+
+                const [first, ...rest] = items;
+
+                const renderItem = (item: any) => (
+                  <View key={item.id} style={styles.item} wrap={false}>
                     <View style={styles.itemHeader}>
                       <View style={styles.itemTitleRow}>
-                        {title ? (
-                          <Text style={styles.itemTitle}>{title}</Text>
+                        {item.title ? (
+                          <Text style={styles.itemTitle}>{item.title}</Text>
                         ) : (
                           <Text style={styles.itemTitle} />
                         )}
-                        {start ? (
-                          <Text style={styles.itemDate}>{start}</Text>
+                        {item.start ? (
+                          <Text style={styles.itemDate}>{item.start}</Text>
                         ) : null}
                       </View>
                       <View style={styles.itemSubtitleRow}>
                         <Text
                           style={[styles.itemSubtitle, { color: accentColor }]}
                         >
-                          {subtitle || " "}
+                          {item.subtitle || " "}
                         </Text>
-                        {end ? (
-                          <Text style={styles.itemDate}>{end}</Text>
+                        {item.end ? (
+                          <Text style={styles.itemDate}>{item.end}</Text>
                         ) : null}
                       </View>
                     </View>
-                    {body ? <Text style={styles.itemBody}>{body}</Text> : null}
+                    {item.body ? (
+                      <Text style={styles.itemBody}>{item.body}</Text>
+                    ) : null}
                   </View>
                 );
-              })}
+
+                return (
+                  <>
+                    <View wrap={false}>
+                      <View style={styles.sectionTitleRow}>
+                        <View
+                          style={[
+                            styles.sectionDot,
+                            {
+                              backgroundColor: accentColor,
+                              position: "absolute",
+                              left: -15,
+                            },
+                          ]}
+                        />
+                        <Text style={styles.sectionTitle}>Education</Text>
+                      </View>
+                      {renderItem(first)}
+                    </View>
+                    {rest.map(renderItem)}
+                  </>
+                );
+              })()}
             </View>
           ) : null}
 
           {hasCustomSections
             ? cleanedCustomSections.map((section) => (
-                <View key={section.id} style={styles.mainSection}>
+                <View key={section.id} style={styles.mainSection} wrap={false}>
                   <View style={styles.sectionTitleRow}>
                     <View
                       style={[

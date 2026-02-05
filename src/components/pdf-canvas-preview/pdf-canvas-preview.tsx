@@ -6,9 +6,16 @@ import { Document, Page, pdfjs } from "react-pdf";
 type PdfCanvasPreviewProps = {
   url: string;
   className?: string;
+  pageNumber?: number;
+  onNumPagesChange?: (numPages: number) => void;
 };
 
-export function PdfCanvasPreview({ url, className }: PdfCanvasPreviewProps) {
+export function PdfCanvasPreview({
+  url,
+  className,
+  pageNumber = 1,
+  onNumPagesChange,
+}: PdfCanvasPreviewProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [width, setWidth] = useState<number>(0);
 
@@ -34,10 +41,17 @@ export function PdfCanvasPreview({ url, className }: PdfCanvasPreviewProps) {
 
   return (
     <div ref={containerRef} className={className}>
-      <Document file={url} loading={null} error={null}>
+      <Document
+        file={url}
+        loading={null}
+        error={null}
+        onLoadSuccess={({ numPages }) => {
+          onNumPagesChange?.(numPages);
+        }}
+      >
         {width > 0 ? (
           <Page
-            pageNumber={1}
+            pageNumber={pageNumber}
             width={width}
             renderAnnotationLayer={false}
             renderTextLayer={false}

@@ -16,6 +16,7 @@ import {
   TEMPLATE_2_ID,
   TemplatePdf2,
 } from "@/components/pdf/templates/template-2/template-pdf";
+import { Button } from "@/components/ui/button/button";
 import styles from "./page.module.scss";
 
 const BlobProvider = dynamic(
@@ -38,6 +39,8 @@ function PreviewPanel({
   loading,
   error,
   blob,
+  pageNumber,
+  onNumPagesChange,
   onHasBlobChange,
   onIsGeneratingChange,
 }: {
@@ -45,6 +48,8 @@ function PreviewPanel({
   loading: boolean;
   error?: Error | null;
   blob?: Blob | null;
+  pageNumber: number;
+  onNumPagesChange: (numPages: number) => void;
   onHasBlobChange: (value: boolean) => void;
   onIsGeneratingChange: (value: boolean) => void;
 }) {
@@ -85,7 +90,12 @@ function PreviewPanel({
             Failed to generate preview.
           </div>
         ) : (
-          <PdfCanvasPreview url={url} className={styles.previewCanvas} />
+          <PdfCanvasPreview
+            url={url}
+            className={styles.previewCanvas}
+            pageNumber={pageNumber}
+            onNumPagesChange={onNumPagesChange}
+          />
         )}
       </div>
     </div>
@@ -94,6 +104,9 @@ function PreviewPanel({
 
 export default function FinalizePage() {
   const { contactDetails, summary } = useCvData();
+
+  const [pageNumber, setPageNumber] = useState(1);
+  const [numPages, setNumPages] = useState(1);
 
   const [isGenerating, setIsGenerating] = useState(true);
   const [hasBlob, setHasBlob] = useState(false);
@@ -104,6 +117,16 @@ export default function FinalizePage() {
 
   const setIsGeneratingIfChanged = useCallback((next: boolean) => {
     setIsGenerating((prev) => (prev === next ? prev : next));
+  }, []);
+
+  const handleNumPagesChange = useCallback((next: number) => {
+    if (!Number.isFinite(next) || next <= 0) return;
+
+    setNumPages((prev) => (prev === next ? prev : next));
+    setPageNumber((prev) => {
+      const clamped = Math.min(Math.max(prev, 1), next);
+      return prev === clamped ? prev : clamped;
+    });
   }, []);
 
   const [templateId] = useLocalStorage("cv-template-id", TEMPLATE_1_ID);
@@ -227,14 +250,36 @@ export default function FinalizePage() {
             blobRef.current = blob ?? null;
 
             return (
-              <PreviewPanel
-                url={url}
-                blob={blob}
-                loading={loading}
-                error={error}
-                onHasBlobChange={setHasBlobIfChanged}
-                onIsGeneratingChange={setIsGeneratingIfChanged}
-              />
+              <>
+                <PreviewPanel
+                  url={url}
+                  blob={blob}
+                  loading={loading}
+                  error={error}
+                  pageNumber={pageNumber}
+                  onNumPagesChange={handleNumPagesChange}
+                  onHasBlobChange={setHasBlobIfChanged}
+                  onIsGeneratingChange={setIsGeneratingIfChanged}
+                />
+
+                <div className={styles.pagination}>
+                  {Array.from({ length: numPages }, (_, i) => i + 1).map(
+                    (pageNum) => (
+                      <button
+                        key={pageNum}
+                        type="button"
+                        className={`${styles.pageButton} ${
+                          pageNumber === pageNum ? styles.active : ""
+                        }`}
+                        onClick={() => setPageNumber(pageNum)}
+                        disabled={isGenerating || !hasBlob}
+                      >
+                        {pageNum}
+                      </button>
+                    ),
+                  )}
+                </div>
+              </>
             );
           }}
         </BlobProvider>
