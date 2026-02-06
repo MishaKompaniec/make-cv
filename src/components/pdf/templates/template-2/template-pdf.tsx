@@ -79,12 +79,12 @@ const styles = StyleSheet.create({
   },
   main: {
     width: "70%",
-    paddingTop: 28,
-    paddingLeft: 28,
-    paddingRight: 28,
+    paddingTop: 10,
+    paddingLeft: 20,
+    paddingRight: 10,
   },
   name: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 700,
     marginBottom: 4,
     color: "#111111",
@@ -92,13 +92,13 @@ const styles = StyleSheet.create({
   jobTitle: {
     fontSize: 12,
     fontWeight: 600,
-    marginBottom: 14,
+    marginBottom: 10,
     color: "#111111",
   },
   summary: {
     fontSize: 10,
     color: "#111111",
-    marginBottom: 20,
+    marginBottom: 10,
     lineHeight: 1.4,
   },
   label: {
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
   mt0: {
     marginTop: 0,
   },
-  skillItem: { marginBottom: "4px", fontSize: 10, color: "#111111" },
+  skillItem: { marginBottom: "4px", fontSize: 8, color: "#111111" },
   mainSection: {
     marginTop: 14,
   },
@@ -164,14 +164,15 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   sectionDot: {
-    width: 7,
-    height: 7,
+    width: 6,
+    height: 6,
     borderRadius: 4,
-    marginRight: 8,
+    position: "absolute",
+    left: -12,
   },
   sectionTitle: {
     fontSize: 12,
-    fontWeight: 700,
+    fontWeight: 600,
     color: "#111111",
   },
   item: {
@@ -187,7 +188,7 @@ const styles = StyleSheet.create({
   },
   itemTitle: {
     fontSize: 10,
-    fontWeight: 700,
+    fontWeight: 600,
     color: "#111111",
   },
   itemDate: {
@@ -202,6 +203,7 @@ const styles = StyleSheet.create({
   itemSubtitle: {
     fontSize: 9,
     marginBottom: 4,
+    fontWeight: 500,
     color: "#111111",
   },
   itemBody: {
@@ -598,8 +600,6 @@ export function TemplatePdf2({
                             styles.sectionDot,
                             {
                               backgroundColor: accentColor,
-                              position: "absolute",
-                              left: -15,
                             },
                           ]}
                         />
@@ -696,8 +696,6 @@ export function TemplatePdf2({
                             styles.sectionDot,
                             {
                               backgroundColor: accentColor,
-                              position: "absolute",
-                              left: -15,
                             },
                           ]}
                         />
@@ -721,8 +719,6 @@ export function TemplatePdf2({
                         styles.sectionDot,
                         {
                           backgroundColor: accentColor,
-                          position: "absolute",
-                          left: -15,
                         },
                       ]}
                     />
