@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CreateCvHeader } from "@/components/layout/create-cv-header/create-cv-header";
+import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import dynamic from "next/dynamic";

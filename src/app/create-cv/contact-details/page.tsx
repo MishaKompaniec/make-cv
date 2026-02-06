@@ -6,7 +6,7 @@ import { useEffect, useRef, useState, type FocusEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input/input";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
-import { CreateCvHeader } from "@/components/layout/create-cv-header/create-cv-header";
+import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
 import {
   contactDetailsSchema,
   type ContactDetailsFormData,

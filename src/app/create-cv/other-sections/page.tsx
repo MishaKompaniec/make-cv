@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
-import { CreateCvHeader } from "@/components/layout/create-cv-header/create-cv-header";
+import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useSectionList } from "@/hooks/useSectionList";
 import { Checkbox } from "@/components/ui/checkbox/checkbox";

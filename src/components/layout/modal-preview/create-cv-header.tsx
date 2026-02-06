@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button/button";
 import { Loader } from "@/components/ui/loader/loader";
@@ -30,6 +30,59 @@ const PdfCanvasPreview = dynamic(
     ),
   { ssr: false },
 );
+
+function PreviewPanel({
+  url,
+  loading,
+  error,
+  blob,
+  pageNumber,
+  onNumPagesChange,
+  onHasBlobChange,
+  onIsGeneratingChange,
+}: {
+  url?: string | null;
+  loading: boolean;
+  error?: Error | null;
+  blob?: Blob | null;
+  pageNumber: number;
+  onNumPagesChange: (numPages: number) => void;
+  onHasBlobChange: (value: boolean) => void;
+  onIsGeneratingChange: (value: boolean) => void;
+}) {
+  useEffect(() => {
+    onHasBlobChange(!!blob);
+  }, [blob, onHasBlobChange]);
+
+  useEffect(() => {
+    onIsGeneratingChange(loading);
+  }, [loading, onIsGeneratingChange]);
+
+  if (loading) {
+    return (
+      <div className={styles.previewModalLoading}>
+        <Loader />
+      </div>
+    );
+  }
+
+  if (error || !url) {
+    return (
+      <div className={styles.previewModalLoading}>
+        Failed to generate preview.
+      </div>
+    );
+  }
+
+  return (
+    <PdfCanvasPreview
+      url={url}
+      className={styles.previewPdfCanvas}
+      pageNumber={pageNumber}
+      onNumPagesChange={onNumPagesChange}
+    />
+  );
+}
 
 type WorkExperiencePreviewItem = {
   id: string;
@@ -94,6 +147,29 @@ export function CreateCvHeader({
 }: CreateCvHeaderProps) {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
+  const [pageNumber, setPageNumber] = useState(1);
+  const [numPages, setNumPages] = useState(1);
+  const [isGenerating, setIsGenerating] = useState(true);
+  const [hasBlob, setHasBlob] = useState(false);
+
+  const setHasBlobIfChanged = useCallback((next: boolean) => {
+    setHasBlob((prev) => (prev === next ? prev : next));
+  }, []);
+
+  const setIsGeneratingIfChanged = useCallback((next: boolean) => {
+    setIsGenerating((prev) => (prev === next ? prev : next));
+  }, []);
+
+  const handleNumPagesChange = useCallback((next: number) => {
+    if (!Number.isFinite(next) || next <= 0) return;
+
+    setNumPages((prev) => (prev === next ? prev : next));
+    setPageNumber((prev) => {
+      const clamped = Math.min(Math.max(prev, 1), next);
+      return prev === clamped ? prev : clamped;
+    });
+  }, []);
+
   const { contactDetails, summary } = useCvData();
   const [templateId] = useLocalStorage("cv-template-id", TEMPLATE_1_ID);
   const [templateColors] = useLocalStorage<Record<string, string>>(
@@ -136,8 +212,41 @@ export function CreateCvHeader({
   const PdfDocument =
     templateId === TEMPLATE_2_ID ? TemplatePdf2 : TemplatePdf1;
 
+  const pdfReactDocument = useMemo(
+    () => (
+      <PdfDocument
+        sidebarColor={selectedColor}
+        contactDetails={contactDetails}
+        workExperience={workExperience}
+        education={education}
+        skills={skills}
+        languages={languages}
+        interests={interests}
+        customSections={customSections}
+        selectedSections={selectedSections}
+        summary={summary}
+      />
+    ),
+    [
+      PdfDocument,
+      selectedColor,
+      contactDetails,
+      workExperience,
+      education,
+      skills,
+      languages,
+      interests,
+      customSections,
+      selectedSections,
+      summary,
+    ],
+  );
+
   useEffect(() => {
     if (!isPreviewOpen) return;
+
+    setPageNumber(1);
+    setNumPages(1);
 
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -192,47 +301,40 @@ export function CreateCvHeader({
               className={styles.previewModalPage}
               onClick={(e) => e.stopPropagation()}
             >
-              <BlobProvider
-                document={
-                  <PdfDocument
-                    sidebarColor={selectedColor}
-                    contactDetails={contactDetails}
-                    workExperience={workExperience}
-                    education={education}
-                    skills={skills}
-                    languages={languages}
-                    interests={interests}
-                    customSections={customSections}
-                    selectedSections={selectedSections}
-                    summary={summary}
+              <BlobProvider document={pdfReactDocument}>
+                {({ url, loading, error, blob }) => (
+                  <PreviewPanel
+                    url={url}
+                    blob={blob}
+                    loading={loading}
+                    error={error}
+                    pageNumber={pageNumber}
+                    onNumPagesChange={handleNumPagesChange}
+                    onHasBlobChange={setHasBlobIfChanged}
+                    onIsGeneratingChange={setIsGeneratingIfChanged}
                   />
-                }
-              >
-                {({ url, loading, error }) => {
-                  const renderStatus = (text: string) => (
-                    <div className={styles.previewModalLoading}>{text}</div>
-                  );
-
-                  if (loading) {
-                    return (
-                      <div className={styles.previewModalLoading}>
-                        <Loader />
-                      </div>
-                    );
-                  }
-
-                  if (error || !url) {
-                    return renderStatus("Failed to generate preview.");
-                  }
-
-                  return (
-                    <PdfCanvasPreview
-                      url={url}
-                      className={styles.previewPdfCanvas}
-                    />
-                  );
-                }}
+                )}
               </BlobProvider>
+
+              {numPages > 1 ? (
+                <div className={styles.pagination}>
+                  {Array.from({ length: numPages }, (_, i) => i + 1).map(
+                    (pageNum) => (
+                      <button
+                        key={pageNum}
+                        type="button"
+                        className={`${styles.pageButton} ${
+                          pageNumber === pageNum ? styles.active : ""
+                        }`}
+                        onClick={() => setPageNumber(pageNum)}
+                        disabled={isGenerating || !hasBlob}
+                      >
+                        {pageNum}
+                      </button>
+                    ),
+                  )}
+                </div>
+              ) : null}
             </div>
           </div>
         </div>

@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
-import { CreateCvHeader } from "@/components/layout/create-cv-header/create-cv-header";
+import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
 import { useSectionList } from "@/hooks/useSectionList";
 import { EducationCard, type EducationItem } from "./education-card";
 import styles from "./page.module.scss";

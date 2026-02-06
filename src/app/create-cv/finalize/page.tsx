@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { Loader } from "@/components/ui/loader/loader";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
-import { CreateCvHeader } from "@/components/layout/create-cv-header/create-cv-header";
+import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useCvData } from "@/hooks/useCvData";
 import {
@@ -262,23 +262,25 @@ export default function FinalizePage() {
                   onIsGeneratingChange={setIsGeneratingIfChanged}
                 />
 
-                <div className={styles.pagination}>
-                  {Array.from({ length: numPages }, (_, i) => i + 1).map(
-                    (pageNum) => (
-                      <button
-                        key={pageNum}
-                        type="button"
-                        className={`${styles.pageButton} ${
-                          pageNumber === pageNum ? styles.active : ""
-                        }`}
-                        onClick={() => setPageNumber(pageNum)}
-                        disabled={isGenerating || !hasBlob}
-                      >
-                        {pageNum}
-                      </button>
-                    ),
-                  )}
-                </div>
+                {numPages > 1 ? (
+                  <div className={styles.pagination}>
+                    {Array.from({ length: numPages }, (_, i) => i + 1).map(
+                      (pageNum) => (
+                        <button
+                          key={pageNum}
+                          type="button"
+                          className={`${styles.pageButton} ${
+                            pageNumber === pageNum ? styles.active : ""
+                          }`}
+                          onClick={() => setPageNumber(pageNum)}
+                          disabled={isGenerating || !hasBlob}
+                        >
+                          {pageNum}
+                        </button>
+                      ),
+                    )}
+                  </div>
+                ) : null}
               </>
             );
           }}
