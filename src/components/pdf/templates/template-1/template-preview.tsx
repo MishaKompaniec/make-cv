@@ -1,91 +1,38 @@
 "use client";
 
 import styles from "./template-preview.module.scss";
-
-type ContactDetailsPreviewData = {
-  fullName?: string;
-  jobTitle?: string;
-  phone?: string;
-  email?: string;
-  city?: string;
-  birthdate?: string;
-  postalCode?: string;
-  linkedIn?: string;
-  git?: string;
-  nationality?: string;
-  workPermit?: string;
-};
-
-type WorkExperiencePreviewItem = {
-  id: string;
-  jobTitle: string;
-  companyName: string;
-  city: string;
-  startDate?: { month: number; year: number };
-  endDate?: { month: number; year: number };
-  description: string;
-};
+import {
+  type ContactDetailsPreviewData,
+  type WorkExperiencePreviewItem,
+  formatMonthYear,
+  makeGhostClass,
+  makeRenderLine,
+  makeRenderText,
+  makeSidebarIcons,
+  resolveAccentColor,
+} from "../template-preview-utils";
 
 interface TemplatePreview1Props {
   sidebarColor?: string;
 }
 
 export function TemplatePreview1({ sidebarColor }: TemplatePreview1Props) {
-  const NBSP = "\u00A0";
+  const accentColor = resolveAccentColor(sidebarColor);
 
-  const ghostClass = (value: string) => (value ? "" : ` ${styles.ghost}`);
+  const ghostClass = makeGhostClass(styles);
+  const renderLine = makeRenderLine(ghostClass, styles);
+  const renderText = makeRenderText(ghostClass);
 
-  const renderLine = (icon: string, value: string) => (
-    <div className={styles.contactRow}>
-      <span className={`${styles.icon}${ghostClass(value)}`}>{icon}</span>
-      <span className={`${styles.text}${ghostClass(value)}`}>
-        {value || NBSP}
-      </span>
-    </div>
-  );
-
-  const renderText = (
-    Tag: "div" | "span",
-    className: string,
-    value: string,
-  ) => {
-    const Comp = Tag;
-    return (
-      <Comp className={`${className}${ghostClass(value)}`}>
-        {value || NBSP}
-      </Comp>
-    );
-  };
-
-  const renderBulletRow = (value: string) => (
-    <div className={styles.bulletRow}>
-      <div className={`${styles.bullet}${ghostClass(value)}`} />
-      <div className={`${styles.bulletText}${ghostClass(value)}`}>
-        {value || NBSP}
-      </div>
-    </div>
-  );
-
-  const monthLong = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-
-  const formatMonthYear = (d?: { month: number; year: number }) => {
-    if (!d) return "";
-    const label = monthLong[d.month - 1] ?? "";
-    return label ? `${label} ${d.year}` : "";
-  };
+  const {
+    IconPhone,
+    IconEmail,
+    IconLocation,
+    IconBirthday,
+    IconFlag,
+    IconDocument,
+    IconLinkedIn,
+    IconGitHub,
+  } = makeSidebarIcons(accentColor);
 
   const placeholderContactDetails: ContactDetailsPreviewData = {
     fullName: "John Doe",
@@ -118,189 +65,250 @@ export function TemplatePreview1({ sidebarColor }: TemplatePreview1Props) {
   const addressLine =
     postalCode || city ? `${postalCode ? `${postalCode}, ` : ""}${city}` : "";
 
-  const sidebarSkill1 = "Skill 1";
-  const sidebarSkill2 = "Skill 2";
-  const sidebarSkill3 = "Skill 3";
+  const sidebarSkill1 = "JavaScript, TypeScript";
+  const sidebarSkill2 = "React, Next.js, Node.js";
+  const sidebarSkill3 = "PostgreSQL, MongoDB, Docker";
 
-  const showSidebarSkills = true;
+  const language1 = "Ukrainian (Native)";
+  const language2 = "English (B2)";
+  const language3 = "Spanish (B1)";
 
-  const language1 = "Language 1";
-  const language2 = "Language 2";
-  const language3 = "Language 3";
-
-  const showLanguages = true;
+  const interest1 = "Snowboarding";
+  const interest2 = "Surfing";
 
   const summary =
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.";
-
-  const showSummary = true;
-
-  const mainSkillsLabel = "Skills:";
-  const mainSkill1 = "Skill 1, Skill 2 with advanced knowledge";
-  const mainSkill2 = "Skill 3 (intermediate level)";
-  const mainSkill3 = "Skill 4 with 2+ years experience";
-  const mainSkill4 = "Skill 5, certified professional";
-
-  const showMainSkills = true;
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.";
 
   const workTitle = "Work history";
   const workItems = [
     {
       id: "p1",
-      jobTitle: "Job Title",
-      companyName: "Company Name",
-      city: "City",
-      startDate: { month: 9, year: 2022 },
-      endDate: { month: 2, year: 2025 },
+      jobTitle: "Senior Full Stack Developer",
+      companyName: "Tech Solutions Inc.",
+      city: "San Francisco, CA",
+      startDate: { month: 3, year: 2021 },
+      endDate: { month: 8, year: 2024 },
       description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "Led development of microservices architecture using Node.js and React. Implemented CI/CD pipelines and improved application performance by 40%. Mentored junior developers and conducted code reviews.",
     },
     {
       id: "p2",
-      jobTitle: "Job Title",
-      companyName: "Company Name",
-      city: "City",
-      startDate: { month: 2, year: 2025 },
-      endDate: undefined,
+      jobTitle: "Frontend Developer",
+      companyName: "Digital Agency Pro",
+      city: "New York, NY",
+      startDate: { month: 6, year: 2019 },
+      endDate: { month: 2, year: 2021 },
       description:
-        "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+        "Developed responsive web applications using React and TypeScript. Collaborated with UX team to implement pixel-perfect designs. Optimized bundle sizes and improved page load times.",
+    },
+    {
+      id: "p3",
+      jobTitle: "Junior Web Developer",
+      companyName: "StartUp Hub",
+      city: "Kyiv, Ukraine",
+      startDate: { month: 9, year: 2017 },
+      endDate: { month: 5, year: 2019 },
+      description:
+        "Built responsive websites using HTML, CSS, JavaScript. Worked with WordPress and custom PHP development. Participated in agile development process and daily standups.",
+    },
+    {
+      id: "p4",
+      jobTitle: "Web Development Intern",
+      companyName: "Creative Studio",
+      city: "Lviv, Ukraine",
+      startDate: { month: 6, year: 2017 },
+      endDate: { month: 8, year: 2017 },
+      description:
+        "Assisted senior developers with website maintenance and updates. Gained experience with version control, client communication, and project management tools.",
     },
   ];
 
   const dataWorkItems = workItems;
 
-  const showWorkHistory = true;
-
   const educationTitle = "Education";
-  const eduItem1Title = "Course Name";
-  const eduItem1Date = "Month Year - Month Year";
-  const eduItem1Subtitle = "Institution Name, City";
-  const eduItem2Title = "Course Name";
-  const eduItem2Date = "Month Year - Month Year";
-  const eduItem2Subtitle = "Institution Name, City";
+  const eduItem1Title = "Bachelor of Computer Science";
+  const eduItem1StartDate = "September 2015";
+  const eduItem1EndDate = "June 2019";
+  const eduItem1Subtitle = "National Technical University of Ukraine, Kyiv";
+  const eduItem2Title = "Full Stack Web Development Bootcamp";
+  const eduItem2StartDate = "January 2020";
+  const eduItem2EndDate = "April 2020";
+  const eduItem2Subtitle = "Code Academy, Online";
   const eduItem2Body =
-    "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.";
-
-  const showEducation = true;
+    "Intensive 16-week program covering modern web development technologies including React, Node.js, databases, and deployment strategies.";
+  const eduItem3Title = "Advanced React & Redux Certification";
+  const eduItem3StartDate = "October 2020";
+  const eduItem3EndDate = "December 2020";
+  const eduItem3Subtitle = "Udemy, Online";
+  const eduItem3Body =
+    "Deep dive into React ecosystem, advanced state management, performance optimization, and testing strategies.";
+  const eduItem4Title = "AWS Cloud Practitioner";
+  const eduItem4StartDate = "March 2021";
+  const eduItem4EndDate = "May 2021";
+  const eduItem4Subtitle = "Amazon Web Services, Online";
+  const eduItem4Body =
+    "Comprehensive understanding of AWS cloud services, architecture best practices, and cloud security fundamentals.";
 
   return (
-    <div className={styles.preview}>
+    <div
+      className={styles.preview}
+      style={{
+        ["--accent-color" as any]: accentColor,
+      }}
+    >
       <div className={styles.sidebar} style={{ backgroundColor: sidebarColor }}>
         <div className={styles.avatar} />
-        {renderLine("☎", phone)}
-        {renderLine("✉", email)}
-        {renderLine("⌂", addressLine)}
-        {renderLine("🎂", birthdate)}
-        {renderLine("🏳", nationality)}
-        {renderLine("🪪", workPermit)}
-        {renderLine("in", linkedIn)}
-        {renderLine("↗", git)}
+        {renderLine(IconPhone, phone)}
+        {renderLine(IconEmail, email)}
+        {renderLine(IconLocation, addressLine)}
+        {renderLine(IconBirthday, birthdate)}
+        {renderLine(IconFlag, nationality)}
+        {renderLine(IconDocument, workPermit)}
+        <div className={styles.contactSpacer} />
+        {renderLine(IconLinkedIn, linkedIn)}
+        {renderLine(IconGitHub, git)}
 
-        {showSidebarSkills && (
-          <div className={styles.section}>
-            {renderText("div", styles.sectionTitle, "Skills")}
-            {renderText("div", styles.item, sidebarSkill1)}
-            {renderText("div", styles.item, sidebarSkill2)}
-            {renderText("div", styles.item, sidebarSkill3)}
-          </div>
-        )}
+        <div className={styles.section}>
+          {renderText("div", styles.sectionTitle, "Skills")}
+          {renderText("div", styles.item, sidebarSkill1)}
+          {renderText("div", styles.item, sidebarSkill2)}
+          {renderText("div", styles.item, sidebarSkill3)}
+        </div>
 
-        {showLanguages && (
-          <div className={styles.section}>
-            {renderText("div", styles.sectionTitle, "Languages")}
-            {renderText("div", styles.item, language1)}
-            {renderText("div", styles.item, language2)}
-            {renderText("div", styles.item, language3)}
-          </div>
-        )}
+        <div className={styles.section}>
+          {renderText("div", styles.sectionTitle, "Languages")}
+          {renderText("div", styles.item, language1)}
+          {renderText("div", styles.item, language2)}
+          {renderText("div", styles.item, language3)}
+        </div>
+
+        <div className={styles.section}>
+          {renderText("div", styles.sectionTitle, "Interests")}
+          {renderText("div", styles.item, interest2)}
+          {renderText("div", styles.item, interest1)}
+        </div>
       </div>
 
       <div className={styles.main}>
         {renderText("div", styles.name, fullName)}
         {renderText("div", styles.jobTitle, jobTitle)}
 
-        {showSummary && renderText("div", styles.summary, summary)}
+        {renderText("div", styles.summary, summary)}
 
-        {showMainSkills && (
-          <>
-            {renderText("div", styles.label, mainSkillsLabel)}
-            {renderBulletRow(mainSkill1)}
-            {renderBulletRow(mainSkill2)}
-            {renderBulletRow(mainSkill3)}
-            {renderBulletRow(mainSkill4)}
-          </>
-        )}
+        <div className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionDot} />
+            {renderText("div", styles.sectionTitle, workTitle)}
+          </div>
+          {dataWorkItems.map((item: WorkExperiencePreviewItem) => {
+            const title = item.jobTitle;
+            const company = item.companyName;
+            const cityLine = item.city;
 
-        {showWorkHistory && (
-          <div className={styles.section}>
-            <div className={styles.sectionHeader}>
-              <div className={`${styles.sectionDot}`} />
-              {renderText("div", styles.sectionTitle, workTitle)}
-            </div>
-            {dataWorkItems.map((item: WorkExperiencePreviewItem) => {
-              const title = item.jobTitle;
-              const company = item.companyName;
-              const cityLine = item.city;
+            const subtitle =
+              cityLine.trim().length > 0
+                ? `${company}${company ? ", " : ""}${cityLine}`
+                : company;
 
-              const subtitle =
-                cityLine.trim().length > 0
-                  ? `${company}${company ? ", " : ""}${cityLine}`
-                  : company;
+            const startLabel = formatMonthYear(item.startDate);
+            const endLabel = item.endDate
+              ? formatMonthYear(item.endDate)
+              : "Current";
+            const body = item.description;
 
-              const startLabel = formatMonthYear(item.startDate);
-              const endLabel = item.endDate
-                ? formatMonthYear(item.endDate)
-                : "Current";
-              const body = item.description;
-
-              return (
-                <div key={item.id} className={styles.workItem}>
-                  <div className={styles.workHeader}>
+            return (
+              <div key={item.id} className={styles.workItem}>
+                <div className={styles.workHeader}>
+                  <div>
                     {renderText("div", styles.workTitle, title)}
-                    <div className={styles.workDate}>
-                      <div>{startLabel}</div>
-                      <div>{endLabel}</div>
-                    </div>
+                    {subtitle ? (
+                      <div className={styles.workSubtitle}>{subtitle}</div>
+                    ) : null}
                   </div>
-
-                  {subtitle ? (
-                    <div className={styles.workSubtitle}>{subtitle}</div>
-                  ) : null}
-
-                  {body.trim() ? (
-                    <div className={styles.workBody}>{body}</div>
-                  ) : null}
+                  <div className={styles.workDate}>
+                    <div>{startLabel}</div>
+                    <div>{endLabel}</div>
+                  </div>
                 </div>
-              );
-            })}
-          </div>
-        )}
 
-        {showEducation && (
-          <div className={styles.section}>
-            <div className={styles.sectionHeader}>
-              <div
-                className={`${styles.sectionDot}${ghostClass(educationTitle)}`}
-              />
-              {renderText("div", styles.sectionTitle, educationTitle)}
-            </div>
-            <div className={styles.workItem}>
-              <div className={styles.workHeader}>
+                {body.trim() ? (
+                  <div className={styles.workBody}>{body}</div>
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionDot} />
+            {renderText("div", styles.sectionTitle, educationTitle)}
+          </div>
+          <div className={styles.workItem}>
+            <div className={styles.workHeader}>
+              <div>
                 {renderText("div", styles.workTitle, eduItem1Title)}
-                {renderText("div", styles.workDate, eduItem1Date)}
+                {renderText("div", styles.workSubtitle, eduItem1Subtitle)}
               </div>
-              {renderText("div", styles.workSubtitle, eduItem1Subtitle)}
-            </div>
-            <div className={styles.workItem}>
-              <div className={styles.workHeader}>
-                {renderText("div", styles.workTitle, eduItem2Title)}
-                {renderText("div", styles.workDate, eduItem2Date)}
+              <div className={styles.workDate}>
+                <div>{eduItem1StartDate}</div>
+                <div>{eduItem1EndDate}</div>
               </div>
-              {renderText("div", styles.workSubtitle, eduItem2Subtitle)}
-              {renderText("div", styles.workBody, eduItem2Body)}
             </div>
           </div>
-        )}
+          <div className={styles.workItem}>
+            <div className={styles.workHeader}>
+              <div>
+                {renderText("div", styles.workTitle, eduItem2Title)}
+                {renderText("div", styles.workSubtitle, eduItem2Subtitle)}
+              </div>
+              <div className={styles.workDate}>
+                <div>{eduItem2StartDate}</div>
+                <div>{eduItem2EndDate}</div>
+              </div>
+            </div>
+            {renderText("div", styles.workBody, eduItem2Body)}
+          </div>
+          <div className={styles.workItem}>
+            <div className={styles.workHeader}>
+              <div>
+                {renderText("div", styles.workTitle, eduItem3Title)}
+                {renderText("div", styles.workSubtitle, eduItem3Subtitle)}
+              </div>
+              <div className={styles.workDate}>
+                <div>{eduItem3StartDate}</div>
+                <div>{eduItem3EndDate}</div>
+              </div>
+            </div>
+            {renderText("div", styles.workBody, eduItem3Body)}
+          </div>
+          <div className={styles.workItem}>
+            <div className={styles.workHeader}>
+              <div>
+                {renderText("div", styles.workTitle, eduItem4Title)}
+                {renderText("div", styles.workSubtitle, eduItem4Subtitle)}
+              </div>
+              <div className={styles.workDate}>
+                <div>{eduItem4StartDate}</div>
+                <div>{eduItem4EndDate}</div>
+              </div>
+            </div>
+            {renderText("div", styles.workBody, eduItem4Body)}
+          </div>
+        </div>
+
+        <div className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionDot} />
+            {renderText("div", styles.sectionTitle, "Custom section")}
+          </div>
+          <div className={styles.workBody}>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+            aliquip ex ea commodo consequat.
+          </div>
+        </div>
       </div>
     </div>
   );
