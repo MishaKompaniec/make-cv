@@ -31,10 +31,36 @@ const TEMPLATE_1_ACCENT_BY_SIDEBAR_COLOR: Record<string, string> = {
 
 Font.register({
   family: "Inter",
-  src: new URL(
-    "../../../../assets/fonts/Inter.ttf",
-    import.meta.url,
-  ).toString(),
+  fonts: [
+    {
+      src: new URL(
+        "../../../../assets/fonts/Inter-Regular.ttf",
+        import.meta.url,
+      ).toString(),
+      fontWeight: 400,
+    },
+    {
+      src: new URL(
+        "../../../../assets/fonts/Inter-Medium.ttf",
+        import.meta.url,
+      ).toString(),
+      fontWeight: 500,
+    },
+    {
+      src: new URL(
+        "../../../../assets/fonts/Inter-SemiBold.ttf",
+        import.meta.url,
+      ).toString(),
+      fontWeight: 600,
+    },
+    {
+      src: new URL(
+        "../../../../assets/fonts/Inter-Bold.ttf",
+        import.meta.url,
+      ).toString(),
+      fontWeight: 700,
+    },
+  ],
 });
 
 const normalizeHex = (value: string) => value.trim().toLowerCase();
@@ -83,7 +109,7 @@ const styles = StyleSheet.create({
   },
   skillLabel: {
     fontSize: 11,
-    fontWeight: 600,
+    fontWeight: 500,
     color: "#111111",
     marginBottom: 4,
   },
@@ -91,9 +117,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginBottom: 6,
     alignItems: "center",
+    gap: "6px",
   },
   sidebarInfoLabel: {
-    width: 26,
     alignItems: "center",
     justifyContent: "center",
     paddingTop: 0,
@@ -111,7 +137,23 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
   },
-  skillItem: { marginBottom: "4px", fontSize: 10, color: "#111111" },
+  sidebarLink: {
+    fontSize: 8,
+    lineHeight: 1.35,
+    color: "#000000",
+    textDecoration: "underline",
+    textDecorationColor: "#000000",
+  },
+  spacer12: {
+    marginBottom: 12,
+  },
+  mt12: {
+    marginTop: 12,
+  },
+  mt0: {
+    marginTop: 0,
+  },
+  skillItem: { marginBottom: "4px", fontSize: 8, color: "#111111" },
   mainSection: {
     marginTop: 14,
   },
@@ -412,11 +454,29 @@ export function TemplatePdf1({
     <Svg viewBox="144 144 512 512" style={styles.sidebarInfoIcon}>
       <Path
         fill={iconColor}
-        d="m400 173.29c-35.887 0.011719-70.301 14.273-95.676 39.648s-39.637 59.789-39.648 95.676c0 114.52 135.32 318.1 135.32 318.1s135.32-203.59 135.32-318.1c-0.011718-35.887-14.273-70.301-39.648-95.676s-59.789-39.637-95.672-39.648zm0 217.19c-21.715 0-42.539-8.625-57.891-23.98-15.355-15.352-23.98-36.176-23.98-57.887 0-21.715 8.625-42.539 23.98-57.891 15.352-15.355 36.176-23.98 57.891-23.98 21.711 0 42.535 8.625 57.887 23.98 15.355 15.352 23.98 36.176 23.98 57.891-0.027344 21.703-8.6602 42.512-24.008 57.859s-36.156 23.98-57.859 24.008z"
+        d="M400 173.29c-35.887 0.011719-70.301 14.273-95.676 39.648s-39.637 59.789-39.648 95.676c0 114.52 135.32 318.1 135.32 318.1s135.32-203.59 135.32-318.1c-0.011718-35.887-14.273-70.301-39.648-95.676s-59.789-39.637-95.672-39.648zm0 217.19c-21.715 0-42.539-8.625-57.891-23.98-15.355-15.352-23.98-36.176-23.98-57.887 0-21.715 8.625-42.539 23.98-57.891 15.352-15.355 36.176-23.98 57.891-23.98 21.711 0 42.535 8.625 57.887 23.98 15.355 15.352 23.98 36.176 23.98 57.891-0.027344 21.703-8.6602 42.512-24.008 57.859s-36.156 23.98-57.859 24.008z"
       />
       <Path
         fill={iconColor}
-        d="m427.25 311.78c0 15.055-12.203 27.258-27.254 27.258-15.055 0-27.258-12.203-27.258-27.258s12.203-27.258 27.258-27.258c15.051 0 27.254 12.203 27.254 27.258"
+        d="M427.25 311.78c0 15.055-12.203 27.258-27.254 27.258-15.055 0-27.258-12.203-27.258-27.258s12.203-27.258 27.258-27.258c15.051 0 27.254 12.203 27.254 27.258"
+      />
+    </Svg>
+  );
+
+  const IconLinkedIn = (
+    <Svg viewBox="0 0 24 24" style={styles.sidebarInfoIcon}>
+      <Path
+        fill={iconColor}
+        d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
+      />
+    </Svg>
+  );
+
+  const IconGitHub = (
+    <Svg viewBox="0 0 24 24" style={styles.sidebarInfoIcon}>
+      <Path
+        fill={iconColor}
+        d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
       />
     </Svg>
   );
@@ -454,20 +514,11 @@ export function TemplatePdf1({
               {renderSidebarRow(IconBirthday, birthdate)}
               {renderSidebarRow(IconFlag, nationality)}
               {renderSidebarRow(IconDocument, workPermit)}
-              <View style={{ marginBottom: 12 }} />
+              <View style={styles.spacer12} />
               {renderSidebarRow(
-                <Text style={[styles.label, { color: accentColor }]}>In</Text>,
+                IconLinkedIn,
                 linkedInHref ? (
-                  <Link
-                    src={linkedInHref}
-                    style={{
-                      fontSize: 8,
-                      lineHeight: 1.35,
-                      color: "#000000",
-                      textDecoration: "underline",
-                      textDecorationColor: "#000000",
-                    }}
-                  >
+                  <Link src={linkedInHref} style={styles.sidebarLink}>
                     {linkedInSafe}
                   </Link>
                 ) : (
@@ -475,18 +526,9 @@ export function TemplatePdf1({
                 ),
               )}
               {renderSidebarRow(
-                <Text style={[styles.label, { color: accentColor }]}>Git</Text>,
+                IconGitHub,
                 gitHref ? (
-                  <Link
-                    src={gitHref}
-                    style={{
-                      fontSize: 8,
-                      lineHeight: 1.35,
-                      color: "#000000",
-                      textDecoration: "underline",
-                      textDecorationColor: "#000000",
-                    }}
-                  >
+                  <Link src={gitHref} style={styles.sidebarLink}>
                     {gitSafe}
                   </Link>
                 ) : (
@@ -497,7 +539,7 @@ export function TemplatePdf1({
           ) : null}
 
           {hasSkills ? (
-            <View style={{ marginTop: hasSidebarInfo ? 12 : 0 }}>
+            <View style={hasSidebarInfo ? styles.mt12 : styles.mt0}>
               <Text style={styles.skillLabel}>Skills</Text>
               {cleanedSkills.map((s) => (
                 <Text key={s.id} style={[styles.skillItem]}>
@@ -509,15 +551,12 @@ export function TemplatePdf1({
 
           {hasLanguages ? (
             <View
-              style={{
-                marginTop: hasSkills ? 12 : hasSidebarInfo ? 12 : 0,
-              }}
+              style={hasSkills || hasSidebarInfo ? styles.mt12 : styles.mt0}
             >
               <Text style={styles.skillLabel}>Languages</Text>
               {cleanedLanguages.map((l) => (
                 <Text key={l.id} style={[styles.skillItem]}>
-                  {l.name}
-                  {l.level ? ` (${l.level})` : ""}
+                  {l.name} - {l.level}
                 </Text>
               ))}
             </View>
@@ -525,15 +564,11 @@ export function TemplatePdf1({
 
           {hasInterests ? (
             <View
-              style={{
-                marginTop: hasLanguages
-                  ? 12
-                  : hasSkills
-                    ? 12
-                    : hasSidebarInfo
-                      ? 12
-                      : 0,
-              }}
+              style={
+                hasLanguages || hasSkills || hasSidebarInfo
+                  ? styles.mt12
+                  : styles.mt0
+              }
             >
               <Text style={styles.skillLabel}>Interests</Text>
               {cleanedInterests.map((i) => (
