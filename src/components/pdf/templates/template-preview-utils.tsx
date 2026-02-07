@@ -1,7 +1,3 @@
-import type { ReactNode } from "react";
-
-export const NBSP = "\u00A0";
-
 export const ACCENT_BY_SIDEBAR_COLOR = {
   "#efeae2": "#bfac8c",
   "#e8f4f8": "#297b96",
@@ -34,6 +30,29 @@ export type WorkExperiencePreviewItem = {
   description: string;
 };
 
+export type EducationPreviewItem = {
+  id: string;
+  title: string;
+  subtitle: string;
+  startLabel: string;
+  endLabel: string;
+  body?: string;
+};
+
+export type TemplatePreviewData = {
+  contactDetails: Required<ContactDetailsPreviewData>;
+  sidebarSkills: string[];
+  languages: string[];
+  interests: string[];
+  summary: string;
+  workTitle: string;
+  workItems: WorkExperiencePreviewItem[];
+  educationTitle: string;
+  educationItems: EducationPreviewItem[];
+  customSectionTitle: string;
+  customSectionBody: string;
+};
+
 const monthLong = [
   "January",
   "February",
@@ -55,6 +74,12 @@ export function formatMonthYear(d?: { month: number; year: number }) {
   return label ? `${label} ${d.year}` : "";
 }
 
+export function buildAddressLine(postalCode: string, city: string) {
+  return postalCode || city
+    ? `${postalCode ? `${postalCode}, ` : ""}${city}`
+    : "";
+}
+
 export function resolveAccentColor(sidebarColor?: string) {
   const normalized = (sidebarColor || "").trim().toLowerCase();
   return (
@@ -64,39 +89,110 @@ export function resolveAccentColor(sidebarColor?: string) {
   );
 }
 
-export function makeGhostClass(styles: Record<string, string>) {
-  const ghost = styles["ghost"] ?? "";
-  return (value: string) => (value ? "" : ghost ? ` ${ghost}` : "");
-}
-
-export function makeRenderText(ghostClass: (value: string) => string) {
-  return (Tag: "div" | "span", className: string, value: string) => {
-    const Comp = Tag;
-    return (
-      <Comp className={`${className}${ghostClass(value)}`}>
-        {value || NBSP}
-      </Comp>
-    );
-  };
-}
-
-export function makeRenderLine(
-  ghostClass: (value: string) => string,
-  styles: Record<string, string>,
-) {
-  const contactRowClass = styles["contactRow"] ?? "";
-  const iconClass = styles["icon"] ?? "";
-  const textClass = styles["text"] ?? "";
-
-  return (icon: ReactNode, value: string) => (
-    <div className={contactRowClass}>
-      <span className={`${iconClass}${ghostClass(value)}`}>{icon}</span>
-      <span className={`${textClass}${ghostClass(value)}`}>
-        {value || NBSP}
-      </span>
-    </div>
-  );
-}
+export const TEMPLATE_PREVIEW_DATA: TemplatePreviewData = {
+  contactDetails: {
+    fullName: "John Doe",
+    jobTitle: "Fullstack Developer",
+    phone: "+1 234 567 890",
+    email: "email@example.com",
+    city: "City, Country",
+    birthdate: "01/01/1990",
+    postalCode: "12345",
+    linkedIn: "linkedin.com/in/johndoe",
+    git: "github.com/johndoe",
+    nationality: "Nationality",
+    workPermit: "Work permit",
+  },
+  sidebarSkills: [
+    "JavaScript, TypeScript",
+    "React, Next.js, Node.js",
+    "PostgreSQL, MongoDB, Docker",
+  ],
+  languages: ["Ukrainian (Native)", "English (B2)", "Spanish (B1)"],
+  interests: ["Snowboarding", "Surfing"],
+  summary:
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
+  workTitle: "Work history",
+  workItems: [
+    {
+      id: "p1",
+      jobTitle: "Senior Full Stack Developer",
+      companyName: "Tech Solutions Inc.",
+      city: "San Francisco, CA",
+      startDate: { month: 3, year: 2021 },
+      endDate: { month: 8, year: 2024 },
+      description:
+        "Led development of microservices architecture using Node.js and React. Implemented CI/CD pipelines and improved application performance by 40%. Mentored junior developers and conducted code reviews.",
+    },
+    {
+      id: "p2",
+      jobTitle: "Frontend Developer",
+      companyName: "Digital Agency Pro",
+      city: "New York, NY",
+      startDate: { month: 6, year: 2019 },
+      endDate: { month: 2, year: 2021 },
+      description:
+        "Developed responsive web applications using React and TypeScript. Collaborated with UX team to implement pixel-perfect designs. Optimized bundle sizes and improved page load times.",
+    },
+    {
+      id: "p3",
+      jobTitle: "Junior Web Developer",
+      companyName: "StartUp Hub",
+      city: "Kyiv, Ukraine",
+      startDate: { month: 9, year: 2017 },
+      endDate: { month: 5, year: 2019 },
+      description:
+        "Built responsive websites using HTML, CSS, JavaScript. Worked with WordPress and custom PHP development. Participated in agile development process and daily standups.",
+    },
+    {
+      id: "p4",
+      jobTitle: "Web Development Intern",
+      companyName: "Creative Studio",
+      city: "Lviv, Ukraine",
+      startDate: { month: 6, year: 2017 },
+      endDate: { month: 8, year: 2017 },
+      description:
+        "Assisted senior developers with website maintenance and updates. Gained experience with version control, client communication, and project management tools.",
+    },
+  ],
+  educationTitle: "Education",
+  educationItems: [
+    {
+      id: "e1",
+      title: "Bachelor of Computer Science",
+      subtitle: "National Technical University of Ukraine, Kyiv",
+      startLabel: "September 2015",
+      endLabel: "June 2019",
+    },
+    {
+      id: "e2",
+      title: "Full Stack Web Development Bootcamp",
+      subtitle: "Code Academy, Online",
+      startLabel: "January 2020",
+      endLabel: "April 2020",
+      body: "Intensive 16-week program covering modern web development technologies including React, Node.js, databases, and deployment strategies.",
+    },
+    {
+      id: "e3",
+      title: "Advanced React & Redux Certification",
+      subtitle: "Udemy, Online",
+      startLabel: "October 2020",
+      endLabel: "December 2020",
+      body: "Deep dive into React ecosystem, advanced state management, performance optimization, and testing strategies.",
+    },
+    {
+      id: "e4",
+      title: "AWS Cloud Practitioner",
+      subtitle: "Amazon Web Services, Online",
+      startLabel: "March 2021",
+      endLabel: "May 2021",
+      body: "Comprehensive understanding of AWS cloud services, architecture best practices, and cloud security fundamentals.",
+    },
+  ],
+  customSectionTitle: "Custom section",
+  customSectionBody:
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+};
 
 export function makeSidebarIcons(accentColor: string) {
   const iconFill = accentColor;
