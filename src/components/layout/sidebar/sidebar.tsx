@@ -4,11 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import styles from "./sidebar.module.scss";
+import { signIn, signOut, useSession } from "next-auth/react";
+import { Button } from "@/components/ui/button/button";
 
 export function Sidebar() {
   const pathname = usePathname();
   const isCreateFlow = pathname.startsWith("/create-cv");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { data: session, status } = useSession();
 
   const steps = [
     { title: "Choose template", path: "/create-cv" },
@@ -186,7 +189,37 @@ export function Sidebar() {
             </Link>
           </nav>
 
-          <div className={styles.account}>Account</div>
+          <div className={styles.account}>
+            {status === "authenticated" ? (
+              <>
+                {session.user?.image && (
+                  <img
+                    src={session.user.image}
+                    alt="User avatar"
+                    className={styles.avatar}
+                  />
+                )}
+                <div className={styles.email}>
+                  {session.user?.email ?? "Account"}
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => signOut({ callbackUrl: "/" })}
+                >
+                  Sign out
+                </Button>
+              </>
+            ) : (
+              <Button
+                variant="outline"
+                size="md"
+                onClick={() => signIn("google")}
+              >
+                Sign in
+              </Button>
+            )}
+          </div>
         </>
       )}
     </aside>

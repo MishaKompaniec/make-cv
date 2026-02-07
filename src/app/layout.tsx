@@ -1,6 +1,7 @@
 import "../styles/globals.scss";
 import { Sidebar } from "@/components/layout/sidebar/sidebar";
 import localFont from "next/font/local";
+import { Providers } from "./providers";
 
 const inter = localFont({
   src: "../assets/fonts/Inter.ttf",
@@ -17,10 +18,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <body className="layout">
-        <Sidebar />
-        <main className="main-content">
-          <div className="create-flow-container">{children}</div>
-        </main>
+        <Providers>
+          <Sidebar />
+          <main className="main-content">
+            <div className="create-flow-container">{children}</div>
+          </main>
+        </Providers>
       </body>
     </html>
   );
