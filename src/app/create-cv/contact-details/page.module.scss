@@ -54,6 +54,205 @@
   margin: 1rem 0;
 }
 
+.avatarSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.avatarRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.avatarPreview {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: $border-light;
+  flex: 0 0 auto;
+}
+
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.avatarPlaceholder {
+  width: 100%;
+  height: 100%;
+  background: $border-light;
+}
+
+.avatarActions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.avatarUploadButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid $border-light;
+  background: $white;
+  cursor: pointer;
+}
+
+.avatarFileInput {
+  display: none;
+}
+
+.avatarRemoveButton {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid $border-light;
+  background: $white;
+  cursor: pointer;
+}
+
+.avatarRemoveButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.avatarHint {
+  font-size: 0.85rem;
+  color: $text-secondary;
+}
+
+.avatarError {
+  font-size: 0.85rem;
+  color: #b42318;
+}
+
+.cropOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 1000;
+}
+
+.cropModal {
+  width: min(720px, 100%);
+  height: calc(100vh - 2rem);
+  background: $white;
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: 0 25px 60px rgba(17, 32, 63, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+@media (min-width: #{$breakpoint-desktop}) and (min-height: 760px) {
+  .cropModal {
+    height: 720px;
+  }
+}
+
+.cropHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.cropTitle {
+  font-weight: 600;
+  font-size: 1rem;
+  color: $text-primary;
+}
+
+.cropClose {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid $border-light;
+  background: $white;
+  cursor: pointer;
+  position: relative;
+}
+
+.cropClose::before,
+.cropClose::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 2px;
+  background: $text-secondary;
+  transform-origin: center;
+}
+
+.cropClose::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.cropClose::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.cropContainer {
+  position: relative;
+  flex: 1;
+  min-height: 280px;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: #111;
+}
+
+.cropControls {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.cropZoomLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  color: $text-secondary;
+  width: 100%;
+}
+
+.cropZoomLabel input[type="range"] {
+  width: 100%;
+}
+
+.cropButtons {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.cropCancel,
+.cropSave {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid $border-light;
+  background: $white;
+  cursor: pointer;
+}
+
+.cropSave:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .hint {
   font-size: 0.85rem;
   color: $text-secondary;

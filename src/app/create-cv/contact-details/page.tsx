@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef, useState, type FocusEvent } from "react";
 import { useRouter } from "next/navigation";
+import Cropper, { type Area } from "react-easy-crop";
 import { Input } from "@/components/ui/input/input";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
@@ -16,12 +17,27 @@ import styles from "./page.module.scss";
 
 const stepTitle = "Contact details";
 
+const AVATAR_MAX_BYTES = 1 * 1024 * 1024;
+const AVATAR_ALLOWED_MIME = ["image/jpeg", "image/png", "image/webp"] as const;
+
+const AVATAR_OUTPUT_SIZE = 512;
+
 export default function ContactDetailsPage() {
   const router = useRouter();
   const { contactDetails, setContactDetails } = useCvData();
 
+  const [avatarError, setAvatarError] = useState<string>("");
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  const [cropSrc, setCropSrc] = useState<string>("");
+  const [isCropOpen, setIsCropOpen] = useState(false);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+
   const didInitRef = useRef(false);
   const debounceTimerRef = useRef<number | null>(null);
+  const avatarInputRef = useRef<HTMLInputElement | null>(null);
 
   const {
     register,
@@ -30,6 +46,7 @@ export default function ContactDetailsPage() {
     reset,
     watch,
     getValues,
+    setValue,
   } = useForm<ContactDetailsFormData>({
     resolver: zodResolver(contactDetailsSchema),
     mode: "onChange",
@@ -43,6 +60,10 @@ export default function ContactDetailsPage() {
     reset(contactDetails);
     didInitRef.current = true;
   }, [contactDetails, reset]);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   // Auto-save on field changes
   useEffect(() => {
@@ -86,6 +107,133 @@ export default function ContactDetailsPage() {
     setContactDetails(data);
     router.push("/create-cv/summary");
   });
+
+  const handleAvatarFile = (file: File | null) => {
+    setAvatarError("");
+
+    if (!file) return;
+
+    if (!AVATAR_ALLOWED_MIME.includes(file.type as any)) {
+      setAvatarError("Unsupported file type. Please upload PNG, JPG or WEBP.");
+      return;
+    }
+
+    if (file.size > AVATAR_MAX_BYTES) {
+      setAvatarError("File is too large. Max size is 1 MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onerror = () => {
+      setAvatarError("Failed to read the file.");
+    };
+    reader.onload = () => {
+      const result = reader.result;
+      if (typeof result !== "string" || !result.startsWith("data:image/")) {
+        setAvatarError("Invalid image file.");
+        return;
+      }
+
+      setCropSrc(result);
+      setIsCropOpen(true);
+      setCrop({ x: 0, y: 0 });
+      setZoom(1);
+      setCroppedAreaPixels(null);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const clearAvatar = () => {
+    setAvatarError("");
+    setValue("avatar", "", { shouldDirty: true, shouldValidate: true });
+    if (avatarInputRef.current) avatarInputRef.current.value = "";
+    flushSave();
+  };
+
+  const closeCrop = () => {
+    setIsCropOpen(false);
+    setCropSrc("");
+    setCrop({ x: 0, y: 0 });
+    setZoom(1);
+    setCroppedAreaPixels(null);
+    if (avatarInputRef.current) avatarInputRef.current.value = "";
+  };
+
+  const loadImage = (src: string) => {
+    return new Promise<HTMLImageElement>((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error("Failed to load image"));
+      img.src = src;
+    });
+  };
+
+  const canvasToDataUrlWithLimit = (canvas: HTMLCanvasElement) => {
+    const maxChars = AVATAR_MAX_BYTES * 1.37;
+    let quality = 0.92;
+    let dataUrl = canvas.toDataURL("image/jpeg", quality);
+    while (dataUrl.length > maxChars && quality > 0.6) {
+      quality -= 0.05;
+      dataUrl = canvas.toDataURL("image/jpeg", quality);
+    }
+    return dataUrl.length <= maxChars ? dataUrl : "";
+  };
+
+  const getCroppedAvatarDataUrl = async () => {
+    if (!cropSrc || !croppedAreaPixels) return "";
+    const img = await loadImage(cropSrc);
+
+    const canvas = document.createElement("canvas");
+    canvas.width = AVATAR_OUTPUT_SIZE;
+    canvas.height = AVATAR_OUTPUT_SIZE;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return "";
+
+    const { x, y, width, height } = croppedAreaPixels;
+    ctx.drawImage(
+      img,
+      x,
+      y,
+      width,
+      height,
+      0,
+      0,
+      AVATAR_OUTPUT_SIZE,
+      AVATAR_OUTPUT_SIZE,
+    );
+
+    let dataUrl = canvasToDataUrlWithLimit(canvas);
+    if (dataUrl) return dataUrl;
+
+    const smallCanvas = document.createElement("canvas");
+    smallCanvas.width = 384;
+    smallCanvas.height = 384;
+    const sctx = smallCanvas.getContext("2d");
+    if (!sctx) return "";
+    sctx.drawImage(canvas, 0, 0, 384, 384);
+    dataUrl = canvasToDataUrlWithLimit(smallCanvas);
+    return dataUrl;
+  };
+
+  const saveCroppedAvatar = async () => {
+    setAvatarError("");
+    try {
+      const dataUrl = await getCroppedAvatarDataUrl();
+      if (!dataUrl) {
+        setAvatarError("Failed to crop image. Try adjusting zoom.");
+        return;
+      }
+      setValue("avatar", dataUrl, { shouldDirty: true, shouldValidate: true });
+      flushSave();
+      closeCrop();
+    } catch (e) {
+      setAvatarError("Failed to crop image.");
+    }
+  };
+
+  const onCropComplete = (_: Area, areaPixels: Area) => {
+    setCroppedAreaPixels(areaPixels);
+  };
 
   return (
     <div className={styles.pageContainer}>
@@ -165,6 +313,127 @@ export default function ContactDetailsPage() {
             </div>
 
             <div className={styles.divider}></div>
+
+            <div className={styles.avatarSection}>
+              <div className={styles.avatarRow}>
+                <div className={styles.avatarPreview}>
+                  {isHydrated && watch("avatar") ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      className={styles.avatarImage}
+                      src={watch("avatar")}
+                      alt="Avatar"
+                    />
+                  ) : (
+                    <div className={styles.avatarPlaceholder} />
+                  )}
+                </div>
+
+                <div className={styles.avatarActions}>
+                  <label className={styles.avatarUploadButton}>
+                    Upload photo
+                    <input
+                      ref={avatarInputRef}
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      className={styles.avatarFileInput}
+                      onChange={(e) =>
+                        handleAvatarFile(e.target.files?.[0] ?? null)
+                      }
+                    />
+                  </label>
+
+                  <button
+                    type="button"
+                    className={styles.avatarRemoveButton}
+                    onClick={clearAvatar}
+                    disabled={!isHydrated || !watch("avatar")}
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+
+              {avatarError ? (
+                <div className={styles.avatarError}>{avatarError}</div>
+              ) : null}
+              <div className={styles.avatarHint}>
+                PNG, JPG or WEBP. Max 1 MB.
+              </div>
+            </div>
+
+            {isCropOpen ? (
+              <div
+                className={styles.cropOverlay}
+                role="dialog"
+                aria-modal="true"
+                onClick={closeCrop}
+              >
+                <div
+                  className={styles.cropModal}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className={styles.cropHeader}>
+                    <div className={styles.cropTitle}>Crop your photo</div>
+                    <button
+                      type="button"
+                      className={styles.cropClose}
+                      onClick={closeCrop}
+                      aria-label="Close"
+                    />
+                  </div>
+
+                  <div className={styles.cropContainer}>
+                    <Cropper
+                      image={cropSrc}
+                      crop={crop}
+                      zoom={zoom}
+                      aspect={1}
+                      cropShape="round"
+                      showGrid={false}
+                      objectFit="contain"
+                      onCropChange={setCrop}
+                      onZoomChange={setZoom}
+                      onCropComplete={onCropComplete}
+                    />
+                  </div>
+
+                  <div className={styles.cropControls}>
+                    <label className={styles.cropZoomLabel}>
+                      Zoom
+                      <input
+                        type="range"
+                        min={1}
+                        max={3}
+                        step={0.01}
+                        value={zoom}
+                        onChange={(e) =>
+                          setZoom(Math.max(1, Number(e.target.value) || 1))
+                        }
+                      />
+                    </label>
+                  </div>
+
+                  <div className={styles.cropButtons}>
+                    <button
+                      type="button"
+                      className={styles.cropCancel}
+                      onClick={closeCrop}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.cropSave}
+                      onClick={saveCroppedAvatar}
+                      disabled={!croppedAreaPixels}
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : null}
 
             <div className={styles.row}>
               <div className={styles.fieldGroup}>

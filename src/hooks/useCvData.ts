@@ -10,6 +10,7 @@ const defaultContactDetails: ContactDetailsFormData = {
   city: "",
   phone: "",
   email: "",
+  avatar: "",
   birthdate: "",
   postalCode: "",
   linkedIn: "",

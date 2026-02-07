@@ -6,6 +6,7 @@ import {
   Page,
   Path,
   Svg,
+  Image,
   Text,
   Link,
   View,
@@ -76,6 +77,20 @@ const styles = StyleSheet.create({
     paddingTop: 28,
     paddingLeft: 18,
     paddingRight: 18,
+  },
+  avatarWrap: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    overflow: "hidden",
+    backgroundColor: "#CFCFCF",
+    alignSelf: "center",
+    marginBottom: 12,
+  },
+  avatarImage: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
   },
   main: {
     width: "70%",
@@ -220,6 +235,7 @@ type Template2Props = {
     jobTitle?: string;
     phone?: string;
     email?: string;
+    avatar?: string;
     city?: string;
     postalCode?: string;
     linkedIn?: string;
@@ -292,6 +308,7 @@ export function TemplatePdf2({
   const email = contactDetails?.email || "";
   const phone = contactDetails?.phone || "";
   const jobTitle = contactDetails?.jobTitle || "";
+  const avatar = contactDetails?.avatar || "";
   const city = contactDetails?.city || "";
   const postalCode = contactDetails?.postalCode || "";
   const addressLine =
@@ -503,6 +520,9 @@ export function TemplatePdf2({
 
   const linkedInSafe = linkedInText;
   const gitSafe = gitText;
+
+  const avatarSrc = avatar.trim();
+  const hasAvatar = Boolean(avatarSrc && avatarSrc.startsWith("data:image/"));
 
   return (
     <Document>
@@ -733,6 +753,11 @@ export function TemplatePdf2({
         </View>
 
         <View style={[styles.sidebar, { backgroundColor: sidebarColor }]}>
+          {hasAvatar ? (
+            <View style={styles.avatarWrap}>
+              <Image src={avatarSrc} style={styles.avatarImage} />
+            </View>
+          ) : null}
           {hasSidebarInfo ? (
             <>
               {renderSidebarRow(IconPhone, phone)}

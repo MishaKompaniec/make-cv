@@ -6,6 +6,7 @@ export const contactDetailsSchema = z.object({
   city: z.string().min(2, "City must be at least 2 characters"),
   phone: z.string().min(5, "Phone number must be at least 5 characters"),
   email: z.string().email("Please enter a valid email address"),
+  avatar: z.string().optional(),
   birthdate: z.string().optional(),
   postalCode: z.string().optional(),
   linkedIn: z.string().optional(),
