@@ -1,8 +1,10 @@
 "use client";
 
-import { Button } from "@/components/ui/button/button";
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+
+import { Button } from "@/components/ui/button/button";
+
 import styles from "./page.module.scss";
 
 type CvListItem = {

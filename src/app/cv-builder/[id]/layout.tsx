@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+
 import { CvProvider } from "./provider";
 
 export default async function CvBuilderLayout({

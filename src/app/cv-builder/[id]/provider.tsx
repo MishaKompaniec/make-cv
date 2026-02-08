@@ -2,14 +2,15 @@
 
 import {
   createContext,
+  type ReactNode,
   useCallback,
   useContext,
   useEffect,
   useMemo,
   useRef,
   useState,
-  type ReactNode,
 } from "react";
+
 import { TEMPLATE_1_ID } from "@/components/pdf/templates/template-1/template-pdf";
 
 type CvSnapshot = {

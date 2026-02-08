@@ -1,11 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { Loader } from "@/components/ui/loader/loader";
-import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
-import { useCv } from "../provider";
+import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import {
   TEMPLATE_1_COLORS,
   TEMPLATE_1_ID,
@@ -15,6 +14,9 @@ import {
   TEMPLATE_2_ID,
   TemplatePdf2,
 } from "@/components/pdf/templates/template-2/template-pdf";
+import { Loader } from "@/components/ui/loader/loader";
+
+import { useCv } from "../provider";
 import styles from "./page.module.scss";
 
 const BlobProvider = dynamic(

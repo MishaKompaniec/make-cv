@@ -1,6 +1,9 @@
 import "../styles/globals.scss";
-import { Sidebar } from "@/components/layout/sidebar/sidebar";
+
 import localFont from "next/font/local";
+
+import { Sidebar } from "@/components/layout/sidebar/sidebar";
+
 import { Providers } from "./providers";
 
 const inter = localFont({

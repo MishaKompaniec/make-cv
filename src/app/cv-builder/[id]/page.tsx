@@ -1,17 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
-import dynamic from "next/dynamic";
-import { useCv } from "./provider";
 import {
-  TEMPLATE_1_ID,
   TEMPLATE_1_COLORS,
+  TEMPLATE_1_ID,
 } from "@/components/pdf/templates/template-1/template-pdf";
 import { TEMPLATE_2_ID } from "@/components/pdf/templates/template-2/template-pdf";
+
 import styles from "./page.module.scss";
+import { useCv } from "./provider";
 
 const TemplatePreview1 = dynamic(() =>
   import("@/components/pdf/templates/template-1/template-preview").then(

@@ -1,4 +1,5 @@
 import { ButtonHTMLAttributes, ReactNode } from "react";
+
 import styles from "./button.module.scss";
 
 type Variant = "primary" | "secondary" | "outline" | "ghost";

@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import styles from "./template-preview.module.scss";
+
 import {
   buildAddressLine,
   formatMonthYear,
@@ -9,6 +9,7 @@ import {
   resolveAccentColor,
   TEMPLATE_PREVIEW_DATA,
 } from "../template-preview-utils";
+import styles from "./template-preview.module.scss";
 
 interface TemplatePreview1Props {
   sidebarColor?: string;

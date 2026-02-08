@@ -1,10 +1,12 @@
 import { forwardRef } from "react";
-import { Input } from "@/components/ui/input/input";
-import { Textarea } from "@/components/ui/textarea/textarea";
+
 import {
   DatePicker,
   type DatePickerValue,
 } from "@/components/ui/date-picker/date-picker";
+import { Input } from "@/components/ui/input/input";
+import { Textarea } from "@/components/ui/textarea/textarea";
+
 import styles from "./page.module.scss";
 
 export type EducationItem = {

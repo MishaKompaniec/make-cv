@@ -1,8 +1,9 @@
 "use client";
 
-import { forwardRef, useEffect, useId, useMemo, useRef, useState } from "react";
 import type React from "react";
+import { forwardRef, useEffect, useId, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+
 import styles from "./select.module.scss";
 
 export type SelectOption = {

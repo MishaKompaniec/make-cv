@@ -1,6 +1,7 @@
 "use client";
 
 import { forwardRef } from "react";
+
 import styles from "./checkbox.module.scss";
 
 export interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {

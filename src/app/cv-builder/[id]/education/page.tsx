@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
+import { useEffect, useRef, useState } from "react";
+
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
+import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { useSectionList } from "@/hooks/useSectionList";
+
 import { useCv } from "../provider";
 import { EducationCard, type EducationItem } from "./education-card";
 import styles from "./page.module.scss";

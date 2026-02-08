@@ -1,18 +1,20 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
+import { useEffect, useRef, useState } from "react";
+
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
-import { useSectionList } from "@/hooks/useSectionList";
+import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { Checkbox } from "@/components/ui/checkbox/checkbox";
+import { useSectionList } from "@/hooks/useSectionList";
+
 import { useCv } from "../provider";
-import { LanguagesCard, type LanguageItem } from "./languages-card";
-import { InterestsCard, type InterestItem } from "./interests-card";
 import {
   CustomSectionCard,
   type CustomSectionItem,
 } from "./custom-section-card";
+import { type InterestItem,InterestsCard } from "./interests-card";
+import { type LanguageItem,LanguagesCard } from "./languages-card";
 import styles from "./page.module.scss";
 
 const stepTitle = "Other sections";

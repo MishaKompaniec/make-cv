@@ -1,18 +1,20 @@
 "use client";
 
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useRef, useState, type FocusEvent } from "react";
 import { useRouter } from "next/navigation";
+import { type FocusEvent,useEffect, useRef, useState } from "react";
 import Cropper, { type Area } from "react-easy-crop";
-import { Input } from "@/components/ui/input/input";
-import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
+import { useForm } from "react-hook-form";
+
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
-import { useCv } from "../provider";
+import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
+import { Input } from "@/components/ui/input/input";
 import {
-  contactDetailsSchema,
   type ContactDetailsFormData,
+  contactDetailsSchema,
 } from "@/lib/validations/cv-schema";
+
+import { useCv } from "../provider";
 import styles from "./page.module.scss";
 
 const stepTitle = "Contact details";

@@ -1,5 +1,7 @@
 import { forwardRef } from "react";
+
 import { Input } from "@/components/ui/input/input";
+
 import styles from "./page.module.scss";
 
 export type SkillItem = {

@@ -1,12 +1,14 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
-import { usePathname, useParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-import styles from "./sidebar.module.scss";
+import Link from "next/link";
+import { useParams,usePathname } from "next/navigation";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { useEffect, useMemo, useState } from "react";
+
 import { Button } from "@/components/ui/button/button";
+
+import styles from "./sidebar.module.scss";
 
 export function Sidebar() {
   const pathname = usePathname();

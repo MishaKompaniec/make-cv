@@ -1,14 +1,16 @@
 "use client";
 
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useRef, useState, type FocusEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Textarea } from "@/components/ui/textarea/textarea";
-import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
-import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
-import { useCv } from "../provider";
+import { type FocusEvent,useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
+
+import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
+import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
+import { Textarea } from "@/components/ui/textarea/textarea";
+
+import { useCv } from "../provider";
 import styles from "./page.module.scss";
 
 const stepTitle = "Add your professional summary";

@@ -1,16 +1,16 @@
-import type { ReactNode } from "react";
 import {
-  Font,
-  StyleSheet,
   Document,
+  Font,
+  Image,
+  Link,
   Page,
   Path,
+  StyleSheet,
   Svg,
-  Image,
   Text,
-  Link,
   View,
 } from "@react-pdf/renderer";
+import type { ReactNode } from "react";
 
 export const TEMPLATE_1_ID = "template-1-v1";
 

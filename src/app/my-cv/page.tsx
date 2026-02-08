@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button/button";
+
 import styles from "./page.module.scss";
 
 export default function MyCVPage() {

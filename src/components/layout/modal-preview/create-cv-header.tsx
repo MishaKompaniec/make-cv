@@ -1,10 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-import { Button } from "@/components/ui/button/button";
-import { Loader } from "@/components/ui/loader/loader";
 import { useParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
 import {
   TEMPLATE_1_COLORS,
   TEMPLATE_1_ID,
@@ -14,6 +13,8 @@ import {
   TEMPLATE_2_ID,
   TemplatePdf2,
 } from "@/components/pdf/templates/template-2/template-pdf";
+import { Button } from "@/components/ui/button/button";
+import { Loader } from "@/components/ui/loader/loader";
 
 import styles from "./create-cv-header.module.scss";
 

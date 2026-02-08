@@ -1,7 +1,9 @@
 "use client";
 
-import { Button } from "@/components/ui/button/button";
 import { useRouter } from "next/navigation";
+
+import { Button } from "@/components/ui/button/button";
+
 import styles from "./navigation-footer.module.scss";
 
 interface NavigationFooterProps {
