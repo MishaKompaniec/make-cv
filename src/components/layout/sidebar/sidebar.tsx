@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import styles from "./sidebar.module.scss";
 import { signIn, signOut, useSession } from "next-auth/react";
@@ -9,19 +9,21 @@ import { Button } from "@/components/ui/button/button";
 
 export function Sidebar() {
   const pathname = usePathname();
-  const isCreateFlow = pathname.startsWith("/create-cv");
+  const params = useParams();
+  const cvId = params.id as string;
+  const isCreateFlow = pathname.startsWith("/cv-builder/") && !!cvId;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { data: session, status } = useSession();
 
   const steps = [
-    { title: "Choose template", path: "/create-cv" },
-    { title: "Contact details", path: "/create-cv/contact-details" },
-    { title: "Summary", path: "/create-cv/summary" },
-    { title: "Work experience", path: "/create-cv/work-experience" },
-    { title: "Education", path: "/create-cv/education" },
-    { title: "Skills", path: "/create-cv/skills" },
-    { title: "Other sections", path: "/create-cv/other-sections" },
-    { title: "Finalize", path: "/create-cv/finalize" },
+    { title: "Choose template", path: `/cv-builder/${cvId}` },
+    { title: "Contact details", path: `/cv-builder/${cvId}/contact-details` },
+    { title: "Summary", path: `/cv-builder/${cvId}/summary` },
+    { title: "Work experience", path: `/cv-builder/${cvId}/work-experience` },
+    { title: "Education", path: `/cv-builder/${cvId}/education` },
+    { title: "Skills", path: `/cv-builder/${cvId}/skills` },
+    { title: "Other sections", path: `/cv-builder/${cvId}/other-sections` },
+    { title: "Finalize", path: `/cv-builder/${cvId}/finalize` },
   ];
 
   const currentStepIndex = useMemo(() => {
@@ -35,8 +37,8 @@ export function Sidebar() {
 
   const previousStepPath = useMemo(() => {
     if (currentStepIndex === 0) return "/";
-    return steps[currentStepIndex - 1]?.path ?? "/create-cv";
-  }, [currentStepIndex, steps]);
+    return steps[currentStepIndex - 1]?.path ?? `/cv-builder/${cvId}`;
+  }, [currentStepIndex, steps, cvId]);
 
   useEffect(() => {
     setIsMobileMenuOpen(false);

@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef, useState, type FocusEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import Cropper, { type Area } from "react-easy-crop";
 import { Input } from "@/components/ui/input/input";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
@@ -24,6 +24,8 @@ const AVATAR_OUTPUT_SIZE = 512;
 
 export default function ContactDetailsPage() {
   const router = useRouter();
+  const params = useParams();
+  const cvId = params.id as string;
   const { contactDetails, setContactDetails } = useCvData();
 
   const [avatarError, setAvatarError] = useState<string>("");
@@ -105,7 +107,7 @@ export default function ContactDetailsPage() {
 
   const handleNextClick = handleSubmit((data) => {
     setContactDetails(data);
-    router.push("/create-cv/summary");
+    router.push(`/cv-builder/${cvId}/summary`);
   });
 
   const handleAvatarFile = (file: File | null) => {
@@ -528,8 +530,8 @@ export default function ContactDetailsPage() {
       </section>
 
       <NavigationFooter
-        backHref="/create-cv"
-        nextHref="/create-cv/summary"
+        backHref={`/cv-builder/${cvId}`}
+        nextHref={`/cv-builder/${cvId}/summary`}
         onNextClick={handleNextClick}
       />
     </div>

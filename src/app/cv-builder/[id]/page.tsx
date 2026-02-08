@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
@@ -26,6 +27,8 @@ const TemplatePreview2 = dynamic(() =>
 const stepTitle = "Choose template";
 
 export default function ChooseTemplatePage() {
+  const params = useParams();
+  const cvId = params.id as string;
   const [storedSelectedTemplateId, setSelectedTemplateId] = useLocalStorage(
     "cv-template-id",
     TEMPLATE_1_ID,
@@ -127,7 +130,7 @@ export default function ChooseTemplatePage() {
         </div>
       </div>
 
-      <NavigationFooter nextHref="/create-cv/contact-details" />
+      <NavigationFooter nextHref={`/cv-builder/${cvId}/contact-details`} />
     </div>
   );
 }

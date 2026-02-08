@@ -8,21 +8,29 @@ export interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElemen
 }
 
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ checked, onChange, disabled = false, className = "", label, ...props }, ref) => {
+  (
+    { checked, onChange, disabled = false, className = "", label, ...props },
+    ref,
+  ) => {
+    const isChecked = Boolean(checked);
     return (
-      <label className={`${styles.checkboxContainer} ${disabled ? styles.disabled : ""} ${className}`}>
+      <label
+        className={`${styles.checkboxContainer} ${disabled ? styles.disabled : ""} ${className}`}
+      >
         <div className={styles.checkboxWrapper}>
           <input
             type="checkbox"
             ref={ref}
-            checked={checked}
+            checked={isChecked}
             onChange={onChange}
             disabled={disabled}
             className={styles.checkboxInput}
             {...props}
           />
-          <div className={`${styles.checkboxCustom} ${checked ? styles.checked : ""}`}>
-            {checked && (
+          <div
+            className={`${styles.checkboxCustom} ${isChecked ? styles.checked : ""}`}
+          >
+            {isChecked && (
               <svg
                 className={styles.checkmark}
                 width="16"
@@ -45,7 +53,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         {label && <span className={styles.checkboxLabel}>{label}</span>}
       </label>
     );
-  }
+  },
 );
 
 Checkbox.displayName = "Checkbox";

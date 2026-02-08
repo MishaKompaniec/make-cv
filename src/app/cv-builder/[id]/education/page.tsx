@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
 import { useSectionList } from "@/hooks/useSectionList";
@@ -44,6 +44,8 @@ const validateEducation = (edu: EducationItem): EducationErrors => {
 
 export default function EducationPage() {
   const router = useRouter();
+  const params = useParams();
+  const cvId = params.id as string;
 
   const educationList = useSectionList<EducationItem, EducationErrors>({
     storageKey: "cv-education",
@@ -63,7 +65,7 @@ export default function EducationPage() {
   const handleNextClick = () => {
     if (!educationList.validateAll()) return;
 
-    router.push("/create-cv/skills");
+    router.push(`/cv-builder/${cvId}/skills`);
   };
 
   return (
@@ -108,8 +110,8 @@ export default function EducationPage() {
       </section>
 
       <NavigationFooter
-        backHref="/create-cv/work-experience"
-        nextHref="/create-cv/skills"
+        backHref={`/cv-builder/${cvId}/work-experience`}
+        nextHref={`/cv-builder/${cvId}/skills`}
         onNextClick={handleNextClick}
       />
     </div>

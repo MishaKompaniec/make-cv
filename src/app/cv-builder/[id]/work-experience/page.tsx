@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
 import { useSectionList } from "@/hooks/useSectionList";
@@ -62,6 +62,8 @@ const validateExperience = (exp: ExperienceItem): ExperienceErrors => {
 
 export default function WorkExperiencePage() {
   const router = useRouter();
+  const params = useParams();
+  const cvId = params.id as string;
 
   const experiencesList = useSectionList<ExperienceItem, ExperienceErrors>({
     storageKey: "cv-work-experience",
@@ -81,7 +83,7 @@ export default function WorkExperiencePage() {
   const handleNextClick = () => {
     if (!experiencesList.validateAll()) return;
 
-    router.push("/create-cv/education");
+    router.push(`/cv-builder/${cvId}/education`);
   };
 
   return (
@@ -128,8 +130,8 @@ export default function WorkExperiencePage() {
       </section>
 
       <NavigationFooter
-        backHref="/create-cv/summary"
-        nextHref="/create-cv/education"
+        backHref={`/cv-builder/${cvId}/summary`}
+        nextHref={`/cv-builder/${cvId}/education`}
         onNextClick={handleNextClick}
       />
     </div>

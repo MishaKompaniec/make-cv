@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
@@ -33,6 +33,8 @@ const MAX_TEXT_LENGTH = 25;
 
 export default function OtherSectionsPage() {
   const router = useRouter();
+  const params = useParams();
+  const cvId = params.id as string;
   const [storedSelectedSections, setStoredSelectedSections] =
     useLocalStorage<SelectedSections>(
       "cv-selected-sections",
@@ -133,7 +135,7 @@ export default function OtherSectionsPage() {
     if (selectedSections.customSection && !customSectionsList.validateAll())
       return;
 
-    router.push("/create-cv/finalize");
+    router.push(`/cv-builder/${cvId}/finalize`);
   };
 
   return (
@@ -297,8 +299,8 @@ export default function OtherSectionsPage() {
       </section>
 
       <NavigationFooter
-        backHref="/create-cv/skills"
-        nextHref="/create-cv/finalize"
+        backHref={`/cv-builder/${cvId}/skills`}
+        nextHref={`/cv-builder/${cvId}/finalize`}
         onNextClick={handleNextClick}
       />
     </div>

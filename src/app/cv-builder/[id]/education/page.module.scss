@@ -1,9 +1,45 @@
-@use "../../../styles/variables" as *;
+@use "../../../../styles/variables.scss" as *;
 
 .pageContainer {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+}
+
+.addExperienceTile {
+  width: 100%;
+  height: 135.5px;
+  border: 2px dashed $border-light;
+  border-radius: 0.75rem;
+  background: $bg-secondary;
+  cursor: pointer;
+  transition: all $transition;
+  color: $text;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+}
+
+.addExperienceTile:hover {
+  border-color: $accent;
+  background: $accent-light;
+  color: $accent;
+}
+
+.addExperienceTileIcon {
+  font-size: 3rem;
+  font-weight: 300;
+  margin-bottom: 0.5rem;
+  line-height: 1;
+}
+
+.addExperienceTileText {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25;
 }
 
 .wrapper {
@@ -23,14 +59,38 @@
   flex-direction: column;
 }
 
-.tagsSection {
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   margin-bottom: 2rem;
+
+  h1 {
+    margin: 0;
+    font-size: 2.25rem;
+    color: $text-primary;
+  }
 }
 
-.tagsContainer {
-  display: flex;
-  flex-wrap: wrap;
+.stepBadge {
+  display: inline-flex;
+  align-items: center;
   gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: $accent;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  background: rgba($accent, 0.1);
+  width: fit-content;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.description {
+  margin: 0;
+  color: $text;
+  max-width: 520px;
 }
 
 .form {
@@ -40,43 +100,7 @@
   gap: 1rem;
 }
 
-.addSkillTile {
-  width: 100%;
-  height: 135.5px;
-  border: 2px dashed $border-light;
-  border-radius: 0.75rem;
-  background: $bg-secondary;
-  cursor: pointer;
-  transition: all $transition;
-  color: $text;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2.5rem 1.5rem;
-}
-
-.addSkillTile:hover {
-  border-color: $accent;
-  background: $accent-light;
-  color: $accent;
-}
-
-.addSkillTileIcon {
-  font-size: 3rem;
-  font-weight: 300;
-  margin-bottom: 0.5rem;
-  line-height: 1;
-}
-
-.addSkillTileText {
-  margin: 0;
-  font-size: 0.875rem;
-  font-weight: 600;
-  line-height: 1.25;
-}
-
-.skillCard {
+.experienceCard {
   position: relative;
   border-radius: 0.75rem;
   padding: 2.5rem 1.5rem 1.5rem 1.5rem;
@@ -87,7 +111,7 @@
   will-change: transform;
 }
 
-.skillCardControls {
+.experienceCardControls {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -96,7 +120,7 @@
   gap: 8px;
 }
 
-.reorderSkillButton {
+.reorderExperienceButton {
   width: 32px;
   height: 32px;
   border-radius: 10px;
@@ -140,11 +164,11 @@
   transform: translateZ(0);
 }
 
-.reorderSkillButton.reorderUp::before {
+.reorderExperienceButton.reorderUp::before {
   transform: rotate(180deg);
 }
 
-.removeSkillButton {
+.removeExperienceButton {
   width: 32px;
   height: 32px;
   border-radius: 10px;
@@ -170,11 +194,30 @@
   }
 }
 
-.skillRowSingle {
+.experienceRowSingle {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1rem;
   align-items: start;
+}
+
+.experienceRowTwoCols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(160px, 1fr));
+  gap: 1rem;
+  align-items: start;
+  margin-top: 1rem;
+}
+
+.experienceDescription {
+  margin-top: 1rem;
+}
+
+.experienceDatesRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 @media (max-width: #{$breakpoint-desktop}) {
@@ -193,18 +236,34 @@
     align-items: center;
   }
 
-  .skillCard {
+  .experienceCard {
     padding: 1rem;
     padding: 2.5rem 1rem 1rem 1rem;
   }
 
-  .skillRowSingle {
+  .experienceRowSingle {
     gap: 0.5rem;
+  }
+
+  .experienceRowTwoCols {
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+
+  .experienceDescription {
+    margin-top: 0.75rem;
+  }
+
+  .experienceDatesRow {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
   }
 }
 
 @media (max-width: #{$breakpoint-tablet}) {
-  .addSkillTile {
+  .addExperienceTile {
     padding: 1rem;
   }
   .wrapper {
@@ -219,8 +278,18 @@
     width: 100%;
   }
 
-  .skillRowSingle {
+  .experienceRowSingle {
     grid-template-columns: 1fr;
     gap: 0.75rem;
+  }
+
+  .experienceRowTwoCols {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+  }
+
+  .experienceDescription {
+    margin-top: 0.75rem;
   }
 }

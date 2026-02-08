@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import { useRouter, useParams } from "next/navigation";
 import { Loader } from "@/components/ui/loader/loader";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
@@ -103,6 +104,9 @@ function PreviewPanel({
 }
 
 export default function FinalizePage() {
+  const router = useRouter();
+  const params = useParams();
+  const cvId = params.id as string;
   const { contactDetails, summary } = useCvData();
 
   const [pageNumber, setPageNumber] = useState(1);
@@ -288,7 +292,7 @@ export default function FinalizePage() {
       </section>
 
       <NavigationFooter
-        backHref="/create-cv/other-sections"
+        backHref={`/cv-builder/${cvId}/other-sections`}
         nextLabel={isGenerating ? "Generating..." : "Download CV"}
         nextDisabled={isGenerating || !hasBlob}
         onNextClick={handleDownload}

@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef, useState, type FocusEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea/textarea";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
@@ -25,6 +25,8 @@ type SummaryFormData = z.infer<typeof summarySchema>;
 
 export default function SummaryPage() {
   const router = useRouter();
+  const params = useParams();
+  const cvId = params.id as string;
   const { summary, setSummary } = useCvData();
 
   const didInitRef = useRef(false);
@@ -90,7 +92,7 @@ export default function SummaryPage() {
 
   const handleNextClick = handleSubmit((data) => {
     setSummary(data.professionalSummary);
-    router.push("/create-cv/work-experience");
+    router.push(`/cv-builder/${cvId}/work-experience`);
   });
 
   return (
@@ -120,8 +122,8 @@ export default function SummaryPage() {
       </section>
 
       <NavigationFooter
-        backHref="/create-cv/contact-details"
-        nextHref="/create-cv/work-experience"
+        backHref={`/cv-builder/${cvId}/contact-details`}
+        nextHref={`/cv-builder/${cvId}/work-experience`}
         onNextClick={handleNextClick}
       />
     </div>
