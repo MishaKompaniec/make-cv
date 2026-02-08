@@ -46,16 +46,6 @@ export default function ChooseTemplatePage() {
   const selectedTemplateId = mounted ? storedSelectedTemplateId : TEMPLATE_1_ID;
   const templateColors = mounted ? storedTemplateColors : {};
 
-  useEffect(() => {
-    const legacy = window.localStorage.getItem("cv-template-color");
-    if (!legacy) return;
-
-    setTemplateColors((prev) => {
-      if (prev?.[TEMPLATE_1_ID]) return prev;
-      return { ...prev, [TEMPLATE_1_ID]: legacy };
-    });
-  }, []);
-
   const templates = [
     { id: TEMPLATE_1_ID, Preview: TemplatePreview1 },
     { id: TEMPLATE_2_ID, Preview: TemplatePreview2 },
