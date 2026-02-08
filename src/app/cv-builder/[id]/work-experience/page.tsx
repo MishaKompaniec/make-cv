@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
@@ -65,6 +66,11 @@ export default function WorkExperiencePage() {
   const params = useParams();
   const cvId = params.id as string;
 
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [cvData, setCvData] = useState<Record<string, unknown>>({});
+  const didInitRef = useRef(false);
+
   const experiencesList = useSectionList<ExperienceItem, ExperienceErrors>({
     storageKey: "cv-work-experience",
     validateItem: validateExperience,
@@ -80,10 +86,71 @@ export default function WorkExperiencePage() {
     debounceMs: 600,
   });
 
-  const handleNextClick = () => {
+  useEffect(() => {
+    let cancelled = false;
+
+    const load = async () => {
+      try {
+        const res = await fetch(`/api/cv/${cvId}`, { cache: "no-store" });
+        if (!res.ok) return;
+
+        const json = (await res.json()) as {
+          cv?: { data?: Record<string, unknown> | null };
+        };
+
+        const cv = json.cv;
+        if (!cv || cancelled) return;
+
+        const nextData = (cv.data ?? {}) as Record<string, unknown>;
+        setCvData(nextData);
+
+        const workExpFromApi = nextData["workExperience"];
+        const initialItems = Array.isArray(workExpFromApi)
+          ? (workExpFromApi as ExperienceItem[])
+          : [];
+
+        if (didInitRef.current) return;
+        experiencesList.setItems(initialItems);
+        didInitRef.current = true;
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    };
+
+    if (cvId) {
+      void load();
+    } else {
+      setIsLoading(false);
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [cvId]);
+
+  const handleNextClick = async () => {
     if (!experiencesList.validateAll()) return;
 
-    router.push(`/cv-builder/${cvId}/education`);
+    setIsSaving(true);
+    try {
+      const nextData = {
+        ...(cvData ?? {}),
+        workExperience: experiencesList.items,
+      };
+
+      const res = await fetch(`/api/cv/${cvId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: nextData }),
+      });
+
+      if (!res.ok) return;
+
+      setCvData(nextData);
+      router.push(`/cv-builder/${cvId}/education`);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -132,6 +199,8 @@ export default function WorkExperiencePage() {
       <NavigationFooter
         backHref={`/cv-builder/${cvId}/summary`}
         nextHref={`/cv-builder/${cvId}/education`}
+        nextLabel={isSaving ? "Saving..." : "Next Step"}
+        nextDisabled={isLoading || isSaving}
         onNextClick={handleNextClick}
       />
     </div>

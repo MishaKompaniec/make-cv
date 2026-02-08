@@ -6,8 +6,6 @@ import { useRouter, useParams } from "next/navigation";
 import { Loader } from "@/components/ui/loader/loader";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { useCvData } from "@/hooks/useCvData";
 import {
   TEMPLATE_1_COLORS,
   TEMPLATE_1_ID,
@@ -19,6 +17,15 @@ import {
 } from "@/components/pdf/templates/template-2/template-pdf";
 import { Button } from "@/components/ui/button/button";
 import styles from "./page.module.scss";
+
+type CvApiResponse = {
+  cv?: {
+    id: string;
+    templateId: string;
+    templateColors: Record<string, string>;
+    data: Record<string, unknown>;
+  };
+};
 
 const BlobProvider = dynamic(
   () => import("@react-pdf/renderer").then((m) => m.BlobProvider),
@@ -107,7 +114,11 @@ export default function FinalizePage() {
   const router = useRouter();
   const params = useParams();
   const cvId = params.id as string;
-  const { contactDetails, summary } = useCvData();
+
+  const [isCvLoading, setIsCvLoading] = useState(true);
+  const [cvSnapshot, setCvSnapshot] = useState<CvApiResponse["cv"] | null>(
+    null,
+  );
 
   const [pageNumber, setPageNumber] = useState(1);
   const [numPages, setNumPages] = useState(1);
@@ -133,22 +144,65 @@ export default function FinalizePage() {
     });
   }, []);
 
-  const [templateId] = useLocalStorage("cv-template-id", TEMPLATE_1_ID);
-  const [templateColors] = useLocalStorage<Record<string, string>>(
-    "cv-template-colors",
-    {},
-  );
-  const [workExperience] = useLocalStorage("cv-work-experience", []);
-  const [education] = useLocalStorage("cv-education", []);
-  const [skills] = useLocalStorage("cv-skills", []);
-  const [languages] = useLocalStorage("cv-languages", []);
-  const [interests] = useLocalStorage("cv-interests", []);
-  const [customSections] = useLocalStorage("cv-custom-sections", []);
-  const [selectedSections] = useLocalStorage("cv-selected-sections", {
-    languages: false,
-    interests: false,
-    customSection: false,
-  });
+  useEffect(() => {
+    let cancelled = false;
+
+    const load = async () => {
+      setIsCvLoading(true);
+      try {
+        const res = await fetch(`/api/cv/${cvId}`, { cache: "no-store" });
+        if (!res.ok) return;
+
+        const json = (await res.json()) as CvApiResponse;
+        if (cancelled) return;
+
+        setCvSnapshot(
+          json.cv
+            ? {
+                ...json.cv,
+                templateId: json.cv.templateId ?? TEMPLATE_1_ID,
+                templateColors: json.cv.templateColors ?? {},
+                data: json.cv.data ?? {},
+              }
+            : null,
+        );
+      } finally {
+        if (!cancelled) setIsCvLoading(false);
+      }
+    };
+
+    if (cvId) {
+      void load();
+    } else {
+      setIsCvLoading(false);
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [cvId]);
+
+  const templateId = cvSnapshot?.templateId ?? TEMPLATE_1_ID;
+  const templateColors = cvSnapshot?.templateColors ?? {};
+  const data = cvSnapshot?.data ?? {};
+
+  const contactDetails =
+    (data["contactDetails"] as Record<string, unknown> | undefined) ?? {};
+  const summary = (data["summary"] as string | undefined) ?? "";
+  const workExperience =
+    (Array.isArray(data["workExperience"]) ? data["workExperience"] : []) ?? [];
+  const education =
+    (Array.isArray(data["education"]) ? data["education"] : []) ?? [];
+  const skills = (Array.isArray(data["skills"]) ? data["skills"] : []) ?? [];
+  const languages =
+    (Array.isArray(data["languages"]) ? data["languages"] : []) ?? [];
+  const interests =
+    (Array.isArray(data["interests"]) ? data["interests"] : []) ?? [];
+  const customSections =
+    (Array.isArray(data["customSections"]) ? data["customSections"] : []) ?? [];
+  const selectedSections =
+    (data["selectedSections"] as any) ??
+    ({ languages: false, interests: false, customSection: false } as const);
 
   const selectedColor =
     templateColors?.[templateId] ?? TEMPLATE_1_COLORS[0].value;
@@ -187,7 +241,7 @@ export default function FinalizePage() {
   };
 
   const defaultFileNameBase = sanitizeFileNameBase(
-    contactDetails?.fullName || "CV",
+    (contactDetails as any)?.fullName || "CV",
   );
   const defaultFileName = `${defaultFileNameBase}.pdf`;
 
@@ -197,7 +251,7 @@ export default function FinalizePage() {
     () => (
       <PdfDocument
         sidebarColor={selectedColor}
-        contactDetails={contactDetails}
+        contactDetails={contactDetails as any}
         workExperience={workExperience}
         education={education}
         skills={skills}
@@ -249,52 +303,66 @@ export default function FinalizePage() {
       />
 
       <section className={styles.wrapper}>
-        <BlobProvider document={pdfReactDocument}>
-          {({ url, blob, loading, error }) => {
-            blobRef.current = blob ?? null;
+        {isCvLoading ? (
+          <div
+            style={{
+              width: "100%",
+              minHeight: 320,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Loader />
+          </div>
+        ) : (
+          <BlobProvider document={pdfReactDocument}>
+            {({ url, blob, loading, error }) => {
+              blobRef.current = blob ?? null;
 
-            return (
-              <>
-                <PreviewPanel
-                  url={url}
-                  blob={blob}
-                  loading={loading}
-                  error={error}
-                  pageNumber={pageNumber}
-                  onNumPagesChange={handleNumPagesChange}
-                  onHasBlobChange={setHasBlobIfChanged}
-                  onIsGeneratingChange={setIsGeneratingIfChanged}
-                />
+              return (
+                <>
+                  <PreviewPanel
+                    url={url}
+                    blob={blob}
+                    loading={loading}
+                    error={error}
+                    pageNumber={pageNumber}
+                    onNumPagesChange={handleNumPagesChange}
+                    onHasBlobChange={setHasBlobIfChanged}
+                    onIsGeneratingChange={setIsGeneratingIfChanged}
+                  />
 
-                {numPages > 1 ? (
-                  <div className={styles.pagination}>
-                    {Array.from({ length: numPages }, (_, i) => i + 1).map(
-                      (pageNum) => (
-                        <button
-                          key={pageNum}
-                          type="button"
-                          className={`${styles.pageButton} ${
-                            pageNumber === pageNum ? styles.active : ""
-                          }`}
-                          onClick={() => setPageNumber(pageNum)}
-                          disabled={isGenerating || !hasBlob}
-                        >
-                          {pageNum}
-                        </button>
-                      ),
-                    )}
-                  </div>
-                ) : null}
-              </>
-            );
-          }}
-        </BlobProvider>
+                  {numPages > 1 ? (
+                    <div className={styles.pagination}>
+                      {Array.from({ length: numPages }, (_, i) => i + 1).map(
+                        (pageNum) => (
+                          <button
+                            key={pageNum}
+                            type="button"
+                            className={`${styles.pageButton} ${
+                              pageNumber === pageNum ? styles.active : ""
+                            }`}
+                            onClick={() => setPageNumber(pageNum)}
+                            disabled={isGenerating || !hasBlob}
+                          >
+                            {pageNum}
+                          </button>
+                        ),
+                      )}
+                    </div>
+                  ) : null}
+                </>
+              );
+            }}
+          </BlobProvider>
+        )}
       </section>
 
       <NavigationFooter
         backHref={`/cv-builder/${cvId}/other-sections`}
         nextLabel={isGenerating ? "Generating..." : "Download CV"}
-        nextDisabled={isGenerating || !hasBlob}
+        nextDisabled={isCvLoading || isGenerating || !hasBlob}
         onNextClick={handleDownload}
       />
     </div>

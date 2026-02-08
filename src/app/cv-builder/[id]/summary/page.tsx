@@ -7,7 +7,6 @@ import { useRouter, useParams } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea/textarea";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
-import { useCvData } from "@/hooks/useCvData";
 import { z } from "zod";
 import styles from "./page.module.scss";
 
@@ -27,57 +26,63 @@ export default function SummaryPage() {
   const router = useRouter();
   const params = useParams();
   const cvId = params.id as string;
-  const { summary, setSummary } = useCvData();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [cvData, setCvData] = useState<Record<string, unknown>>({});
 
   const didInitRef = useRef(false);
-  const debounceTimerRef = useRef<number | null>(null);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-    watch,
-    getValues,
   } = useForm<SummaryFormData>({
     resolver: zodResolver(summarySchema),
     mode: "onChange",
-    defaultValues: { professionalSummary: summary || "" },
+    defaultValues: { professionalSummary: "" },
   });
 
-  // Initialize form values from localStorage once.
   useEffect(() => {
-    if (didInitRef.current) return;
-    reset({ professionalSummary: summary || "" });
-    didInitRef.current = true;
-  }, [summary, reset]);
+    let cancelled = false;
 
-  // Auto-save on field changes
-  useEffect(() => {
-    const subscription = watch((data) => {
-      if (debounceTimerRef.current) {
-        window.clearTimeout(debounceTimerRef.current);
-      }
+    const load = async () => {
+      try {
+        const res = await fetch(`/api/cv/${cvId}`, { cache: "no-store" });
+        if (!res.ok) return;
 
-      debounceTimerRef.current = window.setTimeout(() => {
-        setSummary(data.professionalSummary || "");
-      }, 1000);
-    });
-    return () => {
-      subscription.unsubscribe();
-      if (debounceTimerRef.current) {
-        window.clearTimeout(debounceTimerRef.current);
+        const json = (await res.json()) as {
+          cv?: { data?: Record<string, unknown> | null };
+        };
+
+        const cv = json.cv;
+        if (!cv || cancelled) return;
+
+        const nextData = (cv.data ?? {}) as Record<string, unknown>;
+        setCvData(nextData);
+
+        const summaryFromApi = nextData["summary"];
+        const initialSummary =
+          typeof summaryFromApi === "string" ? summaryFromApi : "";
+
+        if (didInitRef.current) return;
+        reset({ professionalSummary: initialSummary });
+        didInitRef.current = true;
+      } finally {
+        if (!cancelled) setIsLoading(false);
       }
     };
-  }, [watch, setSummary]);
 
-  const flushSave = () => {
-    if (debounceTimerRef.current) {
-      window.clearTimeout(debounceTimerRef.current);
-      debounceTimerRef.current = null;
+    if (cvId) {
+      void load();
+    } else {
+      setIsLoading(false);
     }
-    setSummary(getValues().professionalSummary);
-  };
+
+    return () => {
+      cancelled = true;
+    };
+  }, [cvId, reset]);
 
   const registerWithFlush = (name: keyof SummaryFormData) => {
     const field = register(name);
@@ -85,14 +90,32 @@ export default function SummaryPage() {
       ...field,
       onBlur: (e: FocusEvent<HTMLTextAreaElement>) => {
         field.onBlur(e);
-        flushSave();
       },
     };
   };
 
-  const handleNextClick = handleSubmit((data) => {
-    setSummary(data.professionalSummary);
-    router.push(`/cv-builder/${cvId}/work-experience`);
+  const handleNextClick = handleSubmit(async (data) => {
+    if (!cvId) return;
+
+    setIsSaving(true);
+    try {
+      const nextData = {
+        ...(cvData ?? {}),
+        summary: data.professionalSummary,
+      };
+
+      const res = await fetch(`/api/cv/${cvId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: nextData }),
+      });
+      if (!res.ok) return;
+
+      setCvData(nextData);
+      router.push(`/cv-builder/${cvId}/work-experience`);
+    } finally {
+      setIsSaving(false);
+    }
   });
 
   return (
@@ -124,6 +147,8 @@ export default function SummaryPage() {
       <NavigationFooter
         backHref={`/cv-builder/${cvId}/contact-details`}
         nextHref={`/cv-builder/${cvId}/work-experience`}
+        nextLabel={isSaving ? "Saving..." : "Next Step"}
+        nextDisabled={isLoading || isSaving}
         onNextClick={handleNextClick}
       />
     </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
@@ -47,6 +48,11 @@ export default function EducationPage() {
   const params = useParams();
   const cvId = params.id as string;
 
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [cvData, setCvData] = useState<Record<string, unknown>>({});
+  const didInitRef = useRef(false);
+
   const educationList = useSectionList<EducationItem, EducationErrors>({
     storageKey: "cv-education",
     validateItem: validateEducation,
@@ -62,10 +68,71 @@ export default function EducationPage() {
     debounceMs: 600,
   });
 
-  const handleNextClick = () => {
+  useEffect(() => {
+    let cancelled = false;
+
+    const load = async () => {
+      try {
+        const res = await fetch(`/api/cv/${cvId}`, { cache: "no-store" });
+        if (!res.ok) return;
+
+        const json = (await res.json()) as {
+          cv?: { data?: Record<string, unknown> | null };
+        };
+
+        const cv = json.cv;
+        if (!cv || cancelled) return;
+
+        const nextData = (cv.data ?? {}) as Record<string, unknown>;
+        setCvData(nextData);
+
+        const educationFromApi = nextData["education"];
+        const initialItems = Array.isArray(educationFromApi)
+          ? (educationFromApi as EducationItem[])
+          : [];
+
+        if (didInitRef.current) return;
+        educationList.setItems(initialItems);
+        didInitRef.current = true;
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    };
+
+    if (cvId) {
+      void load();
+    } else {
+      setIsLoading(false);
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [cvId]);
+
+  const handleNextClick = async () => {
     if (!educationList.validateAll()) return;
 
-    router.push(`/cv-builder/${cvId}/skills`);
+    setIsSaving(true);
+    try {
+      const nextData = {
+        ...(cvData ?? {}),
+        education: educationList.items,
+      };
+
+      const res = await fetch(`/api/cv/${cvId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: nextData }),
+      });
+
+      if (!res.ok) return;
+
+      setCvData(nextData);
+      router.push(`/cv-builder/${cvId}/skills`);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -112,6 +179,8 @@ export default function EducationPage() {
       <NavigationFooter
         backHref={`/cv-builder/${cvId}/work-experience`}
         nextHref={`/cv-builder/${cvId}/skills`}
+        nextLabel={isSaving ? "Saving..." : "Next Step"}
+        nextDisabled={isLoading || isSaving}
         onNextClick={handleNextClick}
       />
     </div>

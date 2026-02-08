@@ -12,7 +12,6 @@ import {
   contactDetailsSchema,
   type ContactDetailsFormData,
 } from "@/lib/validations/cv-schema";
-import { useCvData } from "@/hooks/useCvData";
 import styles from "./page.module.scss";
 
 const stepTitle = "Contact details";
@@ -22,11 +21,32 @@ const AVATAR_ALLOWED_MIME = ["image/jpeg", "image/png", "image/webp"] as const;
 
 const AVATAR_OUTPUT_SIZE = 512;
 
+const defaultContactDetails: ContactDetailsFormData = {
+  fullName: "",
+  jobTitle: "",
+  city: "",
+  phone: "",
+  email: "",
+  avatar: "",
+  birthdate: "",
+  postalCode: "",
+  linkedIn: "",
+  git: "",
+  linkedInTitle: "",
+  linkedInUrl: "",
+  gitTitle: "",
+  gitUrl: "",
+  nationality: "",
+  workPermit: "",
+};
+
 export default function ContactDetailsPage() {
   const router = useRouter();
   const params = useParams();
   const cvId = params.id as string;
-  const { contactDetails, setContactDetails } = useCvData();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [cvData, setCvData] = useState<Record<string, unknown>>({});
 
   const [avatarError, setAvatarError] = useState<string>("");
   const [isHydrated, setIsHydrated] = useState(false);
@@ -38,7 +58,6 @@ export default function ContactDetailsPage() {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
 
   const didInitRef = useRef(false);
-  const debounceTimerRef = useRef<number | null>(null);
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
 
   const {
@@ -47,52 +66,62 @@ export default function ContactDetailsPage() {
     formState: { errors },
     reset,
     watch,
-    getValues,
     setValue,
   } = useForm<ContactDetailsFormData>({
     resolver: zodResolver(contactDetailsSchema),
     mode: "onChange",
-    defaultValues: contactDetails,
+    defaultValues: defaultContactDetails,
   });
 
-  // Initialize form values from localStorage once.
-  // Avoid resetting on every localStorage write, because it can cancel browser autofill.
   useEffect(() => {
-    if (didInitRef.current) return;
-    reset(contactDetails);
-    didInitRef.current = true;
-  }, [contactDetails, reset]);
+    let cancelled = false;
+
+    const load = async () => {
+      try {
+        const res = await fetch(`/api/cv/${cvId}`, { cache: "no-store" });
+        if (!res.ok) return;
+
+        const json = (await res.json()) as {
+          cv?: {
+            data?: Record<string, unknown> | null;
+          };
+        };
+
+        const cv = json.cv;
+        if (!cv || cancelled) return;
+
+        const nextData = (cv.data ?? {}) as Record<string, unknown>;
+        setCvData(nextData);
+
+        const contactDetailsFromApi = nextData["contactDetails"] as
+          | Partial<ContactDetailsFormData>
+          | undefined;
+
+        if (didInitRef.current) return;
+        reset({
+          ...defaultContactDetails,
+          ...(contactDetailsFromApi ?? {}),
+        });
+        didInitRef.current = true;
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    };
+
+    if (cvId) {
+      void load();
+    } else {
+      setIsLoading(false);
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [cvId, reset]);
 
   useEffect(() => {
     setIsHydrated(true);
   }, []);
-
-  // Auto-save on field changes
-  useEffect(() => {
-    const subscription = watch((data) => {
-      if (debounceTimerRef.current) {
-        window.clearTimeout(debounceTimerRef.current);
-      }
-
-      debounceTimerRef.current = window.setTimeout(() => {
-        setContactDetails(data as ContactDetailsFormData);
-      }, 1000);
-    });
-    return () => {
-      subscription.unsubscribe();
-      if (debounceTimerRef.current) {
-        window.clearTimeout(debounceTimerRef.current);
-      }
-    };
-  }, [watch, setContactDetails]);
-
-  const flushSave = () => {
-    if (debounceTimerRef.current) {
-      window.clearTimeout(debounceTimerRef.current);
-      debounceTimerRef.current = null;
-    }
-    setContactDetails(getValues());
-  };
 
   const registerWithFlush = (name: keyof ContactDetailsFormData) => {
     const field = register(name);
@@ -100,14 +129,32 @@ export default function ContactDetailsPage() {
       ...field,
       onBlur: (e: FocusEvent<HTMLInputElement>) => {
         field.onBlur(e);
-        flushSave();
       },
     };
   };
 
-  const handleNextClick = handleSubmit((data) => {
-    setContactDetails(data);
-    router.push(`/cv-builder/${cvId}/summary`);
+  const handleNextClick = handleSubmit(async (data) => {
+    if (!cvId) return;
+
+    setIsSaving(true);
+    try {
+      const nextData = {
+        ...(cvData ?? {}),
+        contactDetails: data,
+      };
+
+      const res = await fetch(`/api/cv/${cvId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: nextData }),
+      });
+      if (!res.ok) return;
+
+      setCvData(nextData);
+      router.push(`/cv-builder/${cvId}/summary`);
+    } finally {
+      setIsSaving(false);
+    }
   });
 
   const handleAvatarFile = (file: File | null) => {
@@ -149,7 +196,6 @@ export default function ContactDetailsPage() {
     setAvatarError("");
     setValue("avatar", "", { shouldDirty: true, shouldValidate: true });
     if (avatarInputRef.current) avatarInputRef.current.value = "";
-    flushSave();
   };
 
   const closeCrop = () => {
@@ -226,7 +272,6 @@ export default function ContactDetailsPage() {
         return;
       }
       setValue("avatar", dataUrl, { shouldDirty: true, shouldValidate: true });
-      flushSave();
       closeCrop();
     } catch (e) {
       setAvatarError("Failed to crop image.");
@@ -532,6 +577,8 @@ export default function ContactDetailsPage() {
       <NavigationFooter
         backHref={`/cv-builder/${cvId}`}
         nextHref={`/cv-builder/${cvId}/summary`}
+        nextLabel={isSaving ? "Saving..." : "Next Step"}
+        nextDisabled={isLoading || isSaving}
         onNextClick={handleNextClick}
       />
     </div>
