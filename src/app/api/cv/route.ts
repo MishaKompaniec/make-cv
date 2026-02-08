@@ -52,7 +52,7 @@ export async function POST(request: Request) {
   const { userId, response } = await requireUserId();
   if (response) return response;
 
-  let body: any = {};
+  let body: Record<string, unknown> = {};
   try {
     body = await request.json();
   } catch {

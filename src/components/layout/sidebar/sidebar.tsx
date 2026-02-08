@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import styles from "./sidebar.module.scss";
@@ -15,16 +16,19 @@ export function Sidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { data: session, status } = useSession();
 
-  const steps = [
-    { title: "Choose template", path: `/cv-builder/${cvId}` },
-    { title: "Contact details", path: `/cv-builder/${cvId}/contact-details` },
-    { title: "Summary", path: `/cv-builder/${cvId}/summary` },
-    { title: "Work experience", path: `/cv-builder/${cvId}/work-experience` },
-    { title: "Education", path: `/cv-builder/${cvId}/education` },
-    { title: "Skills", path: `/cv-builder/${cvId}/skills` },
-    { title: "Other sections", path: `/cv-builder/${cvId}/other-sections` },
-    { title: "Finalize", path: `/cv-builder/${cvId}/finalize` },
-  ];
+  const steps = useMemo(
+    () => [
+      { title: "Choose template", path: `/cv-builder/${cvId}` },
+      { title: "Contact details", path: `/cv-builder/${cvId}/contact-details` },
+      { title: "Summary", path: `/cv-builder/${cvId}/summary` },
+      { title: "Work experience", path: `/cv-builder/${cvId}/work-experience` },
+      { title: "Education", path: `/cv-builder/${cvId}/education` },
+      { title: "Skills", path: `/cv-builder/${cvId}/skills` },
+      { title: "Other sections", path: `/cv-builder/${cvId}/other-sections` },
+      { title: "Finalize", path: `/cv-builder/${cvId}/finalize` },
+    ],
+    [cvId],
+  );
 
   const currentStepIndex = useMemo(() => {
     const currentIndex = steps.findIndex((step) => step.path === pathname);
@@ -41,10 +45,6 @@ export function Sidebar() {
   }, [currentStepIndex, steps, cvId]);
 
   useEffect(() => {
-    setIsMobileMenuOpen(false);
-  }, [pathname]);
-
-  useEffect(() => {
     document.body.classList.toggle("create-flow", isCreateFlow);
     return () => {
       document.body.classList.remove("create-flow");
@@ -52,7 +52,7 @@ export function Sidebar() {
   }, [isCreateFlow]);
 
   return (
-    <aside className={styles.sidebar}>
+    <aside key={pathname} className={styles.sidebar}>
       <Link href="/" className={styles.logo}>
         Makemycv
       </Link>
@@ -195,9 +195,11 @@ export function Sidebar() {
             {status === "authenticated" ? (
               <>
                 {session.user?.image && (
-                  <img
+                  <Image
                     src={session.user.image}
                     alt="User avatar"
+                    width={32}
+                    height={32}
                     className={styles.avatar}
                   />
                 )}

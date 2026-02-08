@@ -43,7 +43,9 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
     const listRef = useRef<HTMLDivElement | null>(null);
     const triggerRef = useRef<HTMLButtonElement | null>(null);
     const [isOpen, setIsOpen] = useState(false);
-    const [activeIndex, setActiveIndex] = useState<number>(-1);
+    const [activeIndex, setActiveIndex] = useState<number>(() => {
+      return options.findIndex((o) => o.value === value);
+    });
     const [dropdownRect, setDropdownRect] = useState<{
       top: number;
       left: number;
@@ -114,9 +116,13 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
         const el = listRef.current?.querySelector<HTMLElement>(
           `[data-option-index="${nextIndex}"]`,
         );
-        el?.focus();
+        el?.scrollIntoView({ block: "nearest" });
       });
     }, [isOpen, selectedIndex]);
+
+    useEffect(() => {
+      setActiveIndex(selectedIndex);
+    }, [selectedIndex]);
 
     const selectIndex = (index: number) => {
       const opt = options[index];
@@ -232,6 +238,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
             setIsOpen((v) => !v);
           }}
           onKeyDown={onTriggerKeyDown}
+          role="button"
           aria-haspopup="listbox"
           aria-expanded={isOpen}
           aria-controls={listboxId}

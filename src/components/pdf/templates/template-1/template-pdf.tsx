@@ -530,6 +530,7 @@ export function TemplatePdf1({
         <View style={[styles.sidebar, { backgroundColor: sidebarColor }]}>
           {hasAvatar ? (
             <View style={styles.avatarWrap}>
+              {/* eslint-disable jsx-a11y/alt-text */}
               <Image src={avatarSrc} style={styles.avatarImage} />
             </View>
           ) : null}
@@ -662,35 +663,50 @@ export function TemplatePdf1({
 
                 const [first, ...rest] = items;
 
-                const renderItem = (item: any) => (
-                  <View key={item.id} style={styles.item} wrap={false}>
-                    <View style={styles.itemHeader}>
-                      <View style={styles.itemTitleRow}>
-                        {item.title ? (
-                          <Text style={styles.itemTitle}>{item.title}</Text>
-                        ) : (
-                          <Text style={styles.itemTitle} />
-                        )}
-                        {item.start ? (
-                          <Text style={styles.itemDate}>{item.start}</Text>
-                        ) : null}
+                const renderItem = (
+                  item: {
+                    id: string;
+                    title: string;
+                    subtitle: string;
+                    body: string;
+                    start: string;
+                    end: string;
+                  } | null,
+                ) => {
+                  if (!item) return null;
+                  return (
+                    <View key={item.id} style={styles.item} wrap={false}>
+                      <View style={styles.itemHeader}>
+                        <View style={styles.itemTitleRow}>
+                          {item.title ? (
+                            <Text style={styles.itemTitle}>{item.title}</Text>
+                          ) : (
+                            <Text style={styles.itemTitle} />
+                          )}
+                          {item.start ? (
+                            <Text style={styles.itemDate}>{item.start}</Text>
+                          ) : null}
+                        </View>
+                        <View style={styles.itemSubtitleRow}>
+                          <Text
+                            style={[
+                              styles.itemSubtitle,
+                              { color: accentColor },
+                            ]}
+                          >
+                            {item.subtitle || " "}
+                          </Text>
+                          {item.end ? (
+                            <Text style={styles.itemDate}>{item.end}</Text>
+                          ) : null}
+                        </View>
                       </View>
-                      <View style={styles.itemSubtitleRow}>
-                        <Text
-                          style={[styles.itemSubtitle, { color: accentColor }]}
-                        >
-                          {item.subtitle || " "}
-                        </Text>
-                        {item.end ? (
-                          <Text style={styles.itemDate}>{item.end}</Text>
-                        ) : null}
-                      </View>
+                      {item.body ? (
+                        <Text style={styles.itemBody}>{item.body}</Text>
+                      ) : null}
                     </View>
-                    {item.body ? (
-                      <Text style={styles.itemBody}>{item.body}</Text>
-                    ) : null}
-                  </View>
-                );
+                  );
+                };
 
                 return (
                   <>
@@ -758,35 +774,50 @@ export function TemplatePdf1({
 
                 const [first, ...rest] = items;
 
-                const renderItem = (item: any) => (
-                  <View key={item.id} style={styles.item} wrap={false}>
-                    <View style={styles.itemHeader}>
-                      <View style={styles.itemTitleRow}>
-                        {item.title ? (
-                          <Text style={styles.itemTitle}>{item.title}</Text>
-                        ) : (
-                          <Text style={styles.itemTitle} />
-                        )}
-                        {item.start ? (
-                          <Text style={styles.itemDate}>{item.start}</Text>
-                        ) : null}
+                const renderItem = (
+                  item: {
+                    id: string;
+                    title: string;
+                    subtitle: string;
+                    body: string;
+                    start: string;
+                    end: string;
+                  } | null,
+                ) => {
+                  if (!item) return null;
+                  return (
+                    <View key={item.id} style={styles.item} wrap={false}>
+                      <View style={styles.itemHeader}>
+                        <View style={styles.itemTitleRow}>
+                          {item.title ? (
+                            <Text style={styles.itemTitle}>{item.title}</Text>
+                          ) : (
+                            <Text style={styles.itemTitle} />
+                          )}
+                          {item.start ? (
+                            <Text style={styles.itemDate}>{item.start}</Text>
+                          ) : null}
+                        </View>
+                        <View style={styles.itemSubtitleRow}>
+                          <Text
+                            style={[
+                              styles.itemSubtitle,
+                              { color: accentColor },
+                            ]}
+                          >
+                            {item.subtitle || " "}
+                          </Text>
+                          {item.end ? (
+                            <Text style={styles.itemDate}>{item.end}</Text>
+                          ) : null}
+                        </View>
                       </View>
-                      <View style={styles.itemSubtitleRow}>
-                        <Text
-                          style={[styles.itemSubtitle, { color: accentColor }]}
-                        >
-                          {item.subtitle || " "}
-                        </Text>
-                        {item.end ? (
-                          <Text style={styles.itemDate}>{item.end}</Text>
-                        ) : null}
-                      </View>
+                      {item.body ? (
+                        <Text style={styles.itemBody}>{item.body}</Text>
+                      ) : null}
                     </View>
-                    {item.body ? (
-                      <Text style={styles.itemBody}>{item.body}</Text>
-                    ) : null}
-                  </View>
-                );
+                  );
+                };
 
                 return (
                   <>

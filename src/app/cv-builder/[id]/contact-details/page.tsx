@@ -123,7 +123,11 @@ export default function ContactDetailsPage() {
 
     if (!file) return;
 
-    if (!AVATAR_ALLOWED_MIME.includes(file.type as any)) {
+    if (
+      !AVATAR_ALLOWED_MIME.includes(
+        file.type as "image/jpeg" | "image/png" | "image/webp",
+      )
+    ) {
       setAvatarError("Unsupported file type. Please upload PNG, JPG or WEBP.");
       return;
     }
@@ -234,7 +238,7 @@ export default function ContactDetailsPage() {
       }
       setValue("avatar", dataUrl, { shouldDirty: true, shouldValidate: true });
       closeCrop();
-    } catch (e) {
+    } catch {
       setAvatarError("Failed to crop image.");
     }
   };

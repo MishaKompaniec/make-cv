@@ -14,15 +14,15 @@ interface TemplatePreview2Props {
   sidebarColor?: string;
 }
 
+const ContactRow = ({ icon, value }: { icon: ReactNode; value: string }) => (
+  <div className={styles.contactRow}>
+    <span className={styles.icon}>{icon}</span>
+    <span className={styles.text}>{value}</span>
+  </div>
+);
+
 export function TemplatePreview2({ sidebarColor }: TemplatePreview2Props) {
   const accentColor = resolveAccentColor(sidebarColor);
-
-  const ContactRow = ({ icon, value }: { icon: ReactNode; value: string }) => (
-    <div className={styles.contactRow}>
-      <span className={styles.icon}>{icon}</span>
-      <span className={styles.text}>{value}</span>
-    </div>
-  );
 
   const {
     IconPhone,
@@ -58,7 +58,7 @@ export function TemplatePreview2({ sidebarColor }: TemplatePreview2Props) {
     <div
       className={styles.preview}
       style={{
-        ["--accent-color" as any]: accentColor,
+        ["--accent-color" as string]: accentColor,
       }}
     >
       <div className={styles.main}>

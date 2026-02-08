@@ -58,7 +58,7 @@ export async function PATCH(
 
   const { id } = await ctx.params;
 
-  let body: any = {};
+  let body: Record<string, unknown> = {};
   try {
     body = await request.json();
   } catch {
@@ -73,7 +73,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  const data: Record<string, any> = {};
+  const data: Record<string, unknown> = {};
   if (typeof body?.title === "string") data.title = body.title;
   if (body?.data !== undefined) data.data = body.data;
   if (typeof body?.templateId === "string") data.templateId = body.templateId;

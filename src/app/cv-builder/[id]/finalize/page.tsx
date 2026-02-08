@@ -128,36 +128,61 @@ export default function FinalizePage() {
   }, []);
 
   useEffect(() => {
-    // keep pageNumber stable when cvId changes
-    setPageNumber(1);
-  }, [cvId]);
-
-  useEffect(() => {
     if (!cvId) return;
     void refreshCv();
   }, [cvId, refreshCv]);
 
   const templateId = cvSnapshot?.templateId ?? TEMPLATE_1_ID;
   const templateColors = cvSnapshot?.templateColors ?? {};
-  const data = cvSnapshot?.data ?? {};
+  const data = useMemo(() => cvSnapshot?.data ?? {}, [cvSnapshot?.data]);
 
-  const contactDetails =
-    (data["contactDetails"] as Record<string, unknown> | undefined) ?? {};
-  const summary = (data["summary"] as string | undefined) ?? "";
-  const workExperience =
-    (Array.isArray(data["workExperience"]) ? data["workExperience"] : []) ?? [];
-  const education =
-    (Array.isArray(data["education"]) ? data["education"] : []) ?? [];
-  const skills = (Array.isArray(data["skills"]) ? data["skills"] : []) ?? [];
-  const languages =
-    (Array.isArray(data["languages"]) ? data["languages"] : []) ?? [];
-  const interests =
-    (Array.isArray(data["interests"]) ? data["interests"] : []) ?? [];
-  const customSections =
-    (Array.isArray(data["customSections"]) ? data["customSections"] : []) ?? [];
-  const selectedSections =
-    (data["selectedSections"] as any) ??
-    ({ languages: false, interests: false, customSection: false } as const);
+  const contactDetails = useMemo(
+    () => (data["contactDetails"] as Record<string, unknown> | undefined) ?? {},
+    [data],
+  );
+  const summary = useMemo(
+    () => (data["summary"] as string | undefined) ?? "",
+    [data],
+  );
+  const workExperience = useMemo(
+    () =>
+      (Array.isArray(data["workExperience"]) ? data["workExperience"] : []) ??
+      [],
+    [data],
+  );
+  const education = useMemo(
+    () => (Array.isArray(data["education"]) ? data["education"] : []) ?? [],
+    [data],
+  );
+  const skills = useMemo(
+    () => (Array.isArray(data["skills"]) ? data["skills"] : []) ?? [],
+    [data],
+  );
+  const languages = useMemo(
+    () => (Array.isArray(data["languages"]) ? data["languages"] : []) ?? [],
+    [data],
+  );
+  const interests = useMemo(
+    () => (Array.isArray(data["interests"]) ? data["interests"] : []) ?? [],
+    [data],
+  );
+  const customSections = useMemo(
+    () =>
+      (Array.isArray(data["customSections"]) ? data["customSections"] : []) ??
+      [],
+    [data],
+  );
+  const selectedSections = useMemo(
+    () =>
+      (data["selectedSections"] as
+        | { languages: boolean; interests: boolean; customSection: boolean }
+        | undefined) ?? {
+        languages: false,
+        interests: false,
+        customSection: false,
+      },
+    [data],
+  );
 
   const selectedColor =
     templateColors?.[templateId] ?? TEMPLATE_1_COLORS[0].value;
@@ -196,7 +221,7 @@ export default function FinalizePage() {
   };
 
   const defaultFileNameBase = sanitizeFileNameBase(
-    (contactDetails as any)?.fullName || "CV",
+    ((contactDetails as Record<string, unknown>)?.fullName as string) || "CV",
   );
   const defaultFileName = `${defaultFileNameBase}.pdf`;
 
@@ -206,7 +231,7 @@ export default function FinalizePage() {
     () => (
       <PdfDocument
         sidebarColor={selectedColor}
-        contactDetails={contactDetails as any}
+        contactDetails={contactDetails as Record<string, unknown>}
         workExperience={workExperience}
         education={education}
         skills={skills}
@@ -249,7 +274,7 @@ export default function FinalizePage() {
   };
 
   return (
-    <div className={styles.pageContainer}>
+    <div key={cvId} className={styles.pageContainer}>
       <CreateCvHeader
         stepNumber="Step 8"
         title={stepTitle}

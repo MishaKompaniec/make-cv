@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useEffect, useId, useMemo, useRef, useState } from "react";
+import { forwardRef, useEffect, useId, useRef, useState } from "react";
 import styles from "./date-picker.module.scss";
 
 export type DatePickerValue = {
@@ -62,16 +62,9 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
     const rootRef = useRef<HTMLDivElement | null>(null);
     const [isOpen, setIsOpen] = useState(false);
 
-    const initialYear = useMemo(() => {
-      if (value?.year) return value.year;
-      return new Date().getFullYear();
-    }, [value?.year]);
-
-    const [viewYear, setViewYear] = useState(initialYear);
-
-    useEffect(() => {
-      if (value?.year) setViewYear(value.year);
-    }, [value?.year]);
+    const [viewYear, setViewYear] = useState(
+      () => value?.year ?? new Date().getFullYear(),
+    );
 
     useEffect(() => {
       if (!isOpen) return;
@@ -142,7 +135,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
             placeholder={placeholder}
             readOnly
             disabled={disabled}
-            aria-invalid={Boolean(error)}
+            role="button"
             aria-expanded={isOpen}
             aria-haspopup="dialog"
             onClick={() => {

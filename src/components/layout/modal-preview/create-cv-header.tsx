@@ -223,42 +223,67 @@ export function CreateCvHeader({
 
   const templateId = cvSnapshot?.templateId ?? TEMPLATE_1_ID;
   const templateColors = cvSnapshot?.templateColors ?? {};
-  const data = cvSnapshot?.data ?? {};
+  const data = useMemo(() => cvSnapshot?.data ?? {}, [cvSnapshot?.data]);
 
-  const contactDetails =
-    (data["contactDetails"] as Record<string, unknown> | undefined) ?? {};
-  const summary = (data["summary"] as string | undefined) ?? "";
-  const workExperience =
-    (Array.isArray(data["workExperience"])
-      ? (data["workExperience"] as WorkExperiencePreviewItem[])
-      : []) ?? [];
-  const education =
-    (Array.isArray(data["education"])
-      ? (data["education"] as EducationPreviewItem[])
-      : []) ?? [];
-  const skills =
-    (Array.isArray(data["skills"])
-      ? (data["skills"] as SkillPreviewItem[])
-      : []) ?? [];
-  const languages =
-    (Array.isArray(data["languages"])
-      ? (data["languages"] as LanguagePreviewItem[])
-      : []) ?? [];
-  const interests =
-    (Array.isArray(data["interests"])
-      ? (data["interests"] as InterestPreviewItem[])
-      : []) ?? [];
-  const customSections =
-    (Array.isArray(data["customSections"])
-      ? (data["customSections"] as CustomSectionPreviewItem[])
-      : []) ?? [];
-  const selectedSections = (data["selectedSections"] as
-    | SelectedSectionsPreview
-    | undefined) ?? {
-    languages: false,
-    interests: false,
-    customSection: false,
-  };
+  const contactDetails = useMemo(
+    () => (data["contactDetails"] as Record<string, unknown> | undefined) ?? {},
+    [data],
+  );
+  const summary = useMemo(
+    () => (data["summary"] as string | undefined) ?? "",
+    [data],
+  );
+  const workExperience = useMemo(
+    () =>
+      (Array.isArray(data["workExperience"])
+        ? (data["workExperience"] as WorkExperiencePreviewItem[])
+        : []) ?? [],
+    [data],
+  );
+  const education = useMemo(
+    () =>
+      (Array.isArray(data["education"])
+        ? (data["education"] as EducationPreviewItem[])
+        : []) ?? [],
+    [data],
+  );
+  const skills = useMemo(
+    () =>
+      (Array.isArray(data["skills"])
+        ? (data["skills"] as SkillPreviewItem[])
+        : []) ?? [],
+    [data],
+  );
+  const languages = useMemo(
+    () =>
+      (Array.isArray(data["languages"])
+        ? (data["languages"] as LanguagePreviewItem[])
+        : []) ?? [],
+    [data],
+  );
+  const interests = useMemo(
+    () =>
+      (Array.isArray(data["interests"])
+        ? (data["interests"] as InterestPreviewItem[])
+        : []) ?? [],
+    [data],
+  );
+  const customSections = useMemo(
+    () =>
+      (Array.isArray(data["customSections"])
+        ? (data["customSections"] as CustomSectionPreviewItem[])
+        : []) ?? [],
+    [data],
+  );
+  const selectedSections = useMemo(
+    () =>
+      (data["selectedSections"] as SelectedSectionsPreview | undefined) ?? {
+        languages: false,
+        interests: false,
+        customSection: false,
+      },
+    [data],
+  );
 
   const selectedColor =
     templateColors?.[templateId] ?? TEMPLATE_1_COLORS[0].value;
@@ -270,7 +295,7 @@ export function CreateCvHeader({
     () => (
       <PdfDocument
         sidebarColor={selectedColor}
-        contactDetails={contactDetails as any}
+        contactDetails={contactDetails as Record<string, unknown>}
         workExperience={workExperience}
         education={education}
         skills={skills}

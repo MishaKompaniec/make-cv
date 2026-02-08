@@ -98,7 +98,7 @@ export function CvProvider({
 
         const json = (await res.json()) as CvApiResponse;
         setCv(normalizeCv(json.cv));
-      } catch (e) {
+      } catch {
         setCv(null);
       } finally {
         setIsLoading(false);

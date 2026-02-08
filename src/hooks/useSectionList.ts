@@ -36,7 +36,7 @@ export function useSectionList<
   const didInitRef = useRef(false);
   const saveTimerRef = useRef<number | null>(null);
 
-  const [items, setItems] = useState<TItem[]>([]);
+  const [items, setItems] = useState<TItem[]>(() => storedItems);
   const [errors, setErrors] = useState<Record<string, TErrors>>({});
 
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -44,13 +44,10 @@ export function useSectionList<
   const shouldAnimateRef = useRef(false);
 
   useEffect(() => {
-    if (didInitRef.current) return;
-    setItems(storedItems);
-    didInitRef.current = true;
-  }, [storedItems]);
-
-  useEffect(() => {
-    if (!didInitRef.current) return;
+    if (!didInitRef.current) {
+      didInitRef.current = true;
+      return;
+    }
 
     if (saveTimerRef.current) {
       window.clearTimeout(saveTimerRef.current);
@@ -59,7 +56,9 @@ export function useSectionList<
     saveTimerRef.current = window.setTimeout(() => {
       setStoredItems(items);
     }, debounceMs);
+  }, [items, debounceMs, setStoredItems]);
 
+  useEffect(() => {
     return () => {
       if (saveTimerRef.current) {
         window.clearTimeout(saveTimerRef.current);
