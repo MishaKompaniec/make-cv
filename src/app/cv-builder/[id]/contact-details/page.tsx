@@ -3,11 +3,12 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef, useState, type FocusEvent } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Cropper, { type Area } from "react-easy-crop";
 import { Input } from "@/components/ui/input/input";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
+import { useCv } from "../provider";
 import {
   contactDetailsSchema,
   type ContactDetailsFormData,
@@ -42,11 +43,8 @@ const defaultContactDetails: ContactDetailsFormData = {
 
 export default function ContactDetailsPage() {
   const router = useRouter();
-  const params = useParams();
-  const cvId = params.id as string;
-  const [isLoading, setIsLoading] = useState(true);
+  const { cvId, cv, isLoading: isCvLoading, patchCv } = useCv();
   const [isSaving, setIsSaving] = useState(false);
-  const [cvData, setCvData] = useState<Record<string, unknown>>({});
 
   const [avatarError, setAvatarError] = useState<string>("");
   const [isHydrated, setIsHydrated] = useState(false);
@@ -74,50 +72,20 @@ export default function ContactDetailsPage() {
   });
 
   useEffect(() => {
-    let cancelled = false;
+    if (!cv) return;
+    if (didInitRef.current) return;
 
-    const load = async () => {
-      try {
-        const res = await fetch(`/api/cv/${cvId}`, { cache: "no-store" });
-        if (!res.ok) return;
+    const data = (cv.data ?? {}) as Record<string, unknown>;
+    const contactDetailsFromApi = data["contactDetails"] as
+      | Partial<ContactDetailsFormData>
+      | undefined;
 
-        const json = (await res.json()) as {
-          cv?: {
-            data?: Record<string, unknown> | null;
-          };
-        };
-
-        const cv = json.cv;
-        if (!cv || cancelled) return;
-
-        const nextData = (cv.data ?? {}) as Record<string, unknown>;
-        setCvData(nextData);
-
-        const contactDetailsFromApi = nextData["contactDetails"] as
-          | Partial<ContactDetailsFormData>
-          | undefined;
-
-        if (didInitRef.current) return;
-        reset({
-          ...defaultContactDetails,
-          ...(contactDetailsFromApi ?? {}),
-        });
-        didInitRef.current = true;
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
-    };
-
-    if (cvId) {
-      void load();
-    } else {
-      setIsLoading(false);
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [cvId, reset]);
+    reset({
+      ...defaultContactDetails,
+      ...(contactDetailsFromApi ?? {}),
+    });
+    didInitRef.current = true;
+  }, [cv, reset]);
 
   useEffect(() => {
     setIsHydrated(true);
@@ -139,18 +107,11 @@ export default function ContactDetailsPage() {
     setIsSaving(true);
     try {
       const nextData = {
-        ...(cvData ?? {}),
+        ...(((cv?.data ?? {}) as Record<string, unknown>) ?? {}),
         contactDetails: data,
       };
 
-      const res = await fetch(`/api/cv/${cvId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data: nextData }),
-      });
-      if (!res.ok) return;
-
-      setCvData(nextData);
+      await patchCv({ data: nextData });
       router.push(`/cv-builder/${cvId}/summary`);
     } finally {
       setIsSaving(false);
@@ -578,7 +539,7 @@ export default function ContactDetailsPage() {
         backHref={`/cv-builder/${cvId}`}
         nextHref={`/cv-builder/${cvId}/summary`}
         nextLabel={isSaving ? "Saving..." : "Next Step"}
-        nextDisabled={isLoading || isSaving}
+        nextDisabled={isCvLoading || !didInitRef.current || isSaving}
         onNextClick={handleNextClick}
       />
     </div>

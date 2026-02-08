@@ -3,10 +3,11 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef, useState, type FocusEvent } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea/textarea";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
+import { useCv } from "../provider";
 import { z } from "zod";
 import styles from "./page.module.scss";
 
@@ -24,11 +25,8 @@ type SummaryFormData = z.infer<typeof summarySchema>;
 
 export default function SummaryPage() {
   const router = useRouter();
-  const params = useParams();
-  const cvId = params.id as string;
-  const [isLoading, setIsLoading] = useState(true);
+  const { cvId, cv, isLoading: isCvLoading, patchCv } = useCv();
   const [isSaving, setIsSaving] = useState(false);
-  const [cvData, setCvData] = useState<Record<string, unknown>>({});
 
   const didInitRef = useRef(false);
 
@@ -44,45 +42,17 @@ export default function SummaryPage() {
   });
 
   useEffect(() => {
-    let cancelled = false;
+    if (!cv) return;
+    if (didInitRef.current) return;
 
-    const load = async () => {
-      try {
-        const res = await fetch(`/api/cv/${cvId}`, { cache: "no-store" });
-        if (!res.ok) return;
+    const data = (cv.data ?? {}) as Record<string, unknown>;
+    const summaryFromApi = data["summary"];
+    const initialSummary =
+      typeof summaryFromApi === "string" ? summaryFromApi : "";
 
-        const json = (await res.json()) as {
-          cv?: { data?: Record<string, unknown> | null };
-        };
-
-        const cv = json.cv;
-        if (!cv || cancelled) return;
-
-        const nextData = (cv.data ?? {}) as Record<string, unknown>;
-        setCvData(nextData);
-
-        const summaryFromApi = nextData["summary"];
-        const initialSummary =
-          typeof summaryFromApi === "string" ? summaryFromApi : "";
-
-        if (didInitRef.current) return;
-        reset({ professionalSummary: initialSummary });
-        didInitRef.current = true;
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
-    };
-
-    if (cvId) {
-      void load();
-    } else {
-      setIsLoading(false);
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [cvId, reset]);
+    reset({ professionalSummary: initialSummary });
+    didInitRef.current = true;
+  }, [cv, reset]);
 
   const registerWithFlush = (name: keyof SummaryFormData) => {
     const field = register(name);
@@ -100,18 +70,11 @@ export default function SummaryPage() {
     setIsSaving(true);
     try {
       const nextData = {
-        ...(cvData ?? {}),
+        ...(((cv?.data ?? {}) as Record<string, unknown>) ?? {}),
         summary: data.professionalSummary,
       };
 
-      const res = await fetch(`/api/cv/${cvId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data: nextData }),
-      });
-      if (!res.ok) return;
-
-      setCvData(nextData);
+      await patchCv({ data: nextData });
       router.push(`/cv-builder/${cvId}/work-experience`);
     } finally {
       setIsSaving(false);
@@ -148,7 +111,7 @@ export default function SummaryPage() {
         backHref={`/cv-builder/${cvId}/contact-details`}
         nextHref={`/cv-builder/${cvId}/work-experience`}
         nextLabel={isSaving ? "Saving..." : "Next Step"}
-        nextDisabled={isLoading || isSaving}
+        nextDisabled={isCvLoading || !didInitRef.current || isSaving}
         onNextClick={handleNextClick}
       />
     </div>

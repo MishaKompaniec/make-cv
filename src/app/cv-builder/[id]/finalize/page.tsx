@@ -2,10 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { useRouter, useParams } from "next/navigation";
 import { Loader } from "@/components/ui/loader/loader";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
+import { useCv } from "../provider";
 import {
   TEMPLATE_1_COLORS,
   TEMPLATE_1_ID,
@@ -15,17 +15,7 @@ import {
   TEMPLATE_2_ID,
   TemplatePdf2,
 } from "@/components/pdf/templates/template-2/template-pdf";
-import { Button } from "@/components/ui/button/button";
 import styles from "./page.module.scss";
-
-type CvApiResponse = {
-  cv?: {
-    id: string;
-    templateId: string;
-    templateColors: Record<string, string>;
-    data: Record<string, unknown>;
-  };
-};
 
 const BlobProvider = dynamic(
   () => import("@react-pdf/renderer").then((m) => m.BlobProvider),
@@ -111,14 +101,7 @@ function PreviewPanel({
 }
 
 export default function FinalizePage() {
-  const router = useRouter();
-  const params = useParams();
-  const cvId = params.id as string;
-
-  const [isCvLoading, setIsCvLoading] = useState(true);
-  const [cvSnapshot, setCvSnapshot] = useState<CvApiResponse["cv"] | null>(
-    null,
-  );
+  const { cvId, cv: cvSnapshot, isLoading: isCvLoading, refreshCv } = useCv();
 
   const [pageNumber, setPageNumber] = useState(1);
   const [numPages, setNumPages] = useState(1);
@@ -145,42 +128,14 @@ export default function FinalizePage() {
   }, []);
 
   useEffect(() => {
-    let cancelled = false;
-
-    const load = async () => {
-      setIsCvLoading(true);
-      try {
-        const res = await fetch(`/api/cv/${cvId}`, { cache: "no-store" });
-        if (!res.ok) return;
-
-        const json = (await res.json()) as CvApiResponse;
-        if (cancelled) return;
-
-        setCvSnapshot(
-          json.cv
-            ? {
-                ...json.cv,
-                templateId: json.cv.templateId ?? TEMPLATE_1_ID,
-                templateColors: json.cv.templateColors ?? {},
-                data: json.cv.data ?? {},
-              }
-            : null,
-        );
-      } finally {
-        if (!cancelled) setIsCvLoading(false);
-      }
-    };
-
-    if (cvId) {
-      void load();
-    } else {
-      setIsCvLoading(false);
-    }
-
-    return () => {
-      cancelled = true;
-    };
+    // keep pageNumber stable when cvId changes
+    setPageNumber(1);
   }, [cvId]);
+
+  useEffect(() => {
+    if (!cvId) return;
+    void refreshCv();
+  }, [cvId, refreshCv]);
 
   const templateId = cvSnapshot?.templateId ?? TEMPLATE_1_ID;
   const templateColors = cvSnapshot?.templateColors ?? {};

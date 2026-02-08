@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
 import { useSectionList } from "@/hooks/useSectionList";
+import { useCv } from "../provider";
 import {
   WorkExperienceCard,
   type ExperienceItem,
@@ -63,12 +64,8 @@ const validateExperience = (exp: ExperienceItem): ExperienceErrors => {
 
 export default function WorkExperiencePage() {
   const router = useRouter();
-  const params = useParams();
-  const cvId = params.id as string;
-
-  const [isLoading, setIsLoading] = useState(true);
+  const { cvId, cv, isLoading: isCvLoading, patchCv } = useCv();
   const [isSaving, setIsSaving] = useState(false);
-  const [cvData, setCvData] = useState<Record<string, unknown>>({});
   const didInitRef = useRef(false);
 
   const experiencesList = useSectionList<ExperienceItem, ExperienceErrors>({
@@ -87,46 +84,18 @@ export default function WorkExperiencePage() {
   });
 
   useEffect(() => {
-    let cancelled = false;
+    if (!cv) return;
+    if (didInitRef.current) return;
 
-    const load = async () => {
-      try {
-        const res = await fetch(`/api/cv/${cvId}`, { cache: "no-store" });
-        if (!res.ok) return;
+    const data = (cv.data ?? {}) as Record<string, unknown>;
+    const workExpFromApi = data["workExperience"];
+    const initialItems = Array.isArray(workExpFromApi)
+      ? (workExpFromApi as ExperienceItem[])
+      : [];
 
-        const json = (await res.json()) as {
-          cv?: { data?: Record<string, unknown> | null };
-        };
-
-        const cv = json.cv;
-        if (!cv || cancelled) return;
-
-        const nextData = (cv.data ?? {}) as Record<string, unknown>;
-        setCvData(nextData);
-
-        const workExpFromApi = nextData["workExperience"];
-        const initialItems = Array.isArray(workExpFromApi)
-          ? (workExpFromApi as ExperienceItem[])
-          : [];
-
-        if (didInitRef.current) return;
-        experiencesList.setItems(initialItems);
-        didInitRef.current = true;
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
-    };
-
-    if (cvId) {
-      void load();
-    } else {
-      setIsLoading(false);
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [cvId]);
+    experiencesList.setItems(initialItems);
+    didInitRef.current = true;
+  }, [cv, experiencesList]);
 
   const handleNextClick = async () => {
     if (!experiencesList.validateAll()) return;
@@ -134,19 +103,11 @@ export default function WorkExperiencePage() {
     setIsSaving(true);
     try {
       const nextData = {
-        ...(cvData ?? {}),
+        ...(((cv?.data ?? {}) as Record<string, unknown>) ?? {}),
         workExperience: experiencesList.items,
       };
 
-      const res = await fetch(`/api/cv/${cvId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data: nextData }),
-      });
-
-      if (!res.ok) return;
-
-      setCvData(nextData);
+      await patchCv({ data: nextData });
       router.push(`/cv-builder/${cvId}/education`);
     } finally {
       setIsSaving(false);
@@ -200,7 +161,7 @@ export default function WorkExperiencePage() {
         backHref={`/cv-builder/${cvId}/summary`}
         nextHref={`/cv-builder/${cvId}/education`}
         nextLabel={isSaving ? "Saving..." : "Next Step"}
-        nextDisabled={isLoading || isSaving}
+        nextDisabled={isCvLoading || !didInitRef.current || isSaving}
         onNextClick={handleNextClick}
       />
     </div>

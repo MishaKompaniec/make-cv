@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import dynamic from "next/dynamic";
+import { useCv } from "./provider";
 import {
   TEMPLATE_1_ID,
   TEMPLATE_1_COLORS,
@@ -27,9 +28,7 @@ const stepTitle = "Choose template";
 
 export default function ChooseTemplatePage() {
   const router = useRouter();
-  const params = useParams();
-  const cvId = params.id as string;
-  const [isLoading, setIsLoading] = useState(true);
+  const { cvId, cv, isLoading: isCvLoading, patchCv } = useCv();
   const [isSaving, setIsSaving] = useState(false);
   const [selectedTemplateId, setSelectedTemplateId] =
     useState<string>(TEMPLATE_1_ID);
@@ -37,46 +36,16 @@ export default function ChooseTemplatePage() {
     {},
   );
 
+  const didInitRef = useRef(false);
+
   useEffect(() => {
-    let cancelled = false;
+    if (!cv) return;
+    if (didInitRef.current) return;
 
-    const load = async () => {
-      try {
-        const res = await fetch(`/api/cv/${cvId}`, { cache: "no-store" });
-        if (!res.ok) return;
-
-        const json = (await res.json()) as {
-          cv?: {
-            templateId?: string;
-            templateColors?: Record<string, string> | null;
-          };
-        };
-
-        const cv = json.cv;
-        if (cancelled || !cv) return;
-
-        if (typeof cv.templateId === "string" && cv.templateId) {
-          setSelectedTemplateId(cv.templateId);
-        }
-
-        if (cv.templateColors && typeof cv.templateColors === "object") {
-          setTemplateColors(cv.templateColors);
-        }
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
-    };
-
-    if (cvId) {
-      void load();
-    } else {
-      setIsLoading(false);
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [cvId]);
+    setSelectedTemplateId(cv.templateId || TEMPLATE_1_ID);
+    setTemplateColors(cv.templateColors || {});
+    didInitRef.current = true;
+  }, [cv]);
 
   const templates = [
     { id: TEMPLATE_1_ID, Preview: TemplatePreview1 },
@@ -102,16 +71,10 @@ export default function ChooseTemplatePage() {
 
     setIsSaving(true);
     try {
-      const res = await fetch(`/api/cv/${cvId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          templateId: selectedTemplateId,
-          templateColors,
-        }),
+      await patchCv({
+        templateId: selectedTemplateId,
+        templateColors,
       });
-
-      if (!res.ok) return;
 
       router.push(`/cv-builder/${cvId}/contact-details`);
     } finally {
@@ -176,7 +139,7 @@ export default function ChooseTemplatePage() {
 
       <NavigationFooter
         nextLabel={isSaving ? "Saving..." : "Next Step"}
-        nextDisabled={isLoading || isSaving}
+        nextDisabled={isCvLoading || !didInitRef.current || isSaving}
         onNextClick={handleNextClick}
         nextHref={`/cv-builder/${cvId}/contact-details`}
       />

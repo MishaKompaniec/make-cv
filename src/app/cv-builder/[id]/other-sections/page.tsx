@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
 import { useSectionList } from "@/hooks/useSectionList";
 import { Checkbox } from "@/components/ui/checkbox/checkbox";
+import { useCv } from "../provider";
 import { LanguagesCard, type LanguageItem } from "./languages-card";
 import { InterestsCard, type InterestItem } from "./interests-card";
 import {
@@ -32,12 +33,8 @@ const MAX_TEXT_LENGTH = 25;
 
 export default function OtherSectionsPage() {
   const router = useRouter();
-  const params = useParams();
-  const cvId = params.id as string;
-
-  const [isLoading, setIsLoading] = useState(true);
+  const { cvId, cv, isLoading: isCvLoading, patchCv } = useCv();
   const [isSaving, setIsSaving] = useState(false);
-  const [cvData, setCvData] = useState<Record<string, unknown>>({});
   const didInitRef = useRef(false);
 
   const [selectedSections, setSelectedSections] = useState<SelectedSections>(
@@ -96,66 +93,36 @@ export default function OtherSectionsPage() {
   });
 
   useEffect(() => {
-    let cancelled = false;
+    if (!cv) return;
+    if (didInitRef.current) return;
 
-    const load = async () => {
-      try {
-        const res = await fetch(`/api/cv/${cvId}`, { cache: "no-store" });
-        if (!res.ok) return;
+    const data = (cv.data ?? {}) as Record<string, unknown>;
 
-        const json = (await res.json()) as {
-          cv?: { data?: Record<string, unknown> | null };
-        };
+    const selectedFromApi = data["selectedSections"] as
+      | Partial<SelectedSections>
+      | undefined;
+    setSelectedSections({
+      ...DEFAULT_SELECTED_SECTIONS,
+      ...(selectedFromApi ?? {}),
+    });
 
-        const cv = json.cv;
-        if (!cv || cancelled) return;
-
-        const nextData = (cv.data ?? {}) as Record<string, unknown>;
-        setCvData(nextData);
-
-        if (didInitRef.current) return;
-
-        const selectedFromApi = nextData["selectedSections"] as
-          | Partial<SelectedSections>
-          | undefined;
-        setSelectedSections({
-          ...DEFAULT_SELECTED_SECTIONS,
-          ...(selectedFromApi ?? {}),
-        });
-
-        const languagesFromApi = nextData["languages"];
-        if (Array.isArray(languagesFromApi)) {
-          languagesList.setItems(languagesFromApi as LanguageItem[]);
-        }
-
-        const interestsFromApi = nextData["interests"];
-        if (Array.isArray(interestsFromApi)) {
-          interestsList.setItems(interestsFromApi as InterestItem[]);
-        }
-
-        const customSectionsFromApi = nextData["customSections"];
-        if (Array.isArray(customSectionsFromApi)) {
-          customSectionsList.setItems(
-            customSectionsFromApi as CustomSectionItem[],
-          );
-        }
-
-        didInitRef.current = true;
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
-    };
-
-    if (cvId) {
-      void load();
-    } else {
-      setIsLoading(false);
+    const languagesFromApi = data["languages"];
+    if (Array.isArray(languagesFromApi)) {
+      languagesList.setItems(languagesFromApi as LanguageItem[]);
     }
 
-    return () => {
-      cancelled = true;
-    };
-  }, [cvId]);
+    const interestsFromApi = data["interests"];
+    if (Array.isArray(interestsFromApi)) {
+      interestsList.setItems(interestsFromApi as InterestItem[]);
+    }
+
+    const customSectionsFromApi = data["customSections"];
+    if (Array.isArray(customSectionsFromApi)) {
+      customSectionsList.setItems(customSectionsFromApi as CustomSectionItem[]);
+    }
+
+    didInitRef.current = true;
+  }, [cv, customSectionsList, interestsList, languagesList]);
 
   const toggleSection = (key: keyof SelectedSections) => {
     setSelectedSections((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -170,22 +137,14 @@ export default function OtherSectionsPage() {
     setIsSaving(true);
     try {
       const nextData = {
-        ...(cvData ?? {}),
+        ...(((cv?.data ?? {}) as Record<string, unknown>) ?? {}),
         selectedSections,
         languages: languagesList.items,
         interests: interestsList.items,
         customSections: customSectionsList.items,
       };
 
-      const res = await fetch(`/api/cv/${cvId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data: nextData }),
-      });
-
-      if (!res.ok) return;
-
-      setCvData(nextData);
+      await patchCv({ data: nextData });
       router.push(`/cv-builder/${cvId}/finalize`);
     } finally {
       setIsSaving(false);
@@ -356,7 +315,7 @@ export default function OtherSectionsPage() {
         backHref={`/cv-builder/${cvId}/skills`}
         nextHref={`/cv-builder/${cvId}/finalize`}
         nextLabel={isSaving ? "Saving..." : "Next Step"}
-        nextDisabled={isLoading || isSaving}
+        nextDisabled={isCvLoading || !didInitRef.current || isSaving}
         onNextClick={handleNextClick}
       />
     </div>
