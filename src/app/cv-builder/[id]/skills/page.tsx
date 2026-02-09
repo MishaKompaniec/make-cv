@@ -1,16 +1,17 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
+import { useKeyedDebouncedCallback } from "@/hooks/useKeyedDebouncedCallback";
 import { useSectionList } from "@/hooks/useSectionList";
 
 import { useCv } from "../provider";
 import { SkillTag } from "./components/skill-tag";
 import styles from "./page.module.scss";
-import { type SkillItem,SkillsCard } from "./skills-card";
+import { type SkillItem, SkillsCard } from "./skills-card";
 
 const stepTitle = "Skills";
 
@@ -51,6 +52,8 @@ export default function SkillsPage() {
   const { cvId, cv, isLoading: isCvLoading, patchCv } = useCv();
   const [isSaving, setIsSaving] = useState(false);
   const didInitRef = useRef(false);
+  const skipAutosaveRef = useRef(true);
+  const lastScheduledSnapshotRef = useRef<string>("");
 
   const skillsList = useSectionList<SkillItem, SkillErrors>({
     storageKey: "cv-skills",
@@ -74,22 +77,51 @@ export default function SkillsPage() {
 
     skillsList.setItems(initialItems);
     didInitRef.current = true;
+    skipAutosaveRef.current = true;
   }, [cv, skillsList]);
+
+  const patcher = useKeyedDebouncedCallback<"skills", SkillItem[]>(
+    async (_key, value) => {
+      if (!cvId) return;
+      await patchCv({
+        data: {
+          skills: value,
+        },
+      });
+    },
+  );
+
+  useEffect(() => {
+    setIsSaving(patcher.isInFlight);
+  }, [patcher.isInFlight]);
+
+  const schedulePatch = useCallback(() => {
+    if (!didInitRef.current) return;
+    if (!cvId) return;
+
+    if (skipAutosaveRef.current) {
+      skipAutosaveRef.current = false;
+      return;
+    }
+
+    const snapshot = JSON.stringify(skillsList.items);
+    if (snapshot === lastScheduledSnapshotRef.current) return;
+    lastScheduledSnapshotRef.current = snapshot;
+
+    patcher.schedule("skills", skillsList.items);
+  }, [cvId, patcher, skillsList.items]);
+
+  useEffect(() => {
+    schedulePatch();
+  }, [schedulePatch]);
 
   const handleNextClick = async () => {
     if (!skillsList.validateAll()) return;
-
-    setIsSaving(true);
     try {
-      const nextData = {
-        ...(((cv?.data ?? {}) as Record<string, unknown>) ?? {}),
-        skills: skillsList.items,
-      };
-
-      await patchCv({ data: nextData });
+      await patcher.flush();
       router.push(`/cv-builder/${cvId}/other-sections`);
     } finally {
-      setIsSaving(false);
+      // patcher manages isSaving via in-flight tracking
     }
   };
 

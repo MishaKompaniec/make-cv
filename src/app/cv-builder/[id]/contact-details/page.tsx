@@ -2,13 +2,21 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { type FocusEvent,useEffect, useRef, useState } from "react";
+import {
+  type ChangeEvent,
+  type FocusEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import Cropper, { type Area } from "react-easy-crop";
 import { useForm } from "react-hook-form";
 
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { Input } from "@/components/ui/input/input";
+import { useKeyedDebouncedCallback } from "@/hooks/useKeyedDebouncedCallback";
 import {
   type ContactDetailsFormData,
   contactDetailsSchema,
@@ -89,6 +97,33 @@ export default function ContactDetailsPage() {
     didInitRef.current = true;
   }, [cv, reset]);
 
+  const patcher = useKeyedDebouncedCallback<
+    keyof ContactDetailsFormData,
+    unknown
+  >(async (name, value) => {
+    if (!cvId) return;
+    await patchCv({
+      data: {
+        contactDetails: {
+          [name]: value,
+        },
+      },
+    });
+  });
+
+  useEffect(() => {
+    setIsSaving(patcher.isInFlight);
+  }, [patcher.isInFlight]);
+
+  const schedulePatch = useCallback(
+    (name: keyof ContactDetailsFormData, value: unknown) => {
+      if (!didInitRef.current) return;
+      if (!cvId) return;
+      patcher.schedule(name, value);
+    },
+    [cvId, patcher],
+  );
+
   useEffect(() => {
     setIsHydrated(true);
   }, []);
@@ -97,26 +132,23 @@ export default function ContactDetailsPage() {
     const field = register(name);
     return {
       ...field,
+      onChange: (e: ChangeEvent<HTMLInputElement>) => {
+        field.onChange(e);
+        schedulePatch(name, e.target.value);
+      },
       onBlur: (e: FocusEvent<HTMLInputElement>) => {
         field.onBlur(e);
       },
     };
   };
 
-  const handleNextClick = handleSubmit(async (data) => {
+  const handleNextClick = handleSubmit(async () => {
     if (!cvId) return;
-
-    setIsSaving(true);
     try {
-      const nextData = {
-        ...(((cv?.data ?? {}) as Record<string, unknown>) ?? {}),
-        contactDetails: data,
-      };
-
-      await patchCv({ data: nextData });
+      await patcher.flush();
       router.push(`/cv-builder/${cvId}/summary`);
     } finally {
-      setIsSaving(false);
+      // patcher manages isSaving via in-flight tracking
     }
   });
 
@@ -162,6 +194,7 @@ export default function ContactDetailsPage() {
   const clearAvatar = () => {
     setAvatarError("");
     setValue("avatar", "", { shouldDirty: true, shouldValidate: true });
+    schedulePatch("avatar", "");
     if (avatarInputRef.current) avatarInputRef.current.value = "";
   };
 
@@ -239,6 +272,7 @@ export default function ContactDetailsPage() {
         return;
       }
       setValue("avatar", dataUrl, { shouldDirty: true, shouldValidate: true });
+      schedulePatch("avatar", dataUrl);
       closeCrop();
     } catch {
       setAvatarError("Failed to crop image.");

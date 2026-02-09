@@ -2,13 +2,21 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { type FocusEvent,useEffect, useRef, useState } from "react";
+import {
+  type ChangeEvent,
+  type FocusEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { Textarea } from "@/components/ui/textarea/textarea";
+import { useKeyedDebouncedCallback } from "@/hooks/useKeyedDebouncedCallback";
 
 import { useCv } from "../provider";
 import styles from "./page.module.scss";
@@ -56,30 +64,51 @@ export default function SummaryPage() {
     didInitRef.current = true;
   }, [cv, reset]);
 
+  const patcher = useKeyedDebouncedCallback<"summary", string>(
+    async (_key, value) => {
+      if (!cvId) return;
+      await patchCv({
+        data: {
+          summary: value,
+        },
+      });
+    },
+  );
+
+  useEffect(() => {
+    setIsSaving(patcher.isInFlight);
+  }, [patcher.isInFlight]);
+
+  const schedulePatch = useCallback(
+    (value: string) => {
+      if (!didInitRef.current) return;
+      if (!cvId) return;
+      patcher.schedule("summary", value);
+    },
+    [cvId, patcher],
+  );
+
   const registerWithFlush = (name: keyof SummaryFormData) => {
     const field = register(name);
     return {
       ...field,
+      onChange: (e: ChangeEvent<HTMLTextAreaElement>) => {
+        field.onChange(e);
+        schedulePatch(e.target.value);
+      },
       onBlur: (e: FocusEvent<HTMLTextAreaElement>) => {
         field.onBlur(e);
       },
     };
   };
 
-  const handleNextClick = handleSubmit(async (data) => {
+  const handleNextClick = handleSubmit(async () => {
     if (!cvId) return;
-
-    setIsSaving(true);
     try {
-      const nextData = {
-        ...(((cv?.data ?? {}) as Record<string, unknown>) ?? {}),
-        summary: data.professionalSummary,
-      };
-
-      await patchCv({ data: nextData });
+      await patcher.flush();
       router.push(`/cv-builder/${cvId}/work-experience`);
     } finally {
-      setIsSaving(false);
+      // patcher manages isSaving via in-flight tracking
     }
   });
 

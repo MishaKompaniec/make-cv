@@ -1,10 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
+import { useKeyedDebouncedCallback } from "@/hooks/useKeyedDebouncedCallback";
 import { useSectionList } from "@/hooks/useSectionList";
 
 import { useCv } from "../provider";
@@ -69,6 +70,8 @@ export default function WorkExperiencePage() {
   const { cvId, cv, isLoading: isCvLoading, patchCv } = useCv();
   const [isSaving, setIsSaving] = useState(false);
   const didInitRef = useRef(false);
+  const skipAutosaveRef = useRef(true);
+  const lastScheduledSnapshotRef = useRef<string>("");
 
   const experiencesList = useSectionList<ExperienceItem, ExperienceErrors>({
     storageKey: "cv-work-experience",
@@ -97,22 +100,55 @@ export default function WorkExperiencePage() {
 
     experiencesList.setItems(initialItems);
     didInitRef.current = true;
+    skipAutosaveRef.current = true;
   }, [cv, experiencesList]);
+
+  const patcher = useKeyedDebouncedCallback<"workExperience", ExperienceItem[]>(
+    async (_key, value) => {
+      if (!cvId) return;
+      await patchCv({
+        data: {
+          workExperience: value,
+        },
+      });
+    },
+  );
+
+  const schedule = patcher.schedule;
+  const flush = patcher.flush;
+  const isInFlight = patcher.isInFlight;
+
+  useEffect(() => {
+    setIsSaving(isInFlight);
+  }, [isInFlight]);
+
+  const schedulePatch = useCallback(() => {
+    if (!didInitRef.current) return;
+    if (!cvId) return;
+
+    if (skipAutosaveRef.current) {
+      skipAutosaveRef.current = false;
+      return;
+    }
+
+    const snapshot = JSON.stringify(experiencesList.items);
+    if (snapshot === lastScheduledSnapshotRef.current) return;
+    lastScheduledSnapshotRef.current = snapshot;
+
+    schedule("workExperience", experiencesList.items);
+  }, [cvId, experiencesList.items, schedule]);
+
+  useEffect(() => {
+    schedulePatch();
+  }, [schedulePatch]);
 
   const handleNextClick = async () => {
     if (!experiencesList.validateAll()) return;
-
-    setIsSaving(true);
     try {
-      const nextData = {
-        ...(((cv?.data ?? {}) as Record<string, unknown>) ?? {}),
-        workExperience: experiencesList.items,
-      };
-
-      await patchCv({ data: nextData });
+      await flush();
       router.push(`/cv-builder/${cvId}/education`);
     } finally {
-      setIsSaving(false);
+      // patcher manages isSaving via in-flight tracking
     }
   };
 

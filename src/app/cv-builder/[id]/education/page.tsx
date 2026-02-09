@@ -1,10 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
+import { useKeyedDebouncedCallback } from "@/hooks/useKeyedDebouncedCallback";
 import { useSectionList } from "@/hooks/useSectionList";
 
 import { useCv } from "../provider";
@@ -51,6 +52,8 @@ export default function EducationPage() {
   const { cvId, cv, isLoading: isCvLoading, patchCv } = useCv();
   const [isSaving, setIsSaving] = useState(false);
   const didInitRef = useRef(false);
+  const skipAutosaveRef = useRef(true);
+  const lastScheduledSnapshotRef = useRef<string>("");
 
   const educationList = useSectionList<EducationItem, EducationErrors>({
     storageKey: "cv-education",
@@ -79,22 +82,51 @@ export default function EducationPage() {
 
     educationList.setItems(initialItems);
     didInitRef.current = true;
+    skipAutosaveRef.current = true;
   }, [cv, educationList]);
+
+  const patcher = useKeyedDebouncedCallback<"education", EducationItem[]>(
+    async (_key, value) => {
+      if (!cvId) return;
+      await patchCv({
+        data: {
+          education: value,
+        },
+      });
+    },
+  );
+
+  useEffect(() => {
+    setIsSaving(patcher.isInFlight);
+  }, [patcher.isInFlight]);
+
+  const schedulePatch = useCallback(() => {
+    if (!didInitRef.current) return;
+    if (!cvId) return;
+
+    if (skipAutosaveRef.current) {
+      skipAutosaveRef.current = false;
+      return;
+    }
+
+    const snapshot = JSON.stringify(educationList.items);
+    if (snapshot === lastScheduledSnapshotRef.current) return;
+    lastScheduledSnapshotRef.current = snapshot;
+
+    patcher.schedule("education", educationList.items);
+  }, [cvId, educationList.items, patcher]);
+
+  useEffect(() => {
+    schedulePatch();
+  }, [schedulePatch]);
 
   const handleNextClick = async () => {
     if (!educationList.validateAll()) return;
-
-    setIsSaving(true);
     try {
-      const nextData = {
-        ...(((cv?.data ?? {}) as Record<string, unknown>) ?? {}),
-        education: educationList.items,
-      };
-
-      await patchCv({ data: nextData });
+      await patcher.flush();
       router.push(`/cv-builder/${cvId}/skills`);
     } finally {
-      setIsSaving(false);
+      // patcher manages isSaving via in-flight tracking
     }
   };
 

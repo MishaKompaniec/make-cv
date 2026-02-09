@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
@@ -11,6 +11,7 @@ import {
   TEMPLATE_1_ID,
 } from "@/components/pdf/templates/template-1/template-pdf";
 import { TEMPLATE_2_ID } from "@/components/pdf/templates/template-2/template-pdf";
+import { useKeyedDebouncedCallback } from "@/hooks/useKeyedDebouncedCallback";
 
 import styles from "./page.module.scss";
 import { useCv } from "./provider";
@@ -31,23 +32,31 @@ const stepTitle = "Choose template";
 export default function ChooseTemplatePage() {
   const router = useRouter();
   const { cvId, cv, isLoading: isCvLoading, patchCv } = useCv();
-  const [isSaving, setIsSaving] = useState(false);
-  const [selectedTemplateId, setSelectedTemplateId] =
-    useState<string>(TEMPLATE_1_ID);
-  const [templateColors, setTemplateColors] = useState<Record<string, string>>(
-    {},
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(
+    null,
   );
+  const [templateColors, setTemplateColors] = useState<Record<
+    string,
+    string
+  > | null>(null);
 
-  const didInitRef = useRef(false);
+  const effectiveTemplateId =
+    selectedTemplateId ?? cv?.templateId ?? TEMPLATE_1_ID;
+  const effectiveTemplateColors = templateColors ?? cv?.templateColors ?? {};
+  const isInitialized = Boolean(cv);
 
-  useEffect(() => {
-    if (!cv) return;
-    if (didInitRef.current) return;
+  const patcher = useKeyedDebouncedCallback<
+    "templateId" | "templateColors",
+    unknown
+  >(async (key, value) => {
+    if (!cvId) return;
+    if (key === "templateId") {
+      await patchCv({ templateId: value as string });
+      return;
+    }
 
-    setSelectedTemplateId(cv.templateId || TEMPLATE_1_ID);
-    setTemplateColors(cv.templateColors || {});
-    didInitRef.current = true;
-  }, [cv]);
+    await patchCv({ templateColors: value as Record<string, string> });
+  });
 
   const templates = [
     { id: TEMPLATE_1_ID, Preview: TemplatePreview1 },
@@ -66,22 +75,12 @@ export default function ChooseTemplatePage() {
   };
 
   const getTemplateColor = (templateId: string) =>
-    templateColors?.[templateId] ?? TEMPLATE_1_COLORS[0].value;
+    effectiveTemplateColors?.[templateId] ?? TEMPLATE_1_COLORS[0].value;
 
   const handleNextClick = async () => {
     if (!cvId) return;
-
-    setIsSaving(true);
-    try {
-      await patchCv({
-        templateId: selectedTemplateId,
-        templateColors,
-      });
-
-      router.push(`/cv-builder/${cvId}/contact-details`);
-    } finally {
-      setIsSaving(false);
-    }
+    await patcher.flush();
+    router.push(`/cv-builder/${cvId}/contact-details`);
   };
 
   return (
@@ -102,9 +101,12 @@ export default function ChooseTemplatePage() {
               <div
                 key={id}
                 className={`${styles.templateCard}${
-                  selectedTemplateId === id ? ` ${styles.selected}` : ""
+                  effectiveTemplateId === id ? ` ${styles.selected}` : ""
                 }`}
-                onClick={() => setSelectedTemplateId(id)}
+                onClick={() => {
+                  setSelectedTemplateId(id);
+                  patcher.schedule("templateId", id);
+                }}
               >
                 <div className={styles.templatePreview}>
                   <Preview sidebarColor={cardColor} />
@@ -123,10 +125,14 @@ export default function ChooseTemplatePage() {
                         }`}
                         onClick={(e) => {
                           e.stopPropagation();
-                          setTemplateColors((prev) => ({
-                            ...(prev ?? {}),
-                            [id]: color.value,
-                          }));
+                          setTemplateColors((prev) => {
+                            const nextColors = {
+                              ...(prev ?? {}),
+                              [id]: color.value,
+                            };
+                            patcher.schedule("templateColors", nextColors);
+                            return nextColors;
+                          });
                         }}
                         aria-label={`Select ${color.name} color`}
                       />
@@ -140,8 +146,8 @@ export default function ChooseTemplatePage() {
       </div>
 
       <NavigationFooter
-        nextLabel={isSaving ? "Saving..." : "Next Step"}
-        nextDisabled={isCvLoading || !didInitRef.current || isSaving}
+        nextLabel={patcher.isInFlight ? "Saving..." : "Next Step"}
+        nextDisabled={isCvLoading || !isInitialized || patcher.isInFlight}
         onNextClick={handleNextClick}
         nextHref={`/cv-builder/${cvId}/contact-details`}
       />

@@ -1,11 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { Checkbox } from "@/components/ui/checkbox/checkbox";
+import { useKeyedDebouncedCallback } from "@/hooks/useKeyedDebouncedCallback";
 import { useSectionList } from "@/hooks/useSectionList";
 
 import { useCv } from "../provider";
@@ -13,8 +14,8 @@ import {
   CustomSectionCard,
   type CustomSectionItem,
 } from "./custom-section-card";
-import { type InterestItem,InterestsCard } from "./interests-card";
-import { type LanguageItem,LanguagesCard } from "./languages-card";
+import { type InterestItem, InterestsCard } from "./interests-card";
+import { type LanguageItem, LanguagesCard } from "./languages-card";
 import styles from "./page.module.scss";
 
 const stepTitle = "Other sections";
@@ -38,6 +39,8 @@ export default function OtherSectionsPage() {
   const { cvId, cv, isLoading: isCvLoading, patchCv } = useCv();
   const [isSaving, setIsSaving] = useState(false);
   const didInitRef = useRef(false);
+  const skipAutosaveRef = useRef(true);
+  const lastScheduledSnapshotRef = useRef<string>("");
 
   const [selectedSections, setSelectedSections] = useState<SelectedSections>(
     DEFAULT_SELECTED_SECTIONS,
@@ -124,7 +127,87 @@ export default function OtherSectionsPage() {
     }
 
     didInitRef.current = true;
+    skipAutosaveRef.current = true;
   }, [cv, customSectionsList, interestsList, languagesList]);
+
+  const patcher = useKeyedDebouncedCallback<
+    "selectedSections" | "languages" | "interests" | "customSections",
+    unknown
+  >(async (key, value) => {
+    if (!cvId) return;
+
+    if (key === "selectedSections") {
+      await patchCv({
+        data: {
+          selectedSections: value,
+        },
+      });
+      return;
+    }
+
+    if (key === "languages") {
+      await patchCv({
+        data: {
+          languages: value,
+        },
+      });
+      return;
+    }
+
+    if (key === "interests") {
+      await patchCv({
+        data: {
+          interests: value,
+        },
+      });
+      return;
+    }
+
+    await patchCv({
+      data: {
+        customSections: value,
+      },
+    });
+  });
+
+  useEffect(() => {
+    setIsSaving(patcher.isInFlight);
+  }, [patcher.isInFlight]);
+
+  const schedulePatch = useCallback(() => {
+    if (!didInitRef.current) return;
+    if (!cvId) return;
+
+    if (skipAutosaveRef.current) {
+      skipAutosaveRef.current = false;
+      return;
+    }
+
+    const snapshot = JSON.stringify({
+      selectedSections,
+      languages: languagesList.items,
+      interests: interestsList.items,
+      customSections: customSectionsList.items,
+    });
+    if (snapshot === lastScheduledSnapshotRef.current) return;
+    lastScheduledSnapshotRef.current = snapshot;
+
+    patcher.schedule("selectedSections", selectedSections);
+    patcher.schedule("languages", languagesList.items);
+    patcher.schedule("interests", interestsList.items);
+    patcher.schedule("customSections", customSectionsList.items);
+  }, [
+    cvId,
+    customSectionsList.items,
+    interestsList.items,
+    languagesList.items,
+    patcher,
+    selectedSections,
+  ]);
+
+  useEffect(() => {
+    schedulePatch();
+  }, [schedulePatch]);
 
   const toggleSection = (key: keyof SelectedSections) => {
     setSelectedSections((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -135,21 +218,11 @@ export default function OtherSectionsPage() {
     if (selectedSections.interests && !interestsList.validateAll()) return;
     if (selectedSections.customSection && !customSectionsList.validateAll())
       return;
-
-    setIsSaving(true);
     try {
-      const nextData = {
-        ...(((cv?.data ?? {}) as Record<string, unknown>) ?? {}),
-        selectedSections,
-        languages: languagesList.items,
-        interests: interestsList.items,
-        customSections: customSectionsList.items,
-      };
-
-      await patchCv({ data: nextData });
+      await patcher.flush();
       router.push(`/cv-builder/${cvId}/finalize`);
     } finally {
-      setIsSaving(false);
+      // patcher manages isSaving via in-flight tracking
     }
   };
 

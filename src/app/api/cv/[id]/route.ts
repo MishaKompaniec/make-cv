@@ -3,6 +3,31 @@ import { NextResponse } from "next/server";
 import { getServerAuthSession } from "@/auth";
 import { prisma } from "@/lib/prisma";
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    !Array.isArray(value) &&
+    Object.prototype.toString.call(value) === "[object Object]"
+  );
+}
+
+function deepMerge(
+  base: Record<string, unknown>,
+  patch: Record<string, unknown>,
+): Record<string, unknown> {
+  const out: Record<string, unknown> = { ...base };
+  for (const [key, value] of Object.entries(patch)) {
+    const prev = out[key];
+    if (isPlainObject(prev) && isPlainObject(value)) {
+      out[key] = deepMerge(prev, value);
+    } else {
+      out[key] = value;
+    }
+  }
+  return out;
+}
+
 async function requireUserId() {
   const session = await getServerAuthSession();
   const email = session?.user?.email;
@@ -67,7 +92,7 @@ export async function PATCH(
 
   const existing = await prisma.cv.findFirst({
     where: { id, userId },
-    select: { id: true },
+    select: { id: true, data: true },
   });
   if (!existing) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -75,7 +100,14 @@ export async function PATCH(
 
   const data: Record<string, unknown> = {};
   if (typeof body?.title === "string") data.title = body.title;
-  if (body?.data !== undefined) data.data = body.data;
+  if (body?.data !== undefined) {
+    const base = isPlainObject(existing.data) ? existing.data : {};
+    const patch = isPlainObject(body.data)
+      ? (body.data as Record<string, unknown>)
+      : body.data;
+
+    data.data = isPlainObject(patch) ? deepMerge(base, patch) : patch;
+  }
   if (typeof body?.templateId === "string") data.templateId = body.templateId;
   if (body?.templateColors !== undefined)
     data.templateColors = body.templateColors;
