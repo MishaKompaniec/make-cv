@@ -8,7 +8,6 @@ import {
   useCallback,
   useEffect,
   useRef,
-  useState,
 } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -36,7 +35,6 @@ type SummaryFormData = z.infer<typeof summarySchema>;
 export default function SummaryPage() {
   const router = useRouter();
   const { cvId, cv, isLoading: isCvLoading, patchCv } = useCv();
-  const [isSaving, setIsSaving] = useState(false);
 
   const didInitRef = useRef(false);
 
@@ -75,9 +73,7 @@ export default function SummaryPage() {
     },
   );
 
-  useEffect(() => {
-    setIsSaving(patcher.isInFlight);
-  }, [patcher.isInFlight]);
+  const isSaving = patcher.getIsInFlight();
 
   const schedulePatch = useCallback(
     (value: string) => {

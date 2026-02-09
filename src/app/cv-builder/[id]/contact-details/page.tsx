@@ -54,7 +54,6 @@ const defaultContactDetails: ContactDetailsFormData = {
 export default function ContactDetailsPage() {
   const router = useRouter();
   const { cvId, cv, isLoading: isCvLoading, patchCv } = useCv();
-  const [isSaving, setIsSaving] = useState(false);
 
   const [avatarError, setAvatarError] = useState<string>("");
   const [isHydrated, setIsHydrated] = useState(false);
@@ -111,9 +110,7 @@ export default function ContactDetailsPage() {
     });
   });
 
-  useEffect(() => {
-    setIsSaving(patcher.isInFlight);
-  }, [patcher.isInFlight]);
+  const isSaving = patcher.getIsInFlight();
 
   const schedulePatch = useCallback(
     (name: keyof ContactDetailsFormData, value: unknown) => {

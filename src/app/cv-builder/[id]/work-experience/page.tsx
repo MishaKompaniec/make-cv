@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
@@ -68,7 +68,6 @@ const validateExperience = (exp: ExperienceItem): ExperienceErrors => {
 export default function WorkExperiencePage() {
   const router = useRouter();
   const { cvId, cv, isLoading: isCvLoading, patchCv } = useCv();
-  const [isSaving, setIsSaving] = useState(false);
   const didInitRef = useRef(false);
   const skipAutosaveRef = useRef(true);
   const lastScheduledSnapshotRef = useRef<string>("");
@@ -116,11 +115,8 @@ export default function WorkExperiencePage() {
 
   const schedule = patcher.schedule;
   const flush = patcher.flush;
-  const isInFlight = patcher.isInFlight;
 
-  useEffect(() => {
-    setIsSaving(isInFlight);
-  }, [isInFlight]);
+  const isSaving = patcher.getIsInFlight();
 
   const schedulePatch = useCallback(() => {
     if (!didInitRef.current) return;

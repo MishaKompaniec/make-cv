@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
@@ -37,17 +37,13 @@ const MAX_TEXT_LENGTH = 25;
 export default function OtherSectionsPage() {
   const router = useRouter();
   const { cvId, cv, isLoading: isCvLoading, patchCv } = useCv();
-  const [isSaving, setIsSaving] = useState(false);
   const didInitRef = useRef(false);
-  const skipSelectedAutosaveRef = useRef(true);
-  const skipLanguagesAutosaveRef = useRef(true);
-  const skipInterestsAutosaveRef = useRef(true);
-  const skipCustomSectionsAutosaveRef = useRef(true);
-
-  const lastSelectedSnapshotRef = useRef<string>("");
-  const lastLanguagesSnapshotRef = useRef<string>("");
-  const lastInterestsSnapshotRef = useRef<string>("");
-  const lastCustomSectionsSnapshotRef = useRef<string>("");
+  const autosaveStateRef = useRef({
+    selectedSections: { skip: true, lastSnapshot: "" },
+    languages: { skip: true, lastSnapshot: "" },
+    interests: { skip: true, lastSnapshot: "" },
+    customSections: { skip: true, lastSnapshot: "" },
+  });
 
   const [selectedSections, setSelectedSections] = useState<SelectedSections>(
     DEFAULT_SELECTED_SECTIONS,
@@ -134,10 +130,10 @@ export default function OtherSectionsPage() {
     }
 
     didInitRef.current = true;
-    skipSelectedAutosaveRef.current = true;
-    skipLanguagesAutosaveRef.current = true;
-    skipInterestsAutosaveRef.current = true;
-    skipCustomSectionsAutosaveRef.current = true;
+    autosaveStateRef.current.selectedSections.skip = true;
+    autosaveStateRef.current.languages.skip = true;
+    autosaveStateRef.current.interests.skip = true;
+    autosaveStateRef.current.customSections.skip = true;
   }, [cv, customSectionsList, interestsList, languagesList]);
 
   const patcher = useKeyedDebouncedCallback<
@@ -180,105 +176,82 @@ export default function OtherSectionsPage() {
     });
   });
 
-  useEffect(() => {
-    setIsSaving(patcher.isInFlight);
-  }, [patcher.isInFlight]);
+  const isSaving = patcher.getIsInFlight();
 
-  const scheduleSelectedSectionsPatch = useCallback(() => {
+  const schedulePatch = useCallback(
+    (key: keyof typeof autosaveStateRef.current, value: unknown) => {
+      if (!didInitRef.current) return;
+      if (!cvId) return;
+
+      const state = autosaveStateRef.current[key];
+      const snapshot = JSON.stringify(value);
+
+      if (state.skip) {
+        state.skip = false;
+        state.lastSnapshot = snapshot;
+        return;
+      }
+
+      if (snapshot === state.lastSnapshot) return;
+      state.lastSnapshot = snapshot;
+
+      patcher.schedule(key, value);
+    },
+    [cvId, patcher],
+  );
+
+  useEffect(() => {
     if (!didInitRef.current) return;
-    if (!cvId) return;
-
-    if (skipSelectedAutosaveRef.current) {
-      skipSelectedAutosaveRef.current = false;
-      lastSelectedSnapshotRef.current = JSON.stringify(selectedSections);
-      return;
-    }
-
-    const snapshot = JSON.stringify(selectedSections);
-    if (snapshot === lastSelectedSnapshotRef.current) return;
-    lastSelectedSnapshotRef.current = snapshot;
-
-    patcher.schedule("selectedSections", selectedSections);
-  }, [cvId, patcher, selectedSections]);
-
-  const scheduleLanguagesPatch = useCallback(() => {
-    if (!didInitRef.current) return;
-    if (!cvId) return;
-
-    if (skipLanguagesAutosaveRef.current) {
-      skipLanguagesAutosaveRef.current = false;
-      lastLanguagesSnapshotRef.current = JSON.stringify(languagesList.items);
-      return;
-    }
-
-    const snapshot = JSON.stringify(languagesList.items);
-    if (snapshot === lastLanguagesSnapshotRef.current) return;
-    lastLanguagesSnapshotRef.current = snapshot;
-
-    patcher.schedule("languages", languagesList.items);
-  }, [cvId, languagesList.items, patcher]);
-
-  const scheduleInterestsPatch = useCallback(() => {
-    if (!didInitRef.current) return;
-    if (!cvId) return;
-
-    if (skipInterestsAutosaveRef.current) {
-      skipInterestsAutosaveRef.current = false;
-      lastInterestsSnapshotRef.current = JSON.stringify(interestsList.items);
-      return;
-    }
-
-    const snapshot = JSON.stringify(interestsList.items);
-    if (snapshot === lastInterestsSnapshotRef.current) return;
-    lastInterestsSnapshotRef.current = snapshot;
-
-    patcher.schedule("interests", interestsList.items);
-  }, [cvId, interestsList.items, patcher]);
-
-  const scheduleCustomSectionsPatch = useCallback(() => {
-    if (!didInitRef.current) return;
-    if (!cvId) return;
-
-    if (skipCustomSectionsAutosaveRef.current) {
-      skipCustomSectionsAutosaveRef.current = false;
-      lastCustomSectionsSnapshotRef.current = JSON.stringify(
-        customSectionsList.items,
-      );
-      return;
-    }
-
-    const snapshot = JSON.stringify(customSectionsList.items);
-    if (snapshot === lastCustomSectionsSnapshotRef.current) return;
-    lastCustomSectionsSnapshotRef.current = snapshot;
-
-    patcher.schedule("customSections", customSectionsList.items);
-  }, [cvId, customSectionsList.items, patcher]);
-
-  useEffect(() => {
-    scheduleSelectedSectionsPatch();
-  }, [scheduleSelectedSectionsPatch]);
-
-  useEffect(() => {
-    scheduleLanguagesPatch();
-  }, [scheduleLanguagesPatch]);
-
-  useEffect(() => {
-    scheduleInterestsPatch();
-  }, [scheduleInterestsPatch]);
-
-  useEffect(() => {
-    scheduleCustomSectionsPatch();
-  }, [scheduleCustomSectionsPatch]);
+    if (selectedSections) schedulePatch("selectedSections", selectedSections);
+    if (languagesList.items.length)
+      schedulePatch("languages", languagesList.items);
+    if (interestsList.items.length)
+      schedulePatch("interests", interestsList.items);
+    if (customSectionsList.items.length)
+      schedulePatch("customSections", customSectionsList.items);
+  }, [
+    customSectionsList.items,
+    interestsList.items,
+    languagesList.items,
+    schedulePatch,
+    selectedSections,
+  ]);
 
   const toggleSection = (key: keyof SelectedSections) => {
     setSelectedSections((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
+  const sections = useMemo(
+    () => [
+      {
+        key: "languages" as const,
+        title: "Languages",
+        list: languagesList,
+        Component: LanguagesCard,
+        addLabel: "Add language",
+      },
+      {
+        key: "interests" as const,
+        title: "Interests",
+        list: interestsList,
+        Component: InterestsCard,
+        addLabel: "Add interest",
+      },
+      {
+        key: "customSection" as const,
+        title: "Custom section",
+        list: customSectionsList,
+        Component: CustomSectionCard,
+        addLabel: "Add custom section",
+      },
+    ],
+    [customSectionsList, interestsList, languagesList],
+  );
+
   const handleNextClick = async () => {
-    if (selectedSections.languages && !languagesList.validateAll()) return;
-    if (selectedSections.interests && !interestsList.validateAll()) return;
-    if (selectedSections.customSection && !customSectionsList.validateAll())
-      return;
+    for (const sec of sections) {
+      if (selectedSections[sec.key] && !sec.list.validateAll()) return;
+    }
     try {
       await patcher.flush();
       router.push(`/cv-builder/${cvId}/finalize`);
@@ -297,154 +270,157 @@ export default function OtherSectionsPage() {
 
       <section className={styles.wrapper}>
         <div className={styles.sectionsGrid}>
-          <button
-            type="button"
-            className={`${styles.sectionToggle} ${selectedSections.languages ? styles.sectionToggleActive : ""}`}
-            onClick={() => toggleSection("languages")}
-          >
-            <Checkbox
-              checked={selectedSections.languages}
-              onChange={() => toggleSection("languages")}
-            />
-            <span className={styles.sectionToggleText}>Languages</span>
-          </button>
-
-          <button
-            type="button"
-            className={`${styles.sectionToggle} ${selectedSections.interests ? styles.sectionToggleActive : ""}`}
-            onClick={() => toggleSection("interests")}
-          >
-            <Checkbox
-              checked={selectedSections.interests}
-              onChange={() => toggleSection("interests")}
-            />
-            <span className={styles.sectionToggleText}>Interests</span>
-          </button>
-
-          <button
-            type="button"
-            className={`${styles.sectionToggle} ${selectedSections.customSection ? styles.sectionToggleActive : ""}`}
-            onClick={() => toggleSection("customSection")}
-          >
-            <Checkbox
-              checked={selectedSections.customSection}
-              onChange={() => toggleSection("customSection")}
-            />
-            <span className={styles.sectionToggleText}>Custom section</span>
-          </button>
+          {sections.map((sec) => (
+            <button
+              key={sec.key}
+              type="button"
+              className={`${styles.sectionToggle} ${selectedSections[sec.key] ? styles.sectionToggleActive : ""}`}
+              onClick={() => toggleSection(sec.key)}
+            >
+              <Checkbox
+                checked={selectedSections[sec.key]}
+                onChange={() => toggleSection(sec.key)}
+              />
+              <span className={styles.sectionToggleText}>{sec.title}</span>
+            </button>
+          ))}
         </div>
 
-        {selectedSections.languages ? (
-          <div className={styles.sectionCard}>
-            <div className={styles.sectionCardTitle}>Languages</div>
+        {sections.map((sec) => {
+          if (!selectedSections[sec.key]) return null;
 
-            <div className={styles.itemsList}>
-              {languagesList.items.map((language, index) => (
-                <LanguagesCard
-                  key={language.id}
-                  ref={languagesList.setCardRef(language.id)}
-                  language={language}
-                  errors={languagesList.errors[language.id]}
-                  canMoveUp={languagesList.items.length > 1 && index > 0}
-                  canMoveDown={
-                    languagesList.items.length > 1 &&
-                    index < languagesList.items.length - 1
-                  }
-                  onMoveUp={() => languagesList.moveItem(index, index - 1)}
-                  onMoveDown={() => languagesList.moveItem(index, index + 1)}
-                  onRemove={() => languagesList.removeItem(language.id)}
-                  onChange={(patch) =>
-                    languagesList.updateItem(language.id, patch)
-                  }
-                />
-              ))}
-              <button
-                type="button"
-                className={styles.addItemTile}
-                onClick={languagesList.addItem}
-              >
-                <div className={styles.addItemTileIcon}>+</div>
-                <p className={styles.addItemTileText}>Add language</p>
-              </button>
-            </div>
-          </div>
-        ) : null}
+          switch (sec.key) {
+            case "languages":
+              return (
+                <div key={sec.key} className={styles.sectionCard}>
+                  <div className={styles.sectionCardTitle}>{sec.title}</div>
 
-        {selectedSections.interests ? (
-          <div className={styles.sectionCard}>
-            <div className={styles.sectionCardTitle}>Interests</div>
+                  <div className={styles.itemsList}>
+                    {languagesList.items.map((language, index) => (
+                      <LanguagesCard
+                        key={language.id}
+                        ref={languagesList.setCardRef(language.id)}
+                        language={language}
+                        errors={languagesList.errors[language.id]}
+                        canMoveUp={languagesList.items.length > 1 && index > 0}
+                        canMoveDown={
+                          languagesList.items.length > 1 &&
+                          index < languagesList.items.length - 1
+                        }
+                        onMoveUp={() =>
+                          languagesList.moveItem(index, index - 1)
+                        }
+                        onMoveDown={() =>
+                          languagesList.moveItem(index, index + 1)
+                        }
+                        onRemove={() => languagesList.removeItem(language.id)}
+                        onChange={(patch) =>
+                          languagesList.updateItem(language.id, patch)
+                        }
+                      />
+                    ))}
 
-            <div className={styles.itemsList}>
-              {interestsList.items.map((interest, index) => (
-                <InterestsCard
-                  key={interest.id}
-                  ref={interestsList.setCardRef(interest.id)}
-                  interest={interest}
-                  errors={interestsList.errors[interest.id]}
-                  canMoveUp={interestsList.items.length > 1 && index > 0}
-                  canMoveDown={
-                    interestsList.items.length > 1 &&
-                    index < interestsList.items.length - 1
-                  }
-                  onMoveUp={() => interestsList.moveItem(index, index - 1)}
-                  onMoveDown={() => interestsList.moveItem(index, index + 1)}
-                  onRemove={() => interestsList.removeItem(interest.id)}
-                  onChange={(patch) =>
-                    interestsList.updateItem(interest.id, patch)
-                  }
-                />
-              ))}
+                    <button
+                      type="button"
+                      className={styles.addItemTile}
+                      onClick={languagesList.addItem}
+                    >
+                      <div className={styles.addItemTileIcon}>+</div>
+                      <p className={styles.addItemTileText}>{sec.addLabel}</p>
+                    </button>
+                  </div>
+                </div>
+              );
 
-              <button
-                type="button"
-                className={styles.addItemTile}
-                onClick={interestsList.addItem}
-              >
-                <div className={styles.addItemTileIcon}>+</div>
-                <p className={styles.addItemTileText}>Add interest</p>
-              </button>
-            </div>
-          </div>
-        ) : null}
+            case "interests":
+              return (
+                <div key={sec.key} className={styles.sectionCard}>
+                  <div className={styles.sectionCardTitle}>{sec.title}</div>
 
-        {selectedSections.customSection ? (
-          <div className={styles.sectionCard}>
-            <div className={styles.sectionCardTitle}>Custom section</div>
+                  <div className={styles.itemsList}>
+                    {interestsList.items.map((interest, index) => (
+                      <InterestsCard
+                        key={interest.id}
+                        ref={interestsList.setCardRef(interest.id)}
+                        interest={interest}
+                        errors={interestsList.errors[interest.id]}
+                        canMoveUp={interestsList.items.length > 1 && index > 0}
+                        canMoveDown={
+                          interestsList.items.length > 1 &&
+                          index < interestsList.items.length - 1
+                        }
+                        onMoveUp={() =>
+                          interestsList.moveItem(index, index - 1)
+                        }
+                        onMoveDown={() =>
+                          interestsList.moveItem(index, index + 1)
+                        }
+                        onRemove={() => interestsList.removeItem(interest.id)}
+                        onChange={(patch) =>
+                          interestsList.updateItem(interest.id, patch)
+                        }
+                      />
+                    ))}
 
-            <div className={styles.itemsList}>
-              {customSectionsList.items.map((section, index) => (
-                <CustomSectionCard
-                  key={section.id}
-                  ref={customSectionsList.setCardRef(section.id)}
-                  section={section}
-                  errors={customSectionsList.errors[section.id]}
-                  canMoveUp={customSectionsList.items.length > 1 && index > 0}
-                  canMoveDown={
-                    customSectionsList.items.length > 1 &&
-                    index < customSectionsList.items.length - 1
-                  }
-                  onMoveUp={() => customSectionsList.moveItem(index, index - 1)}
-                  onMoveDown={() =>
-                    customSectionsList.moveItem(index, index + 1)
-                  }
-                  onRemove={() => customSectionsList.removeItem(section.id)}
-                  onChange={(patch) =>
-                    customSectionsList.updateItem(section.id, patch)
-                  }
-                />
-              ))}
+                    <button
+                      type="button"
+                      className={styles.addItemTile}
+                      onClick={interestsList.addItem}
+                    >
+                      <div className={styles.addItemTileIcon}>+</div>
+                      <p className={styles.addItemTileText}>{sec.addLabel}</p>
+                    </button>
+                  </div>
+                </div>
+              );
 
-              <button
-                type="button"
-                className={styles.addItemTile}
-                onClick={customSectionsList.addItem}
-              >
-                <div className={styles.addItemTileIcon}>+</div>
-                <p className={styles.addItemTileText}>Add custom section</p>
-              </button>
-            </div>
-          </div>
-        ) : null}
+            default:
+              return (
+                <div key={sec.key} className={styles.sectionCard}>
+                  <div className={styles.sectionCardTitle}>{sec.title}</div>
+
+                  <div className={styles.itemsList}>
+                    {customSectionsList.items.map((section, index) => (
+                      <CustomSectionCard
+                        key={section.id}
+                        ref={customSectionsList.setCardRef(section.id)}
+                        section={section}
+                        errors={customSectionsList.errors[section.id]}
+                        canMoveUp={
+                          customSectionsList.items.length > 1 && index > 0
+                        }
+                        canMoveDown={
+                          customSectionsList.items.length > 1 &&
+                          index < customSectionsList.items.length - 1
+                        }
+                        onMoveUp={() =>
+                          customSectionsList.moveItem(index, index - 1)
+                        }
+                        onMoveDown={() =>
+                          customSectionsList.moveItem(index, index + 1)
+                        }
+                        onRemove={() =>
+                          customSectionsList.removeItem(section.id)
+                        }
+                        onChange={(patch) =>
+                          customSectionsList.updateItem(section.id, patch)
+                        }
+                      />
+                    ))}
+
+                    <button
+                      type="button"
+                      className={styles.addItemTile}
+                      onClick={customSectionsList.addItem}
+                    >
+                      <div className={styles.addItemTileIcon}>+</div>
+                      <p className={styles.addItemTileText}>{sec.addLabel}</p>
+                    </button>
+                  </div>
+                </div>
+              );
+          }
+        })}
       </section>
 
       <NavigationFooter

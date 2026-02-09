@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
@@ -50,7 +50,6 @@ const PREDEFINED_SKILLS = [
 export default function SkillsPage() {
   const router = useRouter();
   const { cvId, cv, isLoading: isCvLoading, patchCv } = useCv();
-  const [isSaving, setIsSaving] = useState(false);
   const didInitRef = useRef(false);
   const skipAutosaveRef = useRef(true);
   const lastScheduledSnapshotRef = useRef<string>("");
@@ -91,9 +90,7 @@ export default function SkillsPage() {
     },
   );
 
-  useEffect(() => {
-    setIsSaving(patcher.isInFlight);
-  }, [patcher.isInFlight]);
+  const isSaving = patcher.getIsInFlight();
 
   const schedulePatch = useCallback(() => {
     if (!didInitRef.current) return;

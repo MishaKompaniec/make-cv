@@ -83,6 +83,8 @@ export default function ChooseTemplatePage() {
     router.push(`/cv-builder/${cvId}/contact-details`);
   };
 
+  const isSaving = patcher.getIsInFlight();
+
   return (
     <div className={styles.pageContainer}>
       <CreateCvHeader
@@ -146,8 +148,8 @@ export default function ChooseTemplatePage() {
       </div>
 
       <NavigationFooter
-        nextLabel={patcher.isInFlight ? "Saving..." : "Next Step"}
-        nextDisabled={isCvLoading || !isInitialized || patcher.isInFlight}
+        nextLabel={isSaving ? "Saving..." : "Next Step"}
+        nextDisabled={isCvLoading || !isInitialized || isSaving}
         onNextClick={handleNextClick}
         nextHref={`/cv-builder/${cvId}/contact-details`}
       />
