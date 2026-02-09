@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef } from "react";
 
-import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
+import { PageHeader } from "@/components/layout/builder-header/builder-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { useKeyedDebouncedCallback } from "@/hooks/useKeyedDebouncedCallback";
 import { useSectionList } from "@/hooks/useSectionList";
@@ -150,7 +150,7 @@ export default function WorkExperiencePage() {
 
   return (
     <div className={styles.pageContainer}>
-      <CreateCvHeader
+      <PageHeader
         stepNumber="Step 4"
         title={stepTitle}
         description="Add your work experience to show employers your career progression and achievements."

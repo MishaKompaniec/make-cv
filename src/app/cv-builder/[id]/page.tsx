@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
+import { PageHeader } from "@/components/layout/builder-header/builder-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import {
   TEMPLATE_1_COLORS,
@@ -87,11 +87,10 @@ export default function ChooseTemplatePage() {
 
   return (
     <div className={styles.pageContainer}>
-      <CreateCvHeader
+      <PageHeader
         stepNumber="Step 1"
         title={stepTitle}
         description="Choose a template to start building your CV."
-        hidePreviewButton
       />
 
       <div className={styles.content}>

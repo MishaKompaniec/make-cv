@@ -13,7 +13,7 @@ import {
 import Cropper, { type Area } from "react-easy-crop";
 import { useForm } from "react-hook-form";
 
-import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
+import { PageHeader } from "@/components/layout/builder-header/builder-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { Input } from "@/components/ui/input/input";
 import { useKeyedDebouncedCallback } from "@/hooks/useKeyedDebouncedCallback";
@@ -282,7 +282,7 @@ export default function ContactDetailsPage() {
 
   return (
     <div className={styles.pageContainer}>
-      <CreateCvHeader
+      <PageHeader
         stepNumber="Step 2"
         title={stepTitle}
         description="Tell us who you are so we can place your contact details prominently in every template."

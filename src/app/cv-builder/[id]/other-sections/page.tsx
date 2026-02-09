@@ -10,7 +10,7 @@ import {
   useState,
 } from "react";
 
-import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
+import { PageHeader } from "@/components/layout/builder-header/builder-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { Checkbox } from "@/components/ui/checkbox/checkbox";
 import { useKeyedDebouncedCallback } from "@/hooks/useKeyedDebouncedCallback";
@@ -272,7 +272,7 @@ export default function OtherSectionsPage() {
 
   return (
     <div className={styles.pageContainer}>
-      <CreateCvHeader
+      <PageHeader
         stepNumber="Step 7"
         title={stepTitle}
         description="Add additional sections to make your CV more comprehensive and personalized."

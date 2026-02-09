@@ -12,7 +12,7 @@ import {
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
+import { PageHeader } from "@/components/layout/builder-header/builder-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { Textarea } from "@/components/ui/textarea/textarea";
 import { useKeyedDebouncedCallback } from "@/hooks/useKeyedDebouncedCallback";
@@ -110,7 +110,7 @@ export default function SummaryPage() {
 
   return (
     <div className={styles.pageContainer}>
-      <CreateCvHeader
+      <PageHeader
         stepNumber="Step 3"
         title={stepTitle}
         description="Show how your background matches the job you want."

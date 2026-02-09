@@ -1,10 +1,11 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
-import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
+import { PageHeader } from "@/components/layout/builder-header/builder-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
+import { Pagination } from "@/components/pdf/pagination/pagination";
 import {
   TEMPLATE_1_COLORS,
   TEMPLATE_1_ID,
@@ -15,6 +16,16 @@ import {
   TemplatePdf2,
 } from "@/components/pdf/templates/template-2/template-pdf";
 import { Loader } from "@/components/ui/loader/loader";
+import { usePreviewState } from "@/hooks/usePreviewState";
+import { getArray, getSelectedSections } from "@/lib/cv-data";
+import type {
+  CustomSectionPreviewItem,
+  EducationPreviewItem,
+  InterestPreviewItem,
+  LanguagePreviewItem,
+  SkillPreviewItem,
+  WorkExperiencePreviewItem,
+} from "@/lib/preview-items";
 
 import { useCv } from "../provider";
 import styles from "./page.module.scss";
@@ -105,81 +116,42 @@ function PreviewPanel({
 export default function FinalizePage() {
   const { cvId, cv: cvSnapshot, isLoading: isCvLoading } = useCv();
 
-  const [pageNumber, setPageNumber] = useState(1);
-  const [numPages, setNumPages] = useState(1);
-
-  const [isGenerating, setIsGenerating] = useState(true);
-  const [hasBlob, setHasBlob] = useState(false);
-
-  const setHasBlobIfChanged = useCallback((next: boolean) => {
-    setHasBlob((prev) => (prev === next ? prev : next));
-  }, []);
-
-  const setIsGeneratingIfChanged = useCallback((next: boolean) => {
-    setIsGenerating((prev) => (prev === next ? prev : next));
-  }, []);
-
-  const handleNumPagesChange = useCallback((next: number) => {
-    if (!Number.isFinite(next) || next <= 0) return;
-
-    setNumPages((prev) => (prev === next ? prev : next));
-    setPageNumber((prev) => {
-      const clamped = Math.min(Math.max(prev, 1), next);
-      return prev === clamped ? prev : clamped;
-    });
-  }, []);
+  const {
+    pageNumber,
+    setPageNumber,
+    numPages,
+    isGenerating,
+    hasBlob,
+    setHasBlobIfChanged,
+    setIsGeneratingIfChanged,
+    handleNumPagesChange,
+  } = usePreviewState();
 
   const templateId = cvSnapshot?.templateId ?? TEMPLATE_1_ID;
   const templateColors = cvSnapshot?.templateColors ?? {};
-  const data = useMemo(() => cvSnapshot?.data ?? {}, [cvSnapshot?.data]);
 
-  const contactDetails = useMemo(
-    () => (data["contactDetails"] as Record<string, unknown> | undefined) ?? {},
-    [data],
-  );
-  const summary = useMemo(
-    () => (data["summary"] as string | undefined) ?? "",
-    [data],
-  );
-  const workExperience = useMemo(
-    () =>
-      (Array.isArray(data["workExperience"]) ? data["workExperience"] : []) ??
-      [],
-    [data],
-  );
-  const education = useMemo(
-    () => (Array.isArray(data["education"]) ? data["education"] : []) ?? [],
-    [data],
-  );
-  const skills = useMemo(
-    () => (Array.isArray(data["skills"]) ? data["skills"] : []) ?? [],
-    [data],
-  );
-  const languages = useMemo(
-    () => (Array.isArray(data["languages"]) ? data["languages"] : []) ?? [],
-    [data],
-  );
-  const interests = useMemo(
-    () => (Array.isArray(data["interests"]) ? data["interests"] : []) ?? [],
-    [data],
-  );
-  const customSections = useMemo(
-    () =>
-      (Array.isArray(data["customSections"]) ? data["customSections"] : []) ??
-      [],
-    [data],
-  );
-  const selectedSections = useMemo(
-    () =>
-      (data["selectedSections"] as
-        | { languages: boolean; interests: boolean; customSection: boolean }
-        | undefined) ?? {
-        languages: false,
-        interests: false,
-        customSection: false,
-      },
-    [data],
-  );
+  const previewData = useMemo(() => {
+    const data = (cvSnapshot?.data ?? {}) as Record<string, unknown>;
+
+    return {
+      contactDetails:
+        (data["contactDetails"] as Record<string, unknown> | undefined) ?? {},
+      summary: (data["summary"] as string | undefined) ?? "",
+      workExperience: getArray<WorkExperiencePreviewItem>(
+        data,
+        "workExperience",
+      ),
+      education: getArray<EducationPreviewItem>(data, "education"),
+      skills: getArray<SkillPreviewItem>(data, "skills"),
+      languages: getArray<LanguagePreviewItem>(data, "languages"),
+      interests: getArray<InterestPreviewItem>(data, "interests"),
+      customSections: getArray<CustomSectionPreviewItem>(
+        data,
+        "customSections",
+      ),
+      selectedSections: getSelectedSections(data),
+    };
+  }, [cvSnapshot?.data]);
 
   const selectedColor =
     templateColors?.[templateId] ?? TEMPLATE_1_COLORS[0].value;
@@ -218,7 +190,8 @@ export default function FinalizePage() {
   };
 
   const defaultFileNameBase = sanitizeFileNameBase(
-    ((contactDetails as Record<string, unknown>)?.fullName as string) || "CV",
+    ((previewData.contactDetails as Record<string, unknown>)
+      ?.fullName as string) || "CV",
   );
   const defaultFileName = `${defaultFileNameBase}.pdf`;
 
@@ -228,30 +201,18 @@ export default function FinalizePage() {
     () => (
       <PdfDocument
         sidebarColor={selectedColor}
-        contactDetails={contactDetails as Record<string, unknown>}
-        workExperience={workExperience}
-        education={education}
-        skills={skills}
-        languages={languages}
-        interests={interests}
-        customSections={customSections}
-        selectedSections={selectedSections}
-        summary={summary}
+        contactDetails={previewData.contactDetails as Record<string, unknown>}
+        workExperience={previewData.workExperience}
+        education={previewData.education}
+        skills={previewData.skills}
+        languages={previewData.languages}
+        interests={previewData.interests}
+        customSections={previewData.customSections}
+        selectedSections={previewData.selectedSections}
+        summary={previewData.summary}
       />
     ),
-    [
-      PdfDocument,
-      selectedColor,
-      contactDetails,
-      workExperience,
-      education,
-      skills,
-      languages,
-      interests,
-      customSections,
-      selectedSections,
-      summary,
-    ],
+    [PdfDocument, previewData, selectedColor],
   );
 
   const handleDownload = () => {
@@ -272,7 +233,7 @@ export default function FinalizePage() {
 
   return (
     <div key={cvId} className={styles.pageContainer}>
-      <CreateCvHeader
+      <PageHeader
         stepNumber="Step 8"
         title={stepTitle}
         description="Review your CV and make final adjustments before downloading or sharing."
@@ -310,25 +271,16 @@ export default function FinalizePage() {
                     onIsGeneratingChange={setIsGeneratingIfChanged}
                   />
 
-                  {numPages > 1 ? (
-                    <div className={styles.pagination}>
-                      {Array.from({ length: numPages }, (_, i) => i + 1).map(
-                        (pageNum) => (
-                          <button
-                            key={pageNum}
-                            type="button"
-                            className={`${styles.pageButton} ${
-                              pageNumber === pageNum ? styles.active : ""
-                            }`}
-                            onClick={() => setPageNumber(pageNum)}
-                            disabled={isGenerating || !hasBlob}
-                          >
-                            {pageNum}
-                          </button>
-                        ),
-                      )}
-                    </div>
-                  ) : null}
+                  <Pagination
+                    numPages={numPages}
+                    pageNumber={pageNumber}
+                    onPageChange={setPageNumber}
+                    isGenerating={isGenerating}
+                    hasBlob={hasBlob}
+                    className={styles.pagination}
+                    pageButtonClassName={styles.pageButton}
+                    activeClassName={styles.active}
+                  />
                 </>
               );
             }}
