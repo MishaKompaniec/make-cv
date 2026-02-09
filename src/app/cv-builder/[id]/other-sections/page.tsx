@@ -229,6 +229,7 @@ export default function OtherSectionsPage() {
         list: languagesList,
         Component: LanguagesCard,
         addLabel: "Add language",
+        getItemProps: (language: LanguageItem) => ({ language }),
       },
       {
         key: "interests" as const,
@@ -236,6 +237,7 @@ export default function OtherSectionsPage() {
         list: interestsList,
         Component: InterestsCard,
         addLabel: "Add interest",
+        getItemProps: (interest: InterestItem) => ({ interest }),
       },
       {
         key: "customSection" as const,
@@ -243,6 +245,7 @@ export default function OtherSectionsPage() {
         list: customSectionsList,
         Component: CustomSectionCard,
         addLabel: "Add custom section",
+        getItemProps: (section: CustomSectionItem) => ({ section }),
       },
     ],
     [customSectionsList, interestsList, languagesList],
@@ -289,137 +292,44 @@ export default function OtherSectionsPage() {
         {sections.map((sec) => {
           if (!selectedSections[sec.key]) return null;
 
-          switch (sec.key) {
-            case "languages":
-              return (
-                <div key={sec.key} className={styles.sectionCard}>
-                  <div className={styles.sectionCardTitle}>{sec.title}</div>
+          const Component = sec.Component as any;
 
-                  <div className={styles.itemsList}>
-                    {languagesList.items.map((language, index) => (
-                      <LanguagesCard
-                        key={language.id}
-                        ref={languagesList.setCardRef(language.id)}
-                        language={language}
-                        errors={languagesList.errors[language.id]}
-                        canMoveUp={languagesList.items.length > 1 && index > 0}
-                        canMoveDown={
-                          languagesList.items.length > 1 &&
-                          index < languagesList.items.length - 1
-                        }
-                        onMoveUp={() =>
-                          languagesList.moveItem(index, index - 1)
-                        }
-                        onMoveDown={() =>
-                          languagesList.moveItem(index, index + 1)
-                        }
-                        onRemove={() => languagesList.removeItem(language.id)}
-                        onChange={(patch) =>
-                          languagesList.updateItem(language.id, patch)
-                        }
-                      />
-                    ))}
+          return (
+            <div key={sec.key} className={styles.sectionCard}>
+              <div className={styles.sectionCardTitle}>{sec.title}</div>
 
-                    <button
-                      type="button"
-                      className={styles.addItemTile}
-                      onClick={languagesList.addItem}
-                    >
-                      <div className={styles.addItemTileIcon}>+</div>
-                      <p className={styles.addItemTileText}>{sec.addLabel}</p>
-                    </button>
-                  </div>
-                </div>
-              );
+              <div className={styles.itemsList}>
+                {sec.list.items.map((item: any, index: number) => (
+                  <Component
+                    key={item.id}
+                    ref={sec.list.setCardRef(item.id)}
+                    {...sec.getItemProps(item)}
+                    errors={sec.list.errors[item.id]}
+                    canMoveUp={sec.list.items.length > 1 && index > 0}
+                    canMoveDown={
+                      sec.list.items.length > 1 &&
+                      index < sec.list.items.length - 1
+                    }
+                    onMoveUp={() => sec.list.moveItem(index, index - 1)}
+                    onMoveDown={() => sec.list.moveItem(index, index + 1)}
+                    onRemove={() => sec.list.removeItem(item.id)}
+                    onChange={(patch: any) =>
+                      sec.list.updateItem(item.id, patch)
+                    }
+                  />
+                ))}
 
-            case "interests":
-              return (
-                <div key={sec.key} className={styles.sectionCard}>
-                  <div className={styles.sectionCardTitle}>{sec.title}</div>
-
-                  <div className={styles.itemsList}>
-                    {interestsList.items.map((interest, index) => (
-                      <InterestsCard
-                        key={interest.id}
-                        ref={interestsList.setCardRef(interest.id)}
-                        interest={interest}
-                        errors={interestsList.errors[interest.id]}
-                        canMoveUp={interestsList.items.length > 1 && index > 0}
-                        canMoveDown={
-                          interestsList.items.length > 1 &&
-                          index < interestsList.items.length - 1
-                        }
-                        onMoveUp={() =>
-                          interestsList.moveItem(index, index - 1)
-                        }
-                        onMoveDown={() =>
-                          interestsList.moveItem(index, index + 1)
-                        }
-                        onRemove={() => interestsList.removeItem(interest.id)}
-                        onChange={(patch) =>
-                          interestsList.updateItem(interest.id, patch)
-                        }
-                      />
-                    ))}
-
-                    <button
-                      type="button"
-                      className={styles.addItemTile}
-                      onClick={interestsList.addItem}
-                    >
-                      <div className={styles.addItemTileIcon}>+</div>
-                      <p className={styles.addItemTileText}>{sec.addLabel}</p>
-                    </button>
-                  </div>
-                </div>
-              );
-
-            default:
-              return (
-                <div key={sec.key} className={styles.sectionCard}>
-                  <div className={styles.sectionCardTitle}>{sec.title}</div>
-
-                  <div className={styles.itemsList}>
-                    {customSectionsList.items.map((section, index) => (
-                      <CustomSectionCard
-                        key={section.id}
-                        ref={customSectionsList.setCardRef(section.id)}
-                        section={section}
-                        errors={customSectionsList.errors[section.id]}
-                        canMoveUp={
-                          customSectionsList.items.length > 1 && index > 0
-                        }
-                        canMoveDown={
-                          customSectionsList.items.length > 1 &&
-                          index < customSectionsList.items.length - 1
-                        }
-                        onMoveUp={() =>
-                          customSectionsList.moveItem(index, index - 1)
-                        }
-                        onMoveDown={() =>
-                          customSectionsList.moveItem(index, index + 1)
-                        }
-                        onRemove={() =>
-                          customSectionsList.removeItem(section.id)
-                        }
-                        onChange={(patch) =>
-                          customSectionsList.updateItem(section.id, patch)
-                        }
-                      />
-                    ))}
-
-                    <button
-                      type="button"
-                      className={styles.addItemTile}
-                      onClick={customSectionsList.addItem}
-                    >
-                      <div className={styles.addItemTileIcon}>+</div>
-                      <p className={styles.addItemTileText}>{sec.addLabel}</p>
-                    </button>
-                  </div>
-                </div>
-              );
-          }
+                <button
+                  type="button"
+                  className={styles.addItemTile}
+                  onClick={sec.list.addItem}
+                >
+                  <div className={styles.addItemTileIcon}>+</div>
+                  <p className={styles.addItemTileText}>{sec.addLabel}</p>
+                </button>
+              </div>
+            </div>
+          );
         })}
       </section>
 
