@@ -1,9 +1,9 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { useCv } from "@/app/cv-builder/[id]/provider";
 import {
   TEMPLATE_1_COLORS,
   TEMPLATE_1_ID,
@@ -132,15 +132,6 @@ type SelectedSectionsPreview = {
   customSection: boolean;
 };
 
-type CvApiResponse = {
-  cv?: {
-    id: string;
-    templateId: string;
-    templateColors: Record<string, string>;
-    data: Record<string, unknown>;
-  };
-};
-
 interface CreateCvHeaderProps {
   stepNumber: string;
   title: string;
@@ -154,19 +145,20 @@ export function CreateCvHeader({
   description,
   hidePreviewButton,
 }: CreateCvHeaderProps) {
-  const params = useParams();
-  const cvId = params.id as string;
+  const { cv: cvSnapshot, isLoading: isCvLoading } = useCv();
 
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [cvSnapshot, setCvSnapshot] = useState<CvApiResponse["cv"] | null>(
-    null,
-  );
-  const [isCvLoading, setIsCvLoading] = useState(false);
 
   const [pageNumber, setPageNumber] = useState(1);
   const [numPages, setNumPages] = useState(1);
   const [isGenerating, setIsGenerating] = useState(true);
   const [hasBlob, setHasBlob] = useState(false);
+
+  const handleOpenPreview = () => {
+    setPageNumber(1);
+    setNumPages(1);
+    setIsPreviewOpen(true);
+  };
 
   const setHasBlobIfChanged = useCallback((next: boolean) => {
     setHasBlob((prev) => (prev === next ? prev : next));
@@ -185,42 +177,6 @@ export function CreateCvHeader({
       return prev === clamped ? prev : clamped;
     });
   }, []);
-
-  useEffect(() => {
-    if (!isPreviewOpen) return;
-    if (!cvId) return;
-
-    let cancelled = false;
-
-    const load = async () => {
-      setIsCvLoading(true);
-      try {
-        const res = await fetch(`/api/cv/${cvId}`, { cache: "no-store" });
-        if (!res.ok) return;
-
-        const json = (await res.json()) as CvApiResponse;
-        if (cancelled) return;
-
-        setCvSnapshot(
-          json.cv
-            ? {
-                ...json.cv,
-                templateId: json.cv.templateId ?? TEMPLATE_1_ID,
-                templateColors: json.cv.templateColors ?? {},
-                data: json.cv.data ?? {},
-              }
-            : null,
-        );
-      } finally {
-        if (!cancelled) setIsCvLoading(false);
-      }
-    };
-
-    void load();
-    return () => {
-      cancelled = true;
-    };
-  }, [isPreviewOpen, cvId]);
 
   const templateId = cvSnapshot?.templateId ?? TEMPLATE_1_ID;
   const templateColors = cvSnapshot?.templateColors ?? {};
@@ -325,9 +281,6 @@ export function CreateCvHeader({
   useEffect(() => {
     if (!isPreviewOpen) return;
 
-    setPageNumber(1);
-    setNumPages(1);
-
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
@@ -352,11 +305,7 @@ export function CreateCvHeader({
 
       <div>
         {!hidePreviewButton && (
-          <Button
-            variant="outline"
-            type="button"
-            onClick={() => setIsPreviewOpen(true)}
-          >
+          <Button variant="outline" type="button" onClick={handleOpenPreview}>
             Preview CV
           </Button>
         )}

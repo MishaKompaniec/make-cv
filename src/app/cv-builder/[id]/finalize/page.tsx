@@ -103,7 +103,7 @@ function PreviewPanel({
 }
 
 export default function FinalizePage() {
-  const { cvId, cv: cvSnapshot, isLoading: isCvLoading, refreshCv } = useCv();
+  const { cvId, cv: cvSnapshot, isLoading: isCvLoading } = useCv();
 
   const [pageNumber, setPageNumber] = useState(1);
   const [numPages, setNumPages] = useState(1);
@@ -128,11 +128,6 @@ export default function FinalizePage() {
       return prev === clamped ? prev : clamped;
     });
   }, []);
-
-  useEffect(() => {
-    if (!cvId) return;
-    void refreshCv();
-  }, [cvId, refreshCv]);
 
   const templateId = cvSnapshot?.templateId ?? TEMPLATE_1_ID;
   const templateColors = cvSnapshot?.templateColors ?? {};
