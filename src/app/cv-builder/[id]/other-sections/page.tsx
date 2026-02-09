@@ -39,8 +39,15 @@ export default function OtherSectionsPage() {
   const { cvId, cv, isLoading: isCvLoading, patchCv } = useCv();
   const [isSaving, setIsSaving] = useState(false);
   const didInitRef = useRef(false);
-  const skipAutosaveRef = useRef(true);
-  const lastScheduledSnapshotRef = useRef<string>("");
+  const skipSelectedAutosaveRef = useRef(true);
+  const skipLanguagesAutosaveRef = useRef(true);
+  const skipInterestsAutosaveRef = useRef(true);
+  const skipCustomSectionsAutosaveRef = useRef(true);
+
+  const lastSelectedSnapshotRef = useRef<string>("");
+  const lastLanguagesSnapshotRef = useRef<string>("");
+  const lastInterestsSnapshotRef = useRef<string>("");
+  const lastCustomSectionsSnapshotRef = useRef<string>("");
 
   const [selectedSections, setSelectedSections] = useState<SelectedSections>(
     DEFAULT_SELECTED_SECTIONS,
@@ -127,7 +134,10 @@ export default function OtherSectionsPage() {
     }
 
     didInitRef.current = true;
-    skipAutosaveRef.current = true;
+    skipSelectedAutosaveRef.current = true;
+    skipLanguagesAutosaveRef.current = true;
+    skipInterestsAutosaveRef.current = true;
+    skipCustomSectionsAutosaveRef.current = true;
   }, [cv, customSectionsList, interestsList, languagesList]);
 
   const patcher = useKeyedDebouncedCallback<
@@ -174,40 +184,91 @@ export default function OtherSectionsPage() {
     setIsSaving(patcher.isInFlight);
   }, [patcher.isInFlight]);
 
-  const schedulePatch = useCallback(() => {
+  const scheduleSelectedSectionsPatch = useCallback(() => {
     if (!didInitRef.current) return;
     if (!cvId) return;
 
-    if (skipAutosaveRef.current) {
-      skipAutosaveRef.current = false;
+    if (skipSelectedAutosaveRef.current) {
+      skipSelectedAutosaveRef.current = false;
+      lastSelectedSnapshotRef.current = JSON.stringify(selectedSections);
       return;
     }
 
-    const snapshot = JSON.stringify({
-      selectedSections,
-      languages: languagesList.items,
-      interests: interestsList.items,
-      customSections: customSectionsList.items,
-    });
-    if (snapshot === lastScheduledSnapshotRef.current) return;
-    lastScheduledSnapshotRef.current = snapshot;
+    const snapshot = JSON.stringify(selectedSections);
+    if (snapshot === lastSelectedSnapshotRef.current) return;
+    lastSelectedSnapshotRef.current = snapshot;
 
     patcher.schedule("selectedSections", selectedSections);
+  }, [cvId, patcher, selectedSections]);
+
+  const scheduleLanguagesPatch = useCallback(() => {
+    if (!didInitRef.current) return;
+    if (!cvId) return;
+
+    if (skipLanguagesAutosaveRef.current) {
+      skipLanguagesAutosaveRef.current = false;
+      lastLanguagesSnapshotRef.current = JSON.stringify(languagesList.items);
+      return;
+    }
+
+    const snapshot = JSON.stringify(languagesList.items);
+    if (snapshot === lastLanguagesSnapshotRef.current) return;
+    lastLanguagesSnapshotRef.current = snapshot;
+
     patcher.schedule("languages", languagesList.items);
+  }, [cvId, languagesList.items, patcher]);
+
+  const scheduleInterestsPatch = useCallback(() => {
+    if (!didInitRef.current) return;
+    if (!cvId) return;
+
+    if (skipInterestsAutosaveRef.current) {
+      skipInterestsAutosaveRef.current = false;
+      lastInterestsSnapshotRef.current = JSON.stringify(interestsList.items);
+      return;
+    }
+
+    const snapshot = JSON.stringify(interestsList.items);
+    if (snapshot === lastInterestsSnapshotRef.current) return;
+    lastInterestsSnapshotRef.current = snapshot;
+
     patcher.schedule("interests", interestsList.items);
+  }, [cvId, interestsList.items, patcher]);
+
+  const scheduleCustomSectionsPatch = useCallback(() => {
+    if (!didInitRef.current) return;
+    if (!cvId) return;
+
+    if (skipCustomSectionsAutosaveRef.current) {
+      skipCustomSectionsAutosaveRef.current = false;
+      lastCustomSectionsSnapshotRef.current = JSON.stringify(
+        customSectionsList.items,
+      );
+      return;
+    }
+
+    const snapshot = JSON.stringify(customSectionsList.items);
+    if (snapshot === lastCustomSectionsSnapshotRef.current) return;
+    lastCustomSectionsSnapshotRef.current = snapshot;
+
     patcher.schedule("customSections", customSectionsList.items);
-  }, [
-    cvId,
-    customSectionsList.items,
-    interestsList.items,
-    languagesList.items,
-    patcher,
-    selectedSections,
-  ]);
+  }, [cvId, customSectionsList.items, patcher]);
 
   useEffect(() => {
-    schedulePatch();
-  }, [schedulePatch]);
+    scheduleSelectedSectionsPatch();
+  }, [scheduleSelectedSectionsPatch]);
+
+  useEffect(() => {
+    scheduleLanguagesPatch();
+  }, [scheduleLanguagesPatch]);
+
+  useEffect(() => {
+    scheduleInterestsPatch();
+  }, [scheduleInterestsPatch]);
+
+  useEffect(() => {
+    scheduleCustomSectionsPatch();
+  }, [scheduleCustomSectionsPatch]);
 
   const toggleSection = (key: keyof SelectedSections) => {
     setSelectedSections((prev) => ({ ...prev, [key]: !prev[key] }));
