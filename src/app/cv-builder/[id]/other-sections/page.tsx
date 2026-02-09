@@ -1,7 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  type ElementType,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { CreateCvHeader } from "@/components/layout/modal-preview/create-cv-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
@@ -292,18 +299,37 @@ export default function OtherSectionsPage() {
         {sections.map((sec) => {
           if (!selectedSections[sec.key]) return null;
 
-          const Component = sec.Component as any;
+          const Component = sec.Component as ElementType;
+          const onChange = (id: string, patch: unknown) => {
+            if (sec.key === "languages") {
+              languagesList.updateItem(
+                id,
+                patch as Partial<Omit<LanguageItem, "id">>,
+              );
+              return;
+            }
+            if (sec.key === "interests") {
+              interestsList.updateItem(
+                id,
+                patch as Partial<Omit<InterestItem, "id">>,
+              );
+              return;
+            }
+            customSectionsList.updateItem(
+              id,
+              patch as Partial<Omit<CustomSectionItem, "id">>,
+            );
+          };
 
           return (
             <div key={sec.key} className={styles.sectionCard}>
               <div className={styles.sectionCardTitle}>{sec.title}</div>
-
               <div className={styles.itemsList}>
-                {sec.list.items.map((item: any, index: number) => (
+                {sec.list.items.map((item, index) => (
                   <Component
                     key={item.id}
                     ref={sec.list.setCardRef(item.id)}
-                    {...sec.getItemProps(item)}
+                    {...sec.getItemProps(item as never)}
                     errors={sec.list.errors[item.id]}
                     canMoveUp={sec.list.items.length > 1 && index > 0}
                     canMoveDown={
@@ -313,9 +339,7 @@ export default function OtherSectionsPage() {
                     onMoveUp={() => sec.list.moveItem(index, index - 1)}
                     onMoveDown={() => sec.list.moveItem(index, index + 1)}
                     onRemove={() => sec.list.removeItem(item.id)}
-                    onChange={(patch: any) =>
-                      sec.list.updateItem(item.id, patch)
-                    }
+                    onChange={(patch: unknown) => onChange(item.id, patch)}
                   />
                 ))}
 
