@@ -1,82 +1,5 @@
 @use "../../../styles/variables" as *;
 
-.header {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 2rem;
-  padding: 2rem 2rem 0;
-  position: relative;
-
-  h1 {
-    margin: 0;
-    font-size: 2.25rem;
-    color: $text-primary;
-  }
-}
-
-.flexContainer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-@media (max-width: $breakpoint-tablet) {
-  .flexContainer {
-    flex-direction: column-reverse;
-    align-items: flex-start;
-    gap: 0.25rem;
-  }
-  .header {
-    padding: 1rem 1rem 0;
-    gap: 0.25rem;
-
-    h1 {
-      font-size: 2rem;
-    }
-  }
-}
-
-.stepBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: $accent;
-  padding: 0.3rem 0.85rem;
-  border-radius: 999px;
-  background: rgba($accent, 0.1);
-  width: fit-content;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.description {
-  margin: 0;
-  color: $text;
-}
-
-.previewModalOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  z-index: 9999;
-  padding: 1.25rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.previewModalContent {
-  position: relative;
-  width: auto;
-  height: auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .previewModalPage {
   width: min(calc(100vw - 2.5rem), calc((100vh - 2.5rem) * 210 / 297));
   height: auto;
@@ -87,6 +10,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  margin: 0 auto;
 }
 
 .pagination {
@@ -134,7 +58,6 @@
   overflow: hidden;
 }
 
-// react-pdf (pdf.js) output
 .previewPdfCanvas :global(.react-pdf__Document) {
   width: 100%;
   height: 100%;
@@ -156,49 +79,4 @@
   justify-content: center;
   align-items: center;
   background: $white;
-}
-
-.previewModalClose {
-  position: fixed;
-  top: 1.25rem;
-  right: 1.25rem;
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  background: rgba(255, 255, 255, 0.1);
-  z-index: 10000;
-  cursor: pointer;
-  transition: all $transition;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  &::before,
-  &::after {
-    content: "";
-    position: absolute;
-    width: 16px;
-    height: 2px;
-    background: white;
-    border-radius: 999px;
-  }
-
-  &::before {
-    transform: rotate(45deg);
-  }
-
-  &::after {
-    transform: rotate(-45deg);
-  }
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.35);
-  }
-
-  &:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25);
-  }
 }

@@ -15,7 +15,7 @@ import {
   TemplatePdf2,
 } from "@/components/pdf/templates/template-2/template-pdf";
 import { Loader } from "@/components/ui/loader/loader";
-import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
+import { BaseModal } from "@/components/ui/modal/base-modal";
 import { usePreviewState } from "@/hooks/usePreviewState";
 import { getArray, getSelectedSections } from "@/lib/cv-data";
 import type {
@@ -177,72 +177,47 @@ export function PreviewModal({ isOpen, onClose }: PreviewModalProps) {
     [PdfDocument, previewData, selectedColor],
   );
 
-  useLockBodyScroll(isOpen);
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", onKeyDown);
-    };
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
-
   return (
-    <div className={styles.previewModalOverlay} onClick={onClose}>
-      <div className={styles.previewModalContent}>
-        <button
-          type="button"
-          className={styles.previewModalClose}
-          aria-label="Close"
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose();
-          }}
-        />
-        <div
-          className={styles.previewModalPage}
-          onClick={(e) => e.stopPropagation()}
-        >
-          {isCvLoading ? (
-            <div className={styles.previewModalLoading}>
-              <Loader />
-            </div>
-          ) : (
-            <BlobProvider document={pdfReactDocument}>
-              {({ url, loading, error, blob }) => (
-                <PreviewPanel
-                  url={url}
-                  blob={blob}
-                  loading={loading}
-                  error={error}
-                  pageNumber={pageNumber}
-                  onNumPagesChange={handleNumPagesChange}
-                  onHasBlobChange={setHasBlobIfChanged}
-                  onIsGeneratingChange={setIsGeneratingIfChanged}
-                />
-              )}
-            </BlobProvider>
-          )}
+    <BaseModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Preview"
+      showCloseButton
+      variant="fullscreen"
+    >
+      <div className={styles.previewModalPage}>
+        {isCvLoading ? (
+          <div className={styles.previewModalLoading}>
+            <Loader />
+          </div>
+        ) : (
+          <BlobProvider document={pdfReactDocument}>
+            {({ url, loading, error, blob }) => (
+              <PreviewPanel
+                url={url}
+                blob={blob}
+                loading={loading}
+                error={error}
+                pageNumber={pageNumber}
+                onNumPagesChange={handleNumPagesChange}
+                onHasBlobChange={setHasBlobIfChanged}
+                onIsGeneratingChange={setIsGeneratingIfChanged}
+              />
+            )}
+          </BlobProvider>
+        )}
 
-          <Pagination
-            numPages={numPages}
-            pageNumber={pageNumber}
-            onPageChange={setPageNumber}
-            isGenerating={isGenerating}
-            hasBlob={hasBlob}
-            className={styles.pagination}
-            pageButtonClassName={styles.pageButton}
-            activeClassName={styles.active}
-          />
-        </div>
+        <Pagination
+          numPages={numPages}
+          pageNumber={pageNumber}
+          onPageChange={setPageNumber}
+          isGenerating={isGenerating}
+          hasBlob={hasBlob}
+          className={styles.pagination}
+          pageButtonClassName={styles.pageButton}
+          activeClassName={styles.active}
+        />
       </div>
-    </div>
+    </BaseModal>
   );
 }

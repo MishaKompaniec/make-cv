@@ -16,6 +16,7 @@ import { useForm } from "react-hook-form";
 import { PageHeader } from "@/components/layout/builder-header/builder-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { Input } from "@/components/ui/input/input";
+import { BaseModal } from "@/components/ui/modal/base-modal";
 import { useKeyedDebouncedCallback } from "@/hooks/useKeyedDebouncedCallback";
 import {
   type ContactDetailsFormData,
@@ -407,25 +408,16 @@ export default function ContactDetailsPage() {
               </div>
             </div>
 
-            {isCropOpen ? (
-              <div
-                className={styles.cropOverlay}
-                role="dialog"
-                aria-modal="true"
-                onClick={closeCrop}
+            {isCropOpen && (
+              <BaseModal
+                isOpen={isCropOpen}
+                onClose={closeCrop}
+                title="Crop your photo"
+                showCloseButton
               >
-                <div
-                  className={styles.cropModal}
-                  onClick={(e) => e.stopPropagation()}
-                >
+                <div className={styles.cropModal}>
                   <div className={styles.cropHeader}>
                     <div className={styles.cropTitle}>Crop your photo</div>
-                    <button
-                      type="button"
-                      className={styles.cropClose}
-                      onClick={closeCrop}
-                      aria-label="Close"
-                    />
                   </div>
 
                   <div className={styles.cropContainer}>
@@ -477,8 +469,8 @@ export default function ContactDetailsPage() {
                     </button>
                   </div>
                 </div>
-              </div>
-            ) : null}
+              </BaseModal>
+            )}
 
             <div className={styles.row}>
               <div className={styles.fieldGroup}>

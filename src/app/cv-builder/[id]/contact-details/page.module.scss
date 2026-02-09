@@ -133,17 +133,6 @@
   color: #b42318;
 }
 
-.cropOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  z-index: 1000;
-}
-
 .cropModal {
   width: min(720px, 100%);
   height: calc(100vh - 2rem);
@@ -165,7 +154,7 @@
 .cropHeader {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 1rem;
 }
 
@@ -173,36 +162,6 @@
   font-weight: 600;
   font-size: 1rem;
   color: $text-primary;
-}
-
-.cropClose {
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-  border: 1px solid $border-light;
-  background: $white;
-  cursor: pointer;
-  position: relative;
-}
-
-.cropClose::before,
-.cropClose::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 14px;
-  height: 2px;
-  background: $text-secondary;
-  transform-origin: center;
-}
-
-.cropClose::before {
-  transform: translate(-50%, -50%) rotate(45deg);
-}
-
-.cropClose::after {
-  transform: translate(-50%, -50%) rotate(-45deg);
 }
 
 .cropContainer {
