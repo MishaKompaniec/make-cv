@@ -1,0 +1,63 @@
+@use "../../styles/variables" as *;
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer {
+  border-radius: $border-radius;
+  background-color: rgba(0, 0, 0, 0.08);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.7) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.25s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmer {
+    animation: none;
+    background-image: none;
+  }
+}
+
+.title {
+  height: 16px;
+  width: 70%;
+}
+
+.metaLine {
+  height: 12px;
+  width: 90%;
+}
+
+.metaLineSecondary {
+  width: 75%;
+  margin-top: 0.35rem;
+}
+
+.button {
+  min-height: 40px;
+  width: 92px;
+  border-radius: $border-radius;
+}
+
+.deleteButton {
+  min-height: 40px;
+  width: 92px;
+  border-radius: $border-radius;
+}
+
+.downloadButton {
+  min-height: 40px;
+  width: 100%;
+  border-radius: $border-radius;
+}

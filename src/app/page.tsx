@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { CvCard, type CvListItem } from "@/components/cv-card/cv-card";
+import { CvGridSkeleton } from "@/components/cv-card-skeleton/cv-card-skeleton";
 import { Button } from "@/components/ui/button/button";
 import { BaseModal } from "@/components/ui/modal/base-modal";
 
@@ -149,19 +150,21 @@ export default function Home() {
           <p>{isCreating ? "Creating..." : "Create CV"}</p>
         </button>
 
-        {isLoading
-          ? null
-          : cvs.map((cv) => (
-              <CvCard
-                key={cv.id}
-                cv={cv}
-                deletingId={deletingId}
-                duplicatingId={duplicatingId}
-                onEdit={(id) => router.push(`/cv-builder/${id}`)}
-                onRequestDelete={(id) => setConfirmDeleteId(id)}
-                onRequestDuplicate={(id) => setConfirmDuplicateId(id)}
-              />
-            ))}
+        {isLoading ? (
+          <CvGridSkeleton count={2} />
+        ) : (
+          cvs.map((cv) => (
+            <CvCard
+              key={cv.id}
+              cv={cv}
+              deletingId={deletingId}
+              duplicatingId={duplicatingId}
+              onEdit={(id) => router.push(`/cv-builder/${id}`)}
+              onRequestDelete={(id) => setConfirmDeleteId(id)}
+              onRequestDuplicate={(id) => setConfirmDuplicateId(id)}
+            />
+          ))
+        )}
       </div>
 
       <BaseModal

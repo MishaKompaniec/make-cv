@@ -3,6 +3,8 @@
 import dynamic from "next/dynamic";
 import { useMemo } from "react";
 
+import { CvCardLayout } from "@/components/cv-card/cv-card-layout";
+import { CvCardSkeletonLayout } from "@/components/cv-card-skeleton/cv-card-skeleton";
 import {
   TEMPLATE_1_COLORS,
   TEMPLATE_1_ID,
@@ -28,7 +30,10 @@ import styles from "./cv-card.module.scss";
 
 const BlobProvider = dynamic(
   () => import("@react-pdf/renderer").then((m) => m.BlobProvider),
-  { ssr: false },
+  {
+    ssr: false,
+    loading: () => <CvCardSkeletonLayout />,
+  },
 );
 
 const PdfCanvasPreview = dynamic(
@@ -36,7 +41,14 @@ const PdfCanvasPreview = dynamic(
     import("@/components/pdf-canvas-preview/pdf-canvas-preview").then(
       (m) => m.PdfCanvasPreview,
     ),
-  { ssr: false },
+  {
+    ssr: false,
+    loading: () => (
+      <div className={styles.cvPreviewLoading}>
+        <Loader />
+      </div>
+    ),
+  },
 );
 
 export type CvListItem = {
@@ -133,7 +145,8 @@ export function CvCard({
   const selectedColor =
     templateColors?.[templateId] ?? TEMPLATE_1_COLORS[0].value;
 
-  const PdfDocument = templateId === TEMPLATE_2_ID ? TemplatePdf2 : TemplatePdf1;
+  const PdfDocument =
+    templateId === TEMPLATE_2_ID ? TemplatePdf2 : TemplatePdf1;
 
   const pdfReactDocument = useMemo(
     () => (
@@ -163,94 +176,91 @@ export function CvCard({
   const isBusy = deletingId === cv.id || duplicatingId === cv.id;
 
   return (
-    <div className={styles.cvCard}>
-      <BlobProvider document={pdfReactDocument}>
-        {({ url, loading, error, blob }) => (
-          <>
-            <div className={styles.cvPreview}>
-              {loading ? (
-                <div className={styles.cvPreviewLoading}>
-                  <Loader />
-                </div>
-              ) : error || !url ? (
-                <div className={styles.cvPreviewLoading} />
-              ) : (
+    <BlobProvider document={pdfReactDocument}>
+      {({ url, loading, error, blob }) => {
+        const isPdfReady = !loading && !error && !!url && !!blob;
+
+        if (!isPdfReady) {
+          return <CvCardSkeletonLayout />;
+        }
+
+        return (
+          <CvCardLayout
+            preview={
+              <div className={styles.cvPreview}>
                 <PdfCanvasPreview
                   url={url}
                   className={styles.cvPreviewCanvas}
                   pageNumber={1}
                 />
-              )}
-            </div>
-
-            <div className={styles.cvInfo}>
-              <h3>{displayName}</h3>
-              <div className={styles.meta}>
+              </div>
+            }
+            title={<h3>{displayName}</h3>}
+            meta={
+              <>
                 <p className={styles.updated}>
                   created {created.date} to {created.time}
                 </p>
                 <p className={styles.updated}>
                   last updated {updated.date} to {updated.time}
                 </p>
-              </div>
-
-              <div className={styles.actions}>
-                <div className={styles.actionsLeft}>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onEdit(cv.id)}
-                    disabled={isBusy}
-                  >
-                    Edit
-                  </Button>
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onRequestDuplicate(cv.id)}
-                    disabled={isBusy}
-                  >
-                    Duplicate
-                  </Button>
-                </div>
+              </>
+            }
+            actionsLeft={
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onEdit(cv.id)}
+                  disabled={isBusy}
+                >
+                  Edit
+                </Button>
 
                 <Button
                   variant="outline"
                   size="sm"
-                  className={styles.deleteButton}
-                  onClick={() => onRequestDelete(cv.id)}
+                  onClick={() => onRequestDuplicate(cv.id)}
                   disabled={isBusy}
                 >
-                  Delete
+                  Duplicate
                 </Button>
-              </div>
-
-              <div className={styles.downloadRow}>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  fullWidth
-                  onClick={() => {
-                    if (!blob) return;
-                    const objectUrl = URL.createObjectURL(blob);
-                    const a = document.createElement("a");
-                    a.href = objectUrl;
-                    a.download = fileName;
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove();
-                    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
-                  }}
-                  disabled={loading || !blob || isBusy}
-                >
-                  {loading ? "Generating..." : "Download PDF"}
-                </Button>
-              </div>
-            </div>
-          </>
-        )}
-      </BlobProvider>
-    </div>
+              </>
+            }
+            actionsRight={
+              <Button
+                variant="outline"
+                size="sm"
+                className={styles.deleteButton}
+                onClick={() => onRequestDelete(cv.id)}
+                disabled={isBusy}
+              >
+                Delete
+              </Button>
+            }
+            download={
+              <Button
+                variant="primary"
+                size="sm"
+                fullWidth
+                onClick={() => {
+                  const objectUrl = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = objectUrl;
+                  a.download = fileName;
+                  document.body.appendChild(a);
+                  a.click();
+                  a.remove();
+                  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
+                }}
+                disabled={!blob || isBusy}
+              >
+                Download PDF
+              </Button>
+            }
+          />
+        );
+      }}
+    </BlobProvider>
   );
 }
