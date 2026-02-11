@@ -23,7 +23,11 @@ type EducationCardProps = {
   education: EducationItem;
   errors?: {
     diploma?: string;
+    schoolName?: string;
+    schoolLocation?: string;
+    startDate?: string;
     endDate?: string;
+    description?: string;
   };
   canMoveUp: boolean;
   canMoveDown: boolean;
@@ -97,6 +101,7 @@ export const EducationCard = forwardRef<HTMLDivElement, EducationCardProps>(
             fullWidth
             value={education.schoolName}
             onChange={(e) => onChange({ schoolName: e.target.value })}
+            error={errors?.schoolName}
           />
           <Input
             label="School location"
@@ -104,6 +109,7 @@ export const EducationCard = forwardRef<HTMLDivElement, EducationCardProps>(
             fullWidth
             value={education.schoolLocation}
             onChange={(e) => onChange({ schoolLocation: e.target.value })}
+            error={errors?.schoolLocation}
           />
         </div>
 
@@ -115,6 +121,7 @@ export const EducationCard = forwardRef<HTMLDivElement, EducationCardProps>(
               fullWidth
               value={education.startDate}
               onChange={(v) => onChange({ startDate: v })}
+              error={errors?.startDate}
             />
             <DatePicker
               label="End date"
@@ -132,6 +139,7 @@ export const EducationCard = forwardRef<HTMLDivElement, EducationCardProps>(
             fullWidth
             value={education.description}
             onChange={(e) => onChange({ description: e.target.value })}
+            error={errors?.description}
           />
         </div>
       </div>

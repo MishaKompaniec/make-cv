@@ -3,6 +3,15 @@ import { NextResponse } from "next/server";
 import { getServerAuthSession } from "@/auth";
 import { prisma } from "@/lib/prisma";
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    !Array.isArray(value) &&
+    Object.prototype.toString.call(value) === "[object Object]"
+  );
+}
+
 async function requireUserId() {
   const session = await getServerAuthSession();
   const email = session?.user?.email;
@@ -65,11 +74,18 @@ export async function POST(request: Request) {
     typeof body?.title === "string" && body.title.trim()
       ? body.title.trim()
       : "Untitled CV";
-  const templateId =
-    typeof body?.templateId === "string" && body.templateId
-      ? body.templateId
-      : "template-1";
-  const templateColors = body?.templateColors ?? {};
+  const templateIdProvided =
+    typeof body?.templateId === "string" && Boolean(body.templateId);
+  const templateId = templateIdProvided
+    ? (body.templateId as string)
+    : "template-1-v1";
+
+  const templateColorsRaw = body?.templateColors;
+  const templateColors = isPlainObject(templateColorsRaw)
+    ? (templateColorsRaw as Record<string, unknown>)
+    : templateIdProvided
+      ? {}
+      : { [templateId]: "#EFEAE2" };
   const data = body?.data ?? {};
 
   const cv = await prisma.cv.create({

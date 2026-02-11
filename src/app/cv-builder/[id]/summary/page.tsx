@@ -20,7 +20,7 @@ import { useKeyedDebouncedCallback } from "@/hooks/useKeyedDebouncedCallback";
 import { useCv } from "../provider";
 import styles from "./page.module.scss";
 
-const stepTitle = "Add your professional summary";
+const stepTitle = "Summary";
 
 const summarySchema = z.object({
   professionalSummary: z
@@ -113,7 +113,7 @@ export default function SummaryPage() {
       <PageHeader
         stepNumber="Step 3"
         title={stepTitle}
-        description="Show how your background matches the job you want."
+        description="Write a concise professional summary (3–5 sentences) that highlights your key skills, experiences, and career goals. Focus on what makes you unique and relevant to the position you’re applying for. Avoid generic statements and emphasize measurable achievements or specific strengths."
       />
 
       <section className={styles.wrapper}>
@@ -122,7 +122,7 @@ export default function SummaryPage() {
             <div className={styles.fieldGroup}>
               <Textarea
                 label="Professional summary"
-                placeholder="Write a compelling summary that highlights your key skills, experiences, and career goals. Focus on what makes you unique and how your background aligns with your target position."
+                placeholder="Highlight what makes you unique and relevant for your target position."
                 fullWidth
                 required
                 rows={6}

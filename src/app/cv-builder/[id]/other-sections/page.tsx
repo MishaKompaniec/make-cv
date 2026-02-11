@@ -15,6 +15,11 @@ import { NavigationFooter } from "@/components/layout/navigation-footer/navigati
 import { Checkbox } from "@/components/ui/checkbox/checkbox";
 import { useKeyedDebouncedCallback } from "@/hooks/useKeyedDebouncedCallback";
 import { useSectionList } from "@/hooks/useSectionList";
+import {
+  customSectionItemSchema,
+  interestItemSchema,
+  languageItemSchema,
+} from "@/lib/validations/cv-schema";
 
 import { useCv } from "../provider";
 import {
@@ -39,8 +44,6 @@ const DEFAULT_SELECTED_SECTIONS: SelectedSections = {
   customSection: false,
 };
 
-const MAX_TEXT_LENGTH = 25;
-
 export default function OtherSectionsPage() {
   const router = useRouter();
   const { cvId, cv, isLoading: isCvLoading, patchCv } = useCv();
@@ -59,12 +62,17 @@ export default function OtherSectionsPage() {
   const languagesList = useSectionList<LanguageItem, { name?: string }>({
     storageKey: "cv-languages",
     validateItem: (item) => {
-      const errors: { name?: string } = {};
-      const name = item.name.trim();
-      if (!name) errors.name = "Language name is required";
-      else if (name.length > MAX_TEXT_LENGTH)
-        errors.name = "Language name is too long";
-      return errors;
+      const parsed = languageItemSchema.safeParse(item);
+      if (parsed.success) return {};
+
+      const out: { name?: string } = {};
+      for (const issue of parsed.error.issues) {
+        const key = issue.path[0];
+        if (key !== "name") continue;
+        if (out.name) continue;
+        out.name = issue.message;
+      }
+      return out;
     },
     createItem: () => ({
       id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
@@ -79,10 +87,17 @@ export default function OtherSectionsPage() {
   >({
     storageKey: "cv-custom-sections",
     validateItem: (item) => {
-      const errors: { title?: string } = {};
-      const title = item.title.trim();
-      if (!title) errors.title = "Section title is required";
-      return errors;
+      const parsed = customSectionItemSchema.safeParse(item);
+      if (parsed.success) return {};
+
+      const out: { title?: string } = {};
+      for (const issue of parsed.error.issues) {
+        const key = issue.path[0];
+        if (key !== "title") continue;
+        if (out.title) continue;
+        out.title = issue.message;
+      }
+      return out;
     },
     createItem: () => ({
       id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
@@ -94,12 +109,17 @@ export default function OtherSectionsPage() {
   const interestsList = useSectionList<InterestItem, { title?: string }>({
     storageKey: "cv-interests",
     validateItem: (item) => {
-      const errors: { title?: string } = {};
-      const title = item.title.trim();
-      if (!title) errors.title = "Interest is required";
-      else if (title.length > MAX_TEXT_LENGTH)
-        errors.title = "Interest is too long";
-      return errors;
+      const parsed = interestItemSchema.safeParse(item);
+      if (parsed.success) return {};
+
+      const out: { title?: string } = {};
+      for (const issue of parsed.error.issues) {
+        const key = issue.path[0];
+        if (key !== "title") continue;
+        if (out.title) continue;
+        out.title = issue.message;
+      }
+      return out;
     },
     createItem: () => ({
       id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
@@ -275,7 +295,7 @@ export default function OtherSectionsPage() {
       <PageHeader
         stepNumber="Step 7"
         title={stepTitle}
-        description="Add additional sections to make your CV more comprehensive and personalized."
+        description="Add optional sections to make your CV more complete and tailored to your profile. Include languages you speak, your personal interests, or create a custom section to highlight other relevant experiences, projects, or achievements. These sections help recruiters get a fuller picture of your skills and personality."
       />
 
       <section className={styles.wrapper}>

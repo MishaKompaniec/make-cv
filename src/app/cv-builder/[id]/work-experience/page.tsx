@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/layout/builder-header/builder-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { useKeyedDebouncedCallback } from "@/hooks/useKeyedDebouncedCallback";
 import { useSectionList } from "@/hooks/useSectionList";
+import { workExperienceItemSchema } from "@/lib/validations/cv-schema";
 
 import { useCv } from "../provider";
 import styles from "./page.module.scss";
@@ -20,49 +21,24 @@ const stepTitle = "Work experience";
 type ExperienceErrors = {
   jobTitle?: string;
   companyName?: string;
+  city?: string;
   startDate?: string;
   endDate?: string;
-};
-
-const toMonthIndex = (d: ExperienceItem["startDate"]) => {
-  if (!d) return null;
-  return d.year * 12 + d.month;
+  description?: string;
 };
 
 const validateExperience = (exp: ExperienceItem): ExperienceErrors => {
-  const errors: ExperienceErrors = {};
+  const parsed = workExperienceItemSchema.safeParse(exp);
+  if (parsed.success) return {};
 
-  const jobTitle = exp.jobTitle.trim();
-  if (!jobTitle) {
-    errors.jobTitle = "Job title is required";
-  } else if (jobTitle.length < 2) {
-    errors.jobTitle = "Job title is too short";
-  } else if (jobTitle.length > 60) {
-    errors.jobTitle = "Job title is too long";
+  const out: ExperienceErrors = {};
+  for (const issue of parsed.error.issues) {
+    const key = issue.path[0];
+    if (typeof key !== "string") continue;
+    if (key in out) continue;
+    (out as Record<string, string>)[key] = issue.message;
   }
-
-  const companyName = exp.companyName.trim();
-  if (!companyName) {
-    errors.companyName = "Company name is required";
-  } else if (companyName.length < 2) {
-    errors.companyName = "Company name is too short";
-  } else if (companyName.length > 80) {
-    errors.companyName = "Company name is too long";
-  }
-
-  if (!exp.startDate) {
-    errors.startDate = "Start date is required";
-  }
-
-  const startIdx = toMonthIndex(exp.startDate);
-  const endIdx = toMonthIndex(exp.endDate);
-  if (startIdx !== null && endIdx !== null) {
-    if (endIdx <= startIdx) {
-      errors.endDate = "End date must be after start date";
-    }
-  }
-
-  return errors;
+  return out;
 };
 
 export default function WorkExperiencePage() {
@@ -153,7 +129,7 @@ export default function WorkExperiencePage() {
       <PageHeader
         stepNumber="Step 4"
         title={stepTitle}
-        description="Add your work experience to show employers your career progression and achievements."
+        description="Add your work experience to demonstrate your career progression, highlight key achievements, and show the impact you've made in each role. Include company names, job titles, dates, and measurable results wherever possible."
       />
 
       <section className={styles.wrapper}>

@@ -24,8 +24,10 @@ type WorkExperienceCardProps = {
   errors?: {
     jobTitle?: string;
     companyName?: string;
+    city?: string;
     startDate?: string;
     endDate?: string;
+    description?: string;
   };
   canMoveUp: boolean;
   canMoveDown: boolean;
@@ -111,6 +113,7 @@ export const WorkExperienceCard = forwardRef<
             fullWidth
             value={experience.city}
             onChange={(e) => onChange({ city: e.target.value })}
+            error={errors?.city}
           />
         </div>
 
@@ -141,6 +144,7 @@ export const WorkExperienceCard = forwardRef<
             fullWidth
             value={experience.description}
             onChange={(e) => onChange({ description: e.target.value })}
+            error={errors?.description}
           />
         </div>
       </div>

@@ -90,7 +90,7 @@ export default function ChooseTemplatePage() {
       <PageHeader
         stepNumber="Step 1"
         title={stepTitle}
-        description="Choose a template to start building your CV."
+        description="Choose the resume template that best matches your style and needs. Each template defines the layout, fonts, and the way your information will be displayed during the creation process. All subsequent steps will follow this design, ensuring a consistent and professional look for your resume."
       />
 
       <div className={styles.content}>

@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/layout/builder-header/builder-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { useKeyedDebouncedCallback } from "@/hooks/useKeyedDebouncedCallback";
 import { useSectionList } from "@/hooks/useSectionList";
+import { educationItemSchema } from "@/lib/validations/cv-schema";
 
 import { useCv } from "../provider";
 import { EducationCard, type EducationItem } from "./education-card";
@@ -16,35 +17,25 @@ const stepTitle = "Education";
 
 type EducationErrors = {
   diploma?: string;
+  schoolName?: string;
+  schoolLocation?: string;
+  startDate?: string;
   endDate?: string;
-};
-
-const toMonthIndex = (d: EducationItem["startDate"]) => {
-  if (!d) return null;
-  return d.year * 12 + d.month;
+  description?: string;
 };
 
 const validateEducation = (edu: EducationItem): EducationErrors => {
-  const errors: EducationErrors = {};
+  const parsed = educationItemSchema.safeParse(edu);
+  if (parsed.success) return {};
 
-  const diploma = edu.diploma.trim();
-  if (!diploma) {
-    errors.diploma = "Name of the diploma / study area is required";
-  } else if (diploma.length < 2) {
-    errors.diploma = "Name of the diploma / study area is too short";
-  } else if (diploma.length > 120) {
-    errors.diploma = "Name of the diploma / study area is too long";
+  const out: EducationErrors = {};
+  for (const issue of parsed.error.issues) {
+    const key = issue.path[0];
+    if (typeof key !== "string") continue;
+    if (key in out) continue;
+    (out as Record<string, string>)[key] = issue.message;
   }
-
-  const startIdx = toMonthIndex(edu.startDate);
-  const endIdx = toMonthIndex(edu.endDate);
-  if (startIdx !== null && endIdx !== null) {
-    if (endIdx <= startIdx) {
-      errors.endDate = "End date must be after start date";
-    }
-  }
-
-  return errors;
+  return out;
 };
 
 export default function EducationPage() {
@@ -132,7 +123,7 @@ export default function EducationPage() {
       <PageHeader
         stepNumber="Step 5"
         title={stepTitle}
-        description="Add your educational background to showcase your qualifications and knowledge."
+        description="Add your educational background to highlight your qualifications, degrees, and relevant coursework. Include institution names, study periods, and any notable achievements to show your knowledge and readiness for your target role."
       />
 
       <section className={styles.wrapper}>

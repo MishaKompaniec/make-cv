@@ -286,7 +286,7 @@ export default function ContactDetailsPage() {
       <PageHeader
         stepNumber="Step 2"
         title={stepTitle}
-        description="Tell us who you are so we can place your contact details prominently in every template."
+        description="Enter your personal and professional information to display your contact details clearly and consistently on your CV, making it easy for recruiters to reach you and view your online profiles."
       />
 
       <section className={styles.wrapper}>
@@ -490,6 +490,7 @@ export default function ContactDetailsPage() {
                   fullWidth
                   autoComplete="postal-code"
                   {...registerWithFlush("postalCode")}
+                  error={errors.postalCode?.message}
                 />
               </div>
             </div>
@@ -501,6 +502,7 @@ export default function ContactDetailsPage() {
                   placeholder="Danish"
                   fullWidth
                   {...registerWithFlush("nationality")}
+                  error={errors.nationality?.message}
                 />
               </div>
 
@@ -528,6 +530,7 @@ export default function ContactDetailsPage() {
                   placeholder="LinkedIn"
                   fullWidth
                   {...registerWithFlush("linkedInTitle")}
+                  error={errors.linkedInTitle?.message}
                 />
               </div>
 
@@ -537,6 +540,7 @@ export default function ContactDetailsPage() {
                   placeholder="https://linkedin.com/in/janedoe"
                   fullWidth
                   {...registerWithFlush("linkedInUrl")}
+                  error={errors.linkedInUrl?.message}
                 />
               </div>
             </div>
@@ -548,6 +552,7 @@ export default function ContactDetailsPage() {
                   placeholder="GitHub"
                   fullWidth
                   {...registerWithFlush("gitTitle")}
+                  error={errors.gitTitle?.message}
                 />
               </div>
 
@@ -557,6 +562,7 @@ export default function ContactDetailsPage() {
                   placeholder="https://github.com/janedoe"
                   fullWidth
                   {...registerWithFlush("gitUrl")}
+                  error={errors.gitUrl?.message}
                 />
               </div>
             </div>

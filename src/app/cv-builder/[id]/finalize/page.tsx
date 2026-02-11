@@ -236,7 +236,7 @@ export default function FinalizePage() {
       <PageHeader
         stepNumber="Step 8"
         title={stepTitle}
-        description="Review your CV and make final adjustments before downloading or sharing."
+        description="Review all the information and appearance of your CV. You can return to any step at any time to edit your details. You can also download your CV directly from this step. Don’t worry about losing your data — everything has been automatically saved. Feel free to leave the page; your CV will always be accessible on the main page in your list of CVs."
         hidePreviewButton
       />
 

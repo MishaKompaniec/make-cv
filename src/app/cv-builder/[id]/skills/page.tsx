@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/layout/builder-header/builder-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { useKeyedDebouncedCallback } from "@/hooks/useKeyedDebouncedCallback";
 import { useSectionList } from "@/hooks/useSectionList";
+import { skillsItemSchema } from "@/lib/validations/cv-schema";
 
 import { useCv } from "../provider";
 import { SkillTag } from "./components/skill-tag";
@@ -20,16 +21,17 @@ type SkillErrors = {
 };
 
 const validateSkill = (skill: SkillItem): SkillErrors => {
-  const errors: SkillErrors = {};
+  const parsed = skillsItemSchema.safeParse(skill);
+  if (parsed.success) return {};
 
-  const title = skill.title.trim();
-  if (!title) {
-    errors.title = "Skill title is required";
-  } else if (title.length > 25) {
-    errors.title = "Skill title is too long";
+  const out: SkillErrors = {};
+  for (const issue of parsed.error.issues) {
+    const key = issue.path[0];
+    if (typeof key !== "string") continue;
+    if (key in out) continue;
+    (out as Record<string, string>)[key] = issue.message;
   }
-
-  return errors;
+  return out;
 };
 
 const PREDEFINED_SKILLS = [
@@ -145,12 +147,11 @@ export default function SkillsPage() {
       <PageHeader
         stepNumber="Step 6"
         title={stepTitle}
-        description="Highlight your key skills and competencies that make you stand out to employers."
+        description="Add your key skills and competencies to showcase your expertise and strengths. Include technical skills, tools, and methodologies that are relevant to the job you’re targeting. Highlighting your strongest skills helps recruiters quickly see what you excel at."
       />
 
       <section className={styles.wrapper}>
         <div className={styles.content}>
-          {/* Predefined skills tags */}
           <div className={styles.tagsSection}>
             <div className={styles.tagsContainer}>
               {PREDEFINED_SKILLS.map((tag) => {
