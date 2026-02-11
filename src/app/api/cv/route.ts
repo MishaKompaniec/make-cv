@@ -41,6 +41,8 @@ export async function GET() {
       title: true,
       createdAt: true,
       updatedAt: true,
+      templateId: true,
+      templateColors: true,
       data: true,
     },
   });
@@ -83,6 +85,9 @@ export async function POST(request: Request) {
       title: true,
       createdAt: true,
       updatedAt: true,
+      templateId: true,
+      templateColors: true,
+      data: true,
     },
   });
 

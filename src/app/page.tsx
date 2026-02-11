@@ -1,23 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
+import { CvCard, type CvListItem } from "@/components/cv-card/cv-card";
 import { Button } from "@/components/ui/button/button";
+import { BaseModal } from "@/components/ui/modal/base-modal";
 
 import styles from "./page.module.scss";
-
-type CvListItem = {
-  id: string;
-  title: string;
-  createdAt: string;
-  updatedAt: string;
-  data: {
-    contactDetails?: {
-      fullName?: string;
-    };
-  };
-};
 
 export default function Home() {
   const router = useRouter();
@@ -26,6 +16,11 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
+  const [confirmDuplicateId, setConfirmDuplicateId] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -75,6 +70,44 @@ export default function Home() {
     void run();
   };
 
+  const handleDuplicateCv = (id: string) => {
+    const run = async () => {
+      if (!id) return;
+      const source = cvs.find((cv) => cv.id === id);
+      if (!source) return;
+
+      setDuplicatingId(id);
+      try {
+        const titleBase =
+          typeof source.title === "string" && source.title.trim()
+            ? source.title.trim()
+            : "Untitled CV";
+
+        const res = await fetch("/api/cv", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: `${titleBase} (Copy)`,
+            templateId: source.templateId,
+            templateColors: source.templateColors,
+            data: source.data,
+          }),
+        });
+
+        if (!res.ok) return;
+
+        const json = (await res.json()) as { cv?: CvListItem };
+        if (!json.cv?.id) return;
+
+        setCvs((prev) => [json.cv as CvListItem, ...prev]);
+      } finally {
+        setDuplicatingId((prev) => (prev === id ? null : prev));
+      }
+    };
+
+    void run();
+  };
+
   const handleDeleteCv = (id: string) => {
     const run = async () => {
       if (!id) return;
@@ -94,10 +127,18 @@ export default function Home() {
     void run();
   };
 
+  const cvToDelete = useMemo(
+    () => cvs.find((cv) => cv.id === confirmDeleteId) ?? null,
+    [cvs, confirmDeleteId],
+  );
+
+  const cvToDuplicate = useMemo(
+    () => cvs.find((cv) => cv.id === confirmDuplicateId) ?? null,
+    [cvs, confirmDuplicateId],
+  );
+
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>My CV</h1>
-
       <div className={styles.grid}>
         <button
           onClick={handleCreateCv}
@@ -110,50 +151,109 @@ export default function Home() {
 
         {isLoading
           ? null
-          : cvs.map((cv) => {
-              const displayName =
-                cv.data?.contactDetails?.fullName?.trim() || cv.title;
-              return (
-                <div key={cv.id} className={styles.cvCard}>
-                  <div className={styles.cvPreview}>
-                    <div className={styles.previewHeader}></div>
-                    <div className={styles.previewContent}>
-                      <div className={styles.previewLine}></div>
-                      <div
-                        className={`${styles.previewLine} ${styles.short}`}
-                      ></div>
-                      <div className={styles.previewLine}></div>
-                    </div>
-                  </div>
-                  <div className={styles.cvInfo}>
-                    <h3>{displayName}</h3>
-                    <p className={styles.updated}>
-                      Updated {new Date(cv.updatedAt).toLocaleString()}
-                    </p>
-                    <div className={styles.actions}>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => router.push(`/cv-builder/${cv.id}`)}
-                        disabled={deletingId === cv.id}
-                      >
-                        Edit
-                      </Button>
-
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDeleteCv(cv.id)}
-                        disabled={deletingId === cv.id}
-                      >
-                        {deletingId === cv.id ? "Deleting..." : "Delete"}
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+          : cvs.map((cv) => (
+              <CvCard
+                key={cv.id}
+                cv={cv}
+                deletingId={deletingId}
+                duplicatingId={duplicatingId}
+                onEdit={(id) => router.push(`/cv-builder/${id}`)}
+                onRequestDelete={(id) => setConfirmDeleteId(id)}
+                onRequestDuplicate={(id) => setConfirmDuplicateId(id)}
+              />
+            ))}
       </div>
+
+      <BaseModal
+        isOpen={!!confirmDeleteId}
+        onClose={() => setConfirmDeleteId(null)}
+        title="Delete CV"
+        showCloseButton
+        className={styles.confirmDeleteModal}
+      >
+        <div className={styles.confirmDeleteBody}>
+          <div className={styles.confirmDeleteTitle}>Delete this CV?</div>
+          <div className={styles.confirmDeleteText}>
+            {cvToDelete
+              ? `You are about to delete “${
+                  cvToDelete.data?.contactDetails?.fullName?.trim() ||
+                  cvToDelete.title
+                }”. This action can’t be undone.`
+              : "This action can’t be undone."}
+          </div>
+
+          <div className={styles.confirmDeleteActions}>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setConfirmDeleteId(null)}
+              disabled={!!deletingId}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className={styles.confirmDeleteButton}
+              onClick={() => {
+                if (!confirmDeleteId) return;
+                handleDeleteCv(confirmDeleteId);
+                setConfirmDeleteId(null);
+              }}
+              disabled={!confirmDeleteId || !!deletingId}
+            >
+              {deletingId && deletingId === confirmDeleteId
+                ? "Deleting..."
+                : "Delete"}
+            </Button>
+          </div>
+        </div>
+      </BaseModal>
+
+      <BaseModal
+        isOpen={!!confirmDuplicateId}
+        onClose={() => setConfirmDuplicateId(null)}
+        title="Duplicate CV"
+        showCloseButton
+        className={styles.confirmDeleteModal}
+      >
+        <div className={styles.confirmDeleteBody}>
+          <div className={styles.confirmDeleteTitle}>Duplicate this CV?</div>
+          <div className={styles.confirmDeleteText}>
+            {cvToDuplicate
+              ? `You are about to create a copy of “${
+                  cvToDuplicate.data?.contactDetails?.fullName?.trim() ||
+                  cvToDuplicate.title
+                }”. This will not affect your original CV.`
+              : "This will not affect your original CV."}
+          </div>
+
+          <div className={styles.confirmDeleteActions}>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setConfirmDuplicateId(null)}
+              disabled={!!duplicatingId}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => {
+                if (!confirmDuplicateId) return;
+                handleDuplicateCv(confirmDuplicateId);
+                setConfirmDuplicateId(null);
+              }}
+              disabled={!confirmDuplicateId || !!duplicatingId}
+            >
+              {duplicatingId && duplicatingId === confirmDuplicateId
+                ? "Duplicating..."
+                : "Duplicate"}
+            </Button>
+          </div>
+        </div>
+      </BaseModal>
     </div>
   );
 }

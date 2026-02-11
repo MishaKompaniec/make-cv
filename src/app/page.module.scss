@@ -4,15 +4,11 @@
   padding: 2rem;
 }
 
-.title {
-  margin: 0;
-}
-
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
-  margin-top: 2rem;
+  align-items: stretch;
 }
 
 .createCard {
@@ -20,7 +16,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 320px;
+  height: 100%;
   border: 2px dashed $border-light;
   border-radius: $border-radius;
   background: $bg-secondary;
@@ -49,69 +45,39 @@
   }
 }
 
-.cvCard {
+.confirmDeleteModal {
+  width: min(420px, calc(100vw - 2.5rem)) !important;
+}
+
+.confirmDeleteBody {
   background: $white;
+  border: 1px solid $border-light;
   border-radius: $border-radius;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  transition: all $transition;
-
-  &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    transform: translateY(-2px);
-  }
-}
-
-.cvPreview {
-  height: 200px;
-  background: $bg-tertiary;
-  padding: 1rem;
-  border-bottom: 1px solid $border-medium;
-}
-
-.previewHeader {
-  height: 20px;
-  background: $border-medium;
-  border-radius: 0.25rem;
-  margin-bottom: 1rem;
-}
-
-.previewContent {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.previewLine {
-  height: 8px;
-  background: $border-medium;
-  border-radius: 0.25rem;
-  width: 100%;
-
-  &.short {
-    width: 60%;
-  }
-}
-
-.cvInfo {
   padding: 1rem;
 }
 
-.cvInfo h3 {
-  margin: 0 0 0.5rem 0;
+.confirmDeleteTitle {
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   color: $text-primary;
+  margin-bottom: 1.5rem;
 }
 
-.updated {
-  margin: 0 0 1rem 0;
+.confirmDeleteText {
   font-size: 0.875rem;
   color: $text;
+  margin-bottom: 1.5rem;
+  line-height: 1.35;
 }
 
-.actions {
+.confirmDeleteActions {
   display: flex;
+  justify-content: flex-end;
   gap: 0.5rem;
   flex-wrap: wrap;
+}
+
+.confirmDeleteButton {
+  border-color: $error !important;
+  color: $error !important;
 }
