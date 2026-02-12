@@ -1,6 +1,7 @@
 import { forwardRef } from "react";
 
 import { Input } from "@/components/ui/input/input";
+import { normalizeText } from "@/lib/text-normalization";
 
 import styles from "./page.module.scss";
 
@@ -73,7 +74,7 @@ export const SkillsCard = forwardRef<HTMLDivElement, SkillsCardProps>(
             placeholder="Communication"
             fullWidth
             value={skill.title}
-            onChange={(e) => onChange({ title: e.target.value })}
+            onChange={(e) => onChange({ title: normalizeText(e.target.value) })}
             error={errors?.title}
             required
           />

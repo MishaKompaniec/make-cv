@@ -16,6 +16,7 @@ import { PageHeader } from "@/components/layout/builder-header/builder-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { Textarea } from "@/components/ui/textarea/textarea";
 import { useKeyedDebouncedCallback } from "@/hooks/useKeyedDebouncedCallback";
+import { normalizeText } from "@/lib/text-normalization";
 
 import { useCv } from "../provider";
 import styles from "./page.module.scss";
@@ -90,7 +91,7 @@ export default function SummaryPage() {
       ...field,
       onChange: (e: ChangeEvent<HTMLTextAreaElement>) => {
         field.onChange(e);
-        schedulePatch(e.target.value);
+        schedulePatch(normalizeText(e.target.value));
       },
       onBlur: (e: FocusEvent<HTMLTextAreaElement>) => {
         field.onBlur(e);

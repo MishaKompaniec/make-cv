@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/date-picker/date-picker";
 import { Input } from "@/components/ui/input/input";
 import { Textarea } from "@/components/ui/textarea/textarea";
+import { normalizeText } from "@/lib/text-normalization";
 
 import styles from "./page.module.scss";
 
@@ -88,7 +89,9 @@ export const EducationCard = forwardRef<HTMLDivElement, EducationCardProps>(
             placeholder="BSc Computer Science"
             fullWidth
             value={education.diploma}
-            onChange={(e) => onChange({ diploma: e.target.value })}
+            onChange={(e) =>
+              onChange({ diploma: normalizeText(e.target.value) })
+            }
             error={errors?.diploma}
             required
           />
@@ -100,7 +103,9 @@ export const EducationCard = forwardRef<HTMLDivElement, EducationCardProps>(
             placeholder="University of Technology"
             fullWidth
             value={education.schoolName}
-            onChange={(e) => onChange({ schoolName: e.target.value })}
+            onChange={(e) =>
+              onChange({ schoolName: normalizeText(e.target.value) })
+            }
             error={errors?.schoolName}
           />
           <Input
@@ -108,7 +113,9 @@ export const EducationCard = forwardRef<HTMLDivElement, EducationCardProps>(
             placeholder="Boston, MA"
             fullWidth
             value={education.schoolLocation}
-            onChange={(e) => onChange({ schoolLocation: e.target.value })}
+            onChange={(e) =>
+              onChange({ schoolLocation: normalizeText(e.target.value) })
+            }
             error={errors?.schoolLocation}
           />
         </div>
@@ -138,7 +145,9 @@ export const EducationCard = forwardRef<HTMLDivElement, EducationCardProps>(
             placeholder="Describe your studies, achievements, thesis, etc."
             fullWidth
             value={education.description}
-            onChange={(e) => onChange({ description: e.target.value })}
+            onChange={(e) =>
+              onChange({ description: normalizeText(e.target.value) })
+            }
             error={errors?.description}
           />
         </div>
