@@ -54,8 +54,6 @@ export function Sidebar() {
     };
   }, [isCreateFlow]);
 
-  if (pathname === "/welcome") return null;
-
   return (
     <aside key={pathname} className={styles.sidebar}>
       <Link href="/" className={styles.logo}>
@@ -203,8 +201,8 @@ export function Sidebar() {
                   <Image
                     src={session.user.image}
                     alt="User avatar"
-                    width={32}
-                    height={32}
+                    width={50}
+                    height={50}
                     className={styles.avatar}
                   />
                 )}

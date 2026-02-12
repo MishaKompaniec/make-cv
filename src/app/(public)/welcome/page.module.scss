@@ -1,19 +1,4 @@
-@use "../../styles/variables" as *;
-
-:global(.main-content) {
-  margin-left: 0;
-}
-
-@media (max-width: $breakpoint-tablet) {
-  :global(.main-content) {
-    padding-top: 0;
-  }
-}
-
-:global(.create-flow-container) {
-  max-width: none;
-  margin: 0;
-}
+@use "../../../styles/variables.scss" as *;
 
 .container {
   flex: 1;

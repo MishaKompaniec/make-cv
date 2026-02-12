@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useMemo } from "react";
 
-import { useCv } from "@/app/cv-builder/[id]/provider";
+import { useCv } from "@/app/(private)/cv-builder/[id]/provider";
 import { Pagination } from "@/components/pdf/pagination/pagination";
 import {
   TEMPLATE_1_COLORS,

@@ -1,4 +1,4 @@
-@use "../../../../styles/variables.scss" as *;
+@use "../../../../../styles/variables.scss" as *;
 
 .pageContainer {
   display: flex;
@@ -92,12 +92,6 @@
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-  }
-
-  &.active {
-    background: $accent;
-    color: white;
-    border-color: $accent;
   }
 }
 
