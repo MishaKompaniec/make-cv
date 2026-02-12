@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useParams,usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -14,9 +14,10 @@ export function Sidebar() {
   const pathname = usePathname();
   const params = useParams();
   const cvId = params.id as string;
-  const isCreateFlow = pathname.startsWith("/cv-builder/") && !!cvId;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { data: session, status } = useSession();
+
+  const isCreateFlow = pathname.startsWith("/cv-builder/") && !!cvId;
 
   const steps = useMemo(
     () => [
@@ -52,6 +53,8 @@ export function Sidebar() {
       document.body.classList.remove("create-flow");
     };
   }, [isCreateFlow]);
+
+  if (pathname === "/welcome") return null;
 
   return (
     <aside key={pathname} className={styles.sidebar}>
@@ -211,7 +214,7 @@ export function Sidebar() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => signOut({ callbackUrl: "/" })}
+                  onClick={() => signOut({ callbackUrl: "/welcome" })}
                 >
                   Sign out
                 </Button>
