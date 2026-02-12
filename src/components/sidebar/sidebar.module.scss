@@ -1,0 +1,62 @@
+@use "../../../src/styles/variables.scss" as *;
+
+.sidebar {
+  width: 230px;
+  height: 100vh;
+  background: $sidebar-bg;
+  color: $white;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+}
+
+.logo {
+  padding: 1rem 1rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: $white;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: $breakpoint-tablet) {
+  .sidebar {
+    width: 100%;
+    height: 72px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .logo {
+    border-bottom: 0;
+    padding: 1rem 1rem;
+  }
+}
+
+@media (max-width: $breakpoint-desktop) {
+  :global(body.create-flow) {
+    .sidebar {
+      width: 100%;
+      height: 72px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 200;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .logo {
+      display: none;
+    }
+  }
+}

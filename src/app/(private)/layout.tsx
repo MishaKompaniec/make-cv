@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { Sidebar } from "@/components/layout/sidebar/sidebar";
+import { Sidebar } from "@/components/sidebar/sidebar";
 
 export default function PrivateLayout({ children }: { children: ReactNode }) {
   return (
