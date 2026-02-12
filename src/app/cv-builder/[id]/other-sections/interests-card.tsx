@@ -1,7 +1,6 @@
 import { forwardRef } from "react";
 
 import { Input } from "@/components/ui/input/input";
-import { normalizeText } from "@/lib/text-normalization";
 
 import styles from "./page.module.scss";
 
@@ -74,7 +73,7 @@ export const InterestsCard = forwardRef<HTMLDivElement, InterestsCardProps>(
           <Input
             label="Interest"
             value={interest.title}
-            onChange={(e) => onChange({ title: normalizeText(e.target.value) })}
+            onChange={(e) => onChange({ title: e.target.value })}
             error={errors?.title}
             required
             fullWidth

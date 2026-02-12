@@ -182,6 +182,7 @@ export function PreviewModal({ isOpen, onClose }: PreviewModalProps) {
       isOpen={isOpen}
       onClose={onClose}
       title="Preview"
+      descriptionId="preview-modal-description"
       showCloseButton
       variant="fullscreen"
     >

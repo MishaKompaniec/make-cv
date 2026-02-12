@@ -11,6 +11,8 @@ interface BaseModalProps {
   children: ReactNode;
   showCloseButton?: boolean;
   title?: string;
+  description?: string;
+  descriptionId?: string;
   className?: string;
   variant?: "center" | "fullscreen";
 }
@@ -21,6 +23,8 @@ export function BaseModal({
   children,
   showCloseButton = true,
   title,
+  description,
+  descriptionId,
   className,
   variant = "center",
 }: BaseModalProps) {
@@ -35,6 +39,8 @@ export function BaseModal({
   const bodyClassName =
     variant === "fullscreen" ? styles.modalBodyFullscreen : styles.modalBody;
 
+  const resolvedDescription = description ?? title ?? "Modal content";
+
   return (
     <Dialog.Root
       open={isOpen}
@@ -44,6 +50,7 @@ export function BaseModal({
     >
       <Dialog.Portal>
         <Dialog.Overlay className={styles.modalOverlay} />
+
         {variant === "fullscreen" && showCloseButton && (
           <Dialog.Close asChild>
             <button
@@ -53,10 +60,21 @@ export function BaseModal({
             />
           </Dialog.Close>
         )}
-        <Dialog.Content className={`${contentClassName} ${className ?? ""}`}>
+
+        <Dialog.Content
+          className={`${contentClassName} ${className ?? ""}`}
+          aria-describedby={descriptionId}
+        >
           {title && (
             <Dialog.Title className={styles.srOnly}>{title}</Dialog.Title>
           )}
+
+          {descriptionId && (
+            <Dialog.Description id={descriptionId} className={styles.srOnly}>
+              {resolvedDescription}
+            </Dialog.Description>
+          )}
+
           <div className={bodyClassName}>
             {variant === "center" && showCloseButton && (
               <Dialog.Close asChild>

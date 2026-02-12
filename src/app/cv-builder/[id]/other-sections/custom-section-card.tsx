@@ -2,7 +2,6 @@ import { forwardRef } from "react";
 
 import { Input } from "@/components/ui/input/input";
 import { Textarea } from "@/components/ui/textarea/textarea";
-import { normalizeText } from "@/lib/text-normalization";
 
 import styles from "./page.module.scss";
 
@@ -79,7 +78,7 @@ export const CustomSectionCard = forwardRef<
           <Input
             label="Section title"
             value={section.title}
-            onChange={(e) => onChange({ title: normalizeText(e.target.value) })}
+            onChange={(e) => onChange({ title: e.target.value })}
             error={errors?.title}
             required
             fullWidth
@@ -90,9 +89,7 @@ export const CustomSectionCard = forwardRef<
             placeholder="Describe the section"
             fullWidth
             value={section.description}
-            onChange={(e) =>
-              onChange({ description: normalizeText(e.target.value) })
-            }
+            onChange={(e) => onChange({ description: e.target.value })}
           />
         </div>
       </div>

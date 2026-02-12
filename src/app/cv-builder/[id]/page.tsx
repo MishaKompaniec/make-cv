@@ -11,6 +11,7 @@ import {
   TEMPLATE_1_ID,
 } from "@/components/pdf/templates/template-1/template-pdf";
 import { TEMPLATE_2_ID } from "@/components/pdf/templates/template-2/template-pdf";
+import { Loader } from "@/components/ui/loader/loader";
 import { useKeyedDebouncedCallback } from "@/hooks/useKeyedDebouncedCallback";
 
 import styles from "./page.module.scss";
@@ -94,56 +95,64 @@ export default function ChooseTemplatePage() {
       />
 
       <div className={styles.content}>
-        <div className={styles.templateGrid}>
-          {templates.map(({ id, Preview }) => {
-            const cardColor = getTemplateColor(id);
+        {isCvLoading || !cv ? (
+          <div className={styles.loader}>
+            <Loader />
+          </div>
+        ) : (
+          <div className={styles.templateGrid}>
+            {templates.map(({ id, Preview }) => {
+              const cardColor = getTemplateColor(id);
 
-            return (
-              <div
-                key={id}
-                className={`${styles.templateCard}${
-                  effectiveTemplateId === id ? ` ${styles.selected}` : ""
-                }`}
-                onClick={() => {
-                  setSelectedTemplateId(id);
-                  patcher.schedule("templateId", id);
-                }}
-              >
-                <div className={styles.templatePreview}>
-                  <Preview sidebarColor={cardColor} />
-                </div>
+              return (
+                <div
+                  key={id}
+                  className={`${styles.templateCard}${
+                    effectiveTemplateId === id ? ` ${styles.selected}` : ""
+                  }`}
+                  onClick={() => {
+                    setSelectedTemplateId(id);
+                    patcher.schedule("templateId", id);
+                  }}
+                >
+                  <div className={styles.templatePreview}>
+                    <Preview sidebarColor={cardColor} />
+                  </div>
 
-                <div className={styles.colorPicker}>
-                  {TEMPLATE_1_COLORS.map((color) => {
-                    const colorClass = colorClassByName[color.name];
-                    return (
-                      <button
-                        key={color.name}
-                        className={`${styles.colorOption}${
-                          colorClass ? ` ${colorClass}` : ""
-                        }${
-                          cardColor === color.value ? ` ${styles.selected}` : ""
-                        }`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setTemplateColors((prev) => {
-                            const nextColors = {
-                              ...(prev ?? {}),
-                              [id]: color.value,
-                            };
-                            patcher.schedule("templateColors", nextColors);
-                            return nextColors;
-                          });
-                        }}
-                        aria-label={`Select ${color.name} color`}
-                      />
-                    );
-                  })}
+                  <div className={styles.colorPicker}>
+                    {TEMPLATE_1_COLORS.map((color) => {
+                      const colorClass = colorClassByName[color.name];
+                      return (
+                        <button
+                          key={color.name}
+                          className={`${styles.colorOption}${
+                            colorClass ? ` ${colorClass}` : ""
+                          }${
+                            cardColor === color.value
+                              ? ` ${styles.selected}`
+                              : ""
+                          }`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setTemplateColors((prev) => {
+                              const nextColors = {
+                                ...(prev ?? {}),
+                                [id]: color.value,
+                              };
+                              patcher.schedule("templateColors", nextColors);
+                              return nextColors;
+                            });
+                          }}
+                          aria-label={`Select ${color.name} color`}
+                        />
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <NavigationFooter

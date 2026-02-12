@@ -171,6 +171,7 @@ export default function Home() {
         isOpen={!!confirmDeleteId}
         onClose={() => setConfirmDeleteId(null)}
         title="Delete CV"
+        descriptionId="delete-cv-modal-description"
         showCloseButton
         className={styles.confirmDeleteModal}
       >
@@ -217,6 +218,7 @@ export default function Home() {
         isOpen={!!confirmDuplicateId}
         onClose={() => setConfirmDuplicateId(null)}
         title="Duplicate CV"
+        descriptionId="duplicate-cv-modal-description"
         showCloseButton
         className={styles.confirmDeleteModal}
       >

@@ -22,7 +22,6 @@ import {
   type ContactDetailsFormData,
   contactDetailsSchema,
 } from "@/lib/validations/cv-schema";
-import { normalizeCvFieldValue } from "@/lib/text-normalization";
 
 import { useCv } from "../provider";
 import styles from "./page.module.scss";
@@ -133,7 +132,7 @@ export default function ContactDetailsPage() {
       ...field,
       onChange: (e: ChangeEvent<HTMLInputElement>) => {
         field.onChange(e);
-        schedulePatch(name, normalizeCvFieldValue(name, e.target.value));
+        schedulePatch(name, e.target.value);
       },
       onBlur: (e: FocusEvent<HTMLInputElement>) => {
         field.onBlur(e);
@@ -414,6 +413,7 @@ export default function ContactDetailsPage() {
                 isOpen={isCropOpen}
                 onClose={closeCrop}
                 title="Crop your photo"
+                descriptionId="crop-photo-modal-description"
                 showCloseButton
               >
                 <div className={styles.cropModal}>

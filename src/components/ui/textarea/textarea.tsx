@@ -1,4 +1,4 @@
-import { forwardRef,TextareaHTMLAttributes } from "react";
+import { forwardRef, type TextareaHTMLAttributes } from "react";
 
 import styles from "./textarea.module.scss";
 
@@ -17,10 +17,15 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       fullWidth = false,
       required = false,
       label,
+      onChange,
+      value = "",
+      maxLength,
       ...props
     },
     ref,
   ) => {
+    const length = value?.toString().length ?? 0;
+
     const classNames = [
       styles.textarea,
       fullWidth ? styles.fullWidth : "",
@@ -42,9 +47,19 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         <textarea
           ref={ref}
           className={classNames}
+          value={value}
+          maxLength={maxLength}
+          onChange={onChange}
           {...props}
           required={required}
         />
+        {typeof maxLength === "number" && (
+          <div className={styles.metaRow}>
+            <span className={styles.counter}>
+              {length}/{maxLength}
+            </span>
+          </div>
+        )}
         {error && <span className={styles.errorMessage}>{error}</span>}
       </div>
     );

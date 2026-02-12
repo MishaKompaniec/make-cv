@@ -67,6 +67,18 @@
   }
 }
 
+.metaRow {
+  margin-top: 0.25rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.counter {
+  font-size: 0.75rem;
+  color: rgba($text-muted, 0.8);
+  line-height: 1;
+}
+
 .errorMessage {
   margin-top: 0.25rem;
   font-size: 0.75rem;

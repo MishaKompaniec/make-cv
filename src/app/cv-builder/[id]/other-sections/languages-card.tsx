@@ -2,7 +2,6 @@ import { forwardRef } from "react";
 
 import { Input } from "@/components/ui/input/input";
 import { Select } from "@/components/ui/select/select";
-import { normalizeText } from "@/lib/text-normalization";
 
 import styles from "./page.module.scss";
 
@@ -91,9 +90,7 @@ export const LanguagesCard = forwardRef<HTMLDivElement, LanguagesCardProps>(
             <Input
               label="Language name"
               value={language.name}
-              onChange={(e) =>
-                onChange({ name: normalizeText(e.target.value) })
-              }
+              onChange={(e) => onChange({ name: e.target.value })}
               error={errors?.name}
               required
               fullWidth

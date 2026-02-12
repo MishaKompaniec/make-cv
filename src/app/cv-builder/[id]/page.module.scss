@@ -99,6 +99,13 @@
   border: 1px solid $primary;
 }
 
+.loader {
+  min-height: 50vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 @media (max-width: $breakpoint-tablet) {
   .content {
     padding: 0 1rem 1rem;

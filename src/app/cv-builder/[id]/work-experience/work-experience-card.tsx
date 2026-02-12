@@ -6,7 +6,6 @@ import {
 } from "@/components/ui/date-picker/date-picker";
 import { Input } from "@/components/ui/input/input";
 import { Textarea } from "@/components/ui/textarea/textarea";
-import { normalizeText } from "@/lib/text-normalization";
 
 import styles from "./page.module.scss";
 
@@ -92,9 +91,7 @@ export const WorkExperienceCard = forwardRef<
             placeholder="Senior Product Designer"
             fullWidth
             value={experience.jobTitle}
-            onChange={(e) =>
-              onChange({ jobTitle: normalizeText(e.target.value) })
-            }
+            onChange={(e) => onChange({ jobTitle: e.target.value })}
             error={errors?.jobTitle}
             required
           />
@@ -106,9 +103,7 @@ export const WorkExperienceCard = forwardRef<
             placeholder="Tech Company Inc."
             fullWidth
             value={experience.companyName}
-            onChange={(e) =>
-              onChange({ companyName: normalizeText(e.target.value) })
-            }
+            onChange={(e) => onChange({ companyName: e.target.value })}
             error={errors?.companyName}
             required
           />
@@ -117,7 +112,7 @@ export const WorkExperienceCard = forwardRef<
             placeholder="San Francisco"
             fullWidth
             value={experience.city}
-            onChange={(e) => onChange({ city: normalizeText(e.target.value) })}
+            onChange={(e) => onChange({ city: e.target.value })}
             error={errors?.city}
           />
         </div>
@@ -148,9 +143,8 @@ export const WorkExperienceCard = forwardRef<
             placeholder="Add 3–5 bullet points about your role and achievements"
             fullWidth
             value={experience.description}
-            onChange={(e) =>
-              onChange({ description: normalizeText(e.target.value) })
-            }
+            maxLength={1000}
+            onChange={(e) => onChange({ description: e.target.value })}
             error={errors?.description}
           />
         </div>

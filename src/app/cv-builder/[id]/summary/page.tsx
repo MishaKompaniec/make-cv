@@ -16,7 +16,6 @@ import { PageHeader } from "@/components/layout/builder-header/builder-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { Textarea } from "@/components/ui/textarea/textarea";
 import { useKeyedDebouncedCallback } from "@/hooks/useKeyedDebouncedCallback";
-import { normalizeText } from "@/lib/text-normalization";
 
 import { useCv } from "../provider";
 import styles from "./page.module.scss";
@@ -36,7 +35,6 @@ type SummaryFormData = z.infer<typeof summarySchema>;
 export default function SummaryPage() {
   const router = useRouter();
   const { cvId, cv, isLoading: isCvLoading, patchCv } = useCv();
-
   const didInitRef = useRef(false);
 
   const {
@@ -44,6 +42,8 @@ export default function SummaryPage() {
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
+    watch,
   } = useForm<SummaryFormData>({
     resolver: zodResolver(summarySchema),
     mode: "onChange",
@@ -51,8 +51,7 @@ export default function SummaryPage() {
   });
 
   useEffect(() => {
-    if (!cv) return;
-    if (didInitRef.current) return;
+    if (!cv || didInitRef.current) return;
 
     const data = (cv.data ?? {}) as Record<string, unknown>;
     const summaryFromApi = data["summary"];
@@ -73,13 +72,12 @@ export default function SummaryPage() {
       });
     },
   );
-
   const isSaving = patcher.getIsInFlight();
 
   const schedulePatch = useCallback(
     (value: string) => {
-      if (!didInitRef.current) return;
-      if (!cvId) return;
+      if (!didInitRef.current || !cvId) return;
+
       patcher.schedule("summary", value);
     },
     [cvId, patcher],
@@ -87,15 +85,15 @@ export default function SummaryPage() {
 
   const registerWithFlush = (name: keyof SummaryFormData) => {
     const field = register(name);
+
     return {
       ...field,
       onChange: (e: ChangeEvent<HTMLTextAreaElement>) => {
-        field.onChange(e);
-        schedulePatch(normalizeText(e.target.value));
+        const rawValue = e.target.value; // сохраняем всё что вводит пользователь
+        setValue(name, rawValue, { shouldDirty: true, shouldValidate: true });
+        schedulePatch(rawValue); // нормализация только для отправки
       },
-      onBlur: (e: FocusEvent<HTMLTextAreaElement>) => {
-        field.onBlur(e);
-      },
+      onBlur: (e: FocusEvent<HTMLTextAreaElement>) => field.onBlur(e),
     };
   };
 
@@ -105,7 +103,6 @@ export default function SummaryPage() {
       await patcher.flush();
       router.push(`/cv-builder/${cvId}/work-experience`);
     } finally {
-      // patcher manages isSaving via in-flight tracking
     }
   });
 
@@ -127,7 +124,9 @@ export default function SummaryPage() {
                 fullWidth
                 required
                 rows={6}
+                maxLength={500}
                 {...registerWithFlush("professionalSummary")}
+                value={watch("professionalSummary")}
                 error={errors.professionalSummary?.message}
               />
             </div>
