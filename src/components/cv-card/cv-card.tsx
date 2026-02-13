@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { CvCardLayout } from "@/components/cv-card/cv-card-layout";
 import { CvCardSkeletonLayout } from "@/components/cv-card-skeleton/cv-card-skeleton";
@@ -72,6 +72,7 @@ type Props = {
   onEdit: (id: string) => void;
   onRequestDelete: (id: string) => void;
   onRequestDuplicate: (id: string) => void;
+  onPaywall: (cvId: string) => void;
 };
 
 function formatCvDateTime(value: string) {
@@ -115,6 +116,7 @@ export function CvCard({
   onEdit,
   onRequestDelete,
   onRequestDuplicate,
+  onPaywall,
 }: Props) {
   const templateId = cv.templateId ?? TEMPLATE_1_ID;
   const templateColors = cv.templateColors ?? {};
@@ -174,6 +176,7 @@ export function CvCard({
   const updated = formatCvDateTime(cv.updatedAt);
 
   const isBusy = deletingId === cv.id || duplicatingId === cv.id;
+  const [isExporting, setIsExporting] = useState(false);
 
   return (
     <BlobProvider document={pdfReactDocument}>
@@ -244,18 +247,51 @@ export function CvCard({
                 size="sm"
                 fullWidth
                 onClick={() => {
-                  const objectUrl = URL.createObjectURL(blob);
-                  const a = document.createElement("a");
-                  a.href = objectUrl;
-                  a.download = fileName;
-                  document.body.appendChild(a);
-                  a.click();
-                  a.remove();
-                  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
+                  const run = async () => {
+                    if (!blob) return;
+
+                    setIsExporting(true);
+                    try {
+                      const res = await fetch("/api/export/permission", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                      });
+
+                      if (!res.ok) {
+                        onPaywall(cv.id);
+                        return;
+                      }
+
+                      const json = (await res.json()) as {
+                        allowed?: boolean;
+                      };
+
+                      if (!json.allowed) {
+                        onPaywall(cv.id);
+                        return;
+                      }
+
+                      const objectUrl = URL.createObjectURL(blob);
+                      const a = document.createElement("a");
+                      a.href = objectUrl;
+                      a.download = fileName;
+                      document.body.appendChild(a);
+                      a.click();
+                      a.remove();
+                      window.setTimeout(
+                        () => URL.revokeObjectURL(objectUrl),
+                        0,
+                      );
+                    } finally {
+                      setIsExporting(false);
+                    }
+                  };
+
+                  void run();
                 }}
-                disabled={!blob || isBusy}
+                disabled={!blob || isBusy || isExporting}
               >
-                Download PDF
+                {isExporting ? "Checking..." : "Download PDF"}
               </Button>
             }
           />

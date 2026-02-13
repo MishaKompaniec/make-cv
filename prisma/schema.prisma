@@ -48,6 +48,10 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
+  exportAccessUntil  DateTime?
+  hasLifetimeAccess  Boolean   @default(false)
+  freePdfDownloadUsed Boolean  @default(false)
+
   accounts Account[]
   sessions Session[]
   cvs     Cv[]

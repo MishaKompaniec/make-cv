@@ -23,6 +23,11 @@ export default function Home() {
     null,
   );
 
+  const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const [checkoutPlanInFlight, setCheckoutPlanInFlight] = useState<
+    "day" | "week" | "lifetime" | null
+  >(null);
+
   useEffect(() => {
     let cancelled = false;
 
@@ -138,6 +143,32 @@ export default function Home() {
     [cvs, confirmDuplicateId],
   );
 
+  const openPaywall = (cvId: string) => {
+    void cvId;
+    setIsPaywallOpen(true);
+  };
+
+  const startCheckout = (plan: "day" | "week" | "lifetime") => {
+    const run = async () => {
+      setCheckoutPlanInFlight(plan);
+      try {
+        const res = await fetch("/api/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ plan }),
+        });
+
+        const data = (await res.json()) as { url?: string };
+        if (!data.url) return;
+        window.location.href = data.url;
+      } finally {
+        setCheckoutPlanInFlight(null);
+      }
+    };
+
+    void run();
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.grid}>
@@ -162,6 +193,7 @@ export default function Home() {
               onEdit={(id) => router.push(`/cv-builder/${id}`)}
               onRequestDelete={(id) => setConfirmDeleteId(id)}
               onRequestDuplicate={(id) => setConfirmDuplicateId(id)}
+              onPaywall={(id) => openPaywall(id)}
             />
           ))
         )}
@@ -255,6 +287,61 @@ export default function Home() {
               {duplicatingId && duplicatingId === confirmDuplicateId
                 ? "Duplicating..."
                 : "Duplicate"}
+            </Button>
+          </div>
+        </div>
+      </BaseModal>
+
+      <BaseModal
+        isOpen={isPaywallOpen}
+        onClose={() => {
+          setIsPaywallOpen(false);
+        }}
+        title="Download PDF"
+        descriptionId="download-paywall-modal-description"
+        showCloseButton
+        className={styles.confirmDeleteModal}
+      >
+        <div className={styles.confirmDeleteBody}>
+          <div className={styles.confirmDeleteTitle}>
+            Choose a plan to continue
+          </div>
+          <div className={styles.confirmDeleteText}>
+            To continue downloading PDFs, please select a plan.
+          </div>
+
+          <div className={styles.confirmDeleteActions}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => startCheckout("day")}
+              disabled={!!checkoutPlanInFlight}
+            >
+              {checkoutPlanInFlight === "day"
+                ? "Redirecting..."
+                : "24h — $2.99"}
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => startCheckout("week")}
+              disabled={!!checkoutPlanInFlight}
+            >
+              {checkoutPlanInFlight === "week"
+                ? "Redirecting..."
+                : "7 days — $5.99"}
+            </Button>
+
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => startCheckout("lifetime")}
+              disabled={!!checkoutPlanInFlight}
+            >
+              {checkoutPlanInFlight === "lifetime"
+                ? "Redirecting..."
+                : "Lifetime — $9.99"}
             </Button>
           </div>
         </div>

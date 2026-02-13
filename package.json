@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
-    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix"
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "stripe:listen": "stripe listen --forward-to http://localhost:3000/api/webhook/stripe --print-secret"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -27,6 +28,7 @@
     "react-hook-form": "^7.71.1",
     "react-pdf": "^10.3.0",
     "sass": "^1.97.3",
+    "stripe": "^20.3.1",
     "zod": "^4.3.6"
   },
   "devDependencies": {
