@@ -25,6 +25,10 @@ const PRICES = {
 
 type Plan = keyof typeof PRICES;
 
+interface RequestBody {
+  plan: Plan;
+}
+
 function isPlan(value: unknown): value is Plan {
   return value === "day" || value === "week" || value === "lifetime";
 }
@@ -48,11 +52,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  if (!body || typeof body !== "object" || !isPlan((body as any).plan)) {
+  if (
+    !body ||
+    typeof body !== "object" ||
+    !isPlan((body as RequestBody).plan)
+  ) {
     return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
   }
 
-  const plan = (body as any).plan as Plan;
+  const plan = (body as RequestBody).plan;
   const priceId = PRICES[plan];
 
   /* 3️⃣ Stripe Checkout */
