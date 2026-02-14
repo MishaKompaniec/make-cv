@@ -1,10 +1,6 @@
 "use client";
 
-export default function CheckoutButtons({
-  userEmail: _userEmail,
-}: {
-  userEmail: string;
-}) {
+export default function CheckoutButtons() {
   async function buy(plan: "day" | "week" | "lifetime") {
     const res = await fetch("/api/checkout", {
       method: "POST",

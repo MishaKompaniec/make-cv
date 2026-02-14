@@ -6,6 +6,7 @@ import { useEffect } from "react";
 
 import { AccountSidebar } from "./AccountSidebar/account-sidebar";
 import { CreateFlowSidebar } from "./CreateFlowSidebar/create-flow-sidebar";
+import { Logo } from "./Logo";
 import styles from "./sidebar.module.scss";
 
 export function Sidebar() {
@@ -23,8 +24,8 @@ export function Sidebar() {
 
   return (
     <aside key={pathname} className={styles.sidebar}>
-      <Link href="/" className={styles.logo}>
-        Makemycv
+      <Link href="/" className={styles.header}>
+        <Logo />
       </Link>
 
       {isCreateFlow && cvId ? (
