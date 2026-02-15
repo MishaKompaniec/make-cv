@@ -124,109 +124,101 @@
   display: none;
 }
 
-@media (max-width: $breakpoint-tablet) {
+@media (max-width: $breakpoint-desktop) {
   .steps {
     display: none;
   }
-}
 
-@media (max-width: $breakpoint-desktop) {
-  :global(body.create-flow) {
-    .steps {
-      display: none;
-    }
+  .mobileHeader {
+    display: grid;
+    grid-template-columns: 44px 1fr 44px;
+    align-items: center;
+    width: 100%;
+    padding: 0 12px;
+  }
 
-    .mobileHeader {
-      display: grid;
-      grid-template-columns: 44px 1fr 44px;
-      align-items: center;
-      width: 100%;
-      padding: 0 12px;
-    }
+  .mobileHeaderIconButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    color: $white;
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
 
-    .mobileHeaderIconButton {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      color: $white;
-      text-decoration: none;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
+  .mobileHeaderCenter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    background: transparent;
+    color: $white;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    text-align: center;
+    min-width: 0;
+  }
 
-    .mobileHeaderCenter {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2px;
-      background: transparent;
-      color: $white;
-      border: 0;
-      padding: 0;
-      cursor: pointer;
-      text-align: center;
-      min-width: 0;
-    }
+  .mobileHeaderTitle {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 
-    .mobileHeaderTitle {
-      max-width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+  .mobileDropdown {
+    display: block;
+    position: fixed;
+    top: 72px;
+    left: 0;
+    right: 0;
+    background: $sidebar-bg;
+    transform: translateY(-8px);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      transform $transition,
+      opacity $transition;
+    padding: 10px 12px 14px;
+    z-index: 195;
+    border-bottom-left-radius: 18px;
+    border-bottom-right-radius: 18px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  }
 
-    .mobileDropdown {
-      display: block;
-      position: fixed;
-      top: 72px;
-      left: 0;
-      right: 0;
-      background: $sidebar-bg;
-      transform: translateY(-8px);
-      opacity: 0;
-      pointer-events: none;
-      transition:
-        transform $transition,
-        opacity $transition;
-      padding: 10px 12px 14px;
-      z-index: 195;
-      border-bottom-left-radius: 18px;
-      border-bottom-right-radius: 18px;
-      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
-    }
+  .mobileDropdownOpen {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
 
-    .mobileDropdownOpen {
-      transform: translateY(0);
-      opacity: 1;
-      pointer-events: auto;
-    }
+  .mobileDropdownItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 12px 10px;
+    border-radius: 14px;
+    text-decoration: none;
+    color: $white;
+    cursor: default;
+  }
 
-    .mobileDropdownItem {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-      padding: 12px 10px;
-      border-radius: 14px;
-      text-decoration: none;
-      color: $white;
-      cursor: default;
-    }
+  .step {
+    color: rgba(255, 255, 255, 0.3);
+  }
 
-    .step {
-      color: rgba(255, 255, 255, 0.3);
-    }
+  .activeStep {
+    color: $white;
+  }
 
-    .activeStep {
-      color: $white;
-    }
-
-    .completedStep {
-      color: $accent;
-    }
+  .completedStep {
+    color: $accent;
   }
 }

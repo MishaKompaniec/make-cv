@@ -26,7 +26,7 @@
   }
 }
 
-@media (max-width: $breakpoint-tablet) {
+@media (max-width: $breakpoint-desktop) {
   .sidebar {
     width: 100%;
     height: 72px;
@@ -45,22 +45,6 @@
 
     svg {
       width: 80px;
-    }
-  }
-}
-
-@media (max-width: $breakpoint-desktop) {
-  :global(body.create-flow) {
-    .sidebar {
-      width: 100%;
-      height: 72px;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 200;
-      flex-direction: row;
-      align-items: center;
     }
   }
 }
