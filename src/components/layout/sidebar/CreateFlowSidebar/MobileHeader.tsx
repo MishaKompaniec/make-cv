@@ -1,10 +1,21 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 import type { CvBuilderStep } from "@/hooks/use-cv-builder-flow";
 
 import styles from "./sidebar.module.scss";
+
+type Props = {
+  previousPath: string;
+  currentStep: CvBuilderStep | null;
+  currentStepNumber: number;
+  totalSteps: number;
+  isMenuOpen: boolean;
+  toggleMenu: () => void;
+};
 
 export function MobileHeader({
   previousPath,
@@ -13,14 +24,24 @@ export function MobileHeader({
   totalSteps,
   isMenuOpen,
   toggleMenu,
-}: {
-  previousPath: string;
-  currentStep: CvBuilderStep;
-  currentStepNumber: number;
-  totalSteps: number;
-  isMenuOpen: boolean;
-  toggleMenu: () => void;
-}) {
+}: Props) {
+  const { data: session } = useSession();
+
+  const email = session?.user?.email ?? "";
+  const avatarUrl = session?.user?.image;
+
+  const getInitial = (value?: string | null) => {
+    if (!value) return "?";
+
+    const trimmed = value.trim();
+
+    return trimmed ? trimmed[0].toUpperCase() : "?";
+  };
+
+  if (!currentStep) {
+    return null;
+  }
+
   return (
     <div className={styles.mobileHeader}>
       <Link
@@ -56,8 +77,10 @@ export function MobileHeader({
         <div className={styles.mobileHeaderStepCount}>
           Step {currentStepNumber} of {totalSteps}
         </div>
+
         <div className={styles.mobileHeaderTitleRow}>
           <div className={styles.mobileHeaderTitle}>{currentStep.title}</div>
+
           <svg
             className={`${styles.mobileHeaderChevron}${
               isMenuOpen ? ` ${styles.mobileHeaderChevronOpen}` : ""
@@ -79,7 +102,21 @@ export function MobileHeader({
         </div>
       </button>
 
-      <div className={styles.mobileHeaderIconButton} aria-hidden="true" />
+      <div className={styles.mobileHeaderIconButton} aria-label="User profile">
+        {avatarUrl ? (
+          <Image
+            src={avatarUrl}
+            alt="User avatar"
+            width={44}
+            height={44}
+            className={styles.mobileHeaderAvatarImage}
+          />
+        ) : (
+          <div className={styles.mobileHeaderAvatarInitial}>
+            {getInitial(email)}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

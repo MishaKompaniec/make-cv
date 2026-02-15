@@ -15,10 +15,6 @@
   position: relative;
 }
 
-.stepLink {
-  text-decoration: none;
-}
-
 .step {
   display: flex;
   align-items: center;
@@ -65,19 +61,7 @@
   }
 }
 
-.stepDivider {
-  position: absolute;
-  left: 15px;
-  top: 22px;
-  border-left: 1px dashed rgba(255, 255, 255, 0.2);
-  height: 20px;
-}
-
 .mobileHeader {
-  display: none;
-}
-
-.mobileHeaderIconButton {
   display: none;
 }
 
@@ -134,7 +118,7 @@
     grid-template-columns: 44px 1fr 44px;
     align-items: center;
     width: 100%;
-    padding: 0 12px;
+    padding: 1rem 2rem;
   }
 
   .mobileHeaderIconButton {
@@ -148,6 +132,25 @@
     text-decoration: none;
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .mobileHeaderAvatarImage {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    object-fit: cover;
+  }
+
+  .mobileHeaderAvatarInitial {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: $white;
   }
 
   .mobileHeaderCenter {
@@ -220,5 +223,11 @@
 
   .completedStep {
     color: $accent;
+  }
+}
+
+@media (max-width: $breakpoint-tablet) {
+  .mobileHeader {
+    padding: 1rem 1rem;
   }
 }

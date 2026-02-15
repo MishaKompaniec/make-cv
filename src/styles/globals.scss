@@ -61,12 +61,6 @@ textarea::placeholder {
   }
 }
 
-.create-flow-container {
-  max-width: 1264px;
-  margin: 0 auto;
-  width: 100%;
-}
-
 @media (max-width: $breakpoint-desktop) {
   .main-content {
     margin-left: 0;
