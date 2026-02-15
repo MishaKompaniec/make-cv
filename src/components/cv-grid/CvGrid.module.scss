@@ -1,0 +1,42 @@
+@use "../../styles/variables.scss" as *;
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+.createCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 466px;
+  border: 2px dashed $border-light;
+  border-radius: $border-radius;
+  background: $bg-secondary;
+  cursor: pointer;
+  transition: all $transition;
+  color: $text;
+  text-decoration: none;
+
+  &:hover {
+    border-color: $accent;
+    background: $accent-light;
+    color: $accent;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+}
+
+.plusIcon {
+  font-size: 3rem;
+  font-weight: 300;
+  margin-bottom: 0.5rem;
+}

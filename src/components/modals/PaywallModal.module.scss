@@ -1,0 +1,33 @@
+@use "../../styles/variables.scss" as *;
+
+.modal {
+  width: min(420px, calc(100vw - 2.5rem)) !important;
+}
+
+.body {
+  background: $white;
+  border: 1px solid $border-light;
+  border-radius: $border-radius;
+  padding: 1rem;
+}
+
+.heading {
+  font-size: 1rem;
+  font-weight: 700;
+  color: $text-primary;
+  margin-bottom: 0.75rem;
+}
+
+.text {
+  font-size: 0.875rem;
+  color: $text;
+  margin-bottom: 1.5rem;
+  line-height: 1.35;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
