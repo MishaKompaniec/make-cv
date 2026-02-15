@@ -54,10 +54,21 @@ textarea::placeholder {
   min-height: 100vh;
 }
 
+.main-content__inner {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
 @media (max-width: $breakpoint-tablet) {
   .main-content {
     margin-left: 0;
     padding-top: 72px;
+  }
+
+  .main-content__inner {
+    padding: 0 1rem;
   }
 }
 

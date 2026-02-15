@@ -17,7 +17,9 @@ export default async function CvBuilderLayout({
     <div className="layout">
       <Sidebar />
       <main className="main-content">
-        <CvProvider cvId={id}>{children}</CvProvider>
+        <div className="main-content__inner">
+          <CvProvider cvId={id}>{children}</CvProvider>
+        </div>
       </main>
     </div>
   );

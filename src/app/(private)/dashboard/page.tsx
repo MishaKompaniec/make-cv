@@ -171,20 +171,104 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.grid}>
-        <button
-          onClick={handleCreateCv}
-          className={styles.createCard}
-          disabled={isCreating}
-        >
-          <div className={styles.plusIcon}>+</div>
-          <p>{isCreating ? "Creating..." : "Create CV"}</p>
-        </button>
-
-        {isLoading ? (
+      {isLoading ? (
+        <div className={styles.grid}>
           <CvGridSkeleton count={2} />
-        ) : (
-          cvs.map((cv) => (
+        </div>
+      ) : cvs.length === 0 ? (
+        <div className={styles.emptyState}>
+          <div className={styles.emptyContent}>
+            <div aria-hidden>
+              <svg
+                width="72"
+                height="72"
+                viewBox="0 0 72 72"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect
+                  x="6"
+                  y="6"
+                  width="60"
+                  height="60"
+                  rx="12"
+                  fill="#f5f2f2ff"
+                />
+                <rect
+                  x="16"
+                  y="16"
+                  width="40"
+                  height="8"
+                  rx="2"
+                  fill="#daf0e0"
+                />
+                <rect
+                  x="16"
+                  y="28"
+                  width="28"
+                  height="6"
+                  rx="2"
+                  fill="#2f855a"
+                />
+                <rect
+                  x="16"
+                  y="38"
+                  width="24"
+                  height="6"
+                  rx="2"
+                  fill="#bcdbc5ff"
+                />
+                <rect
+                  x="16"
+                  y="48"
+                  width="32"
+                  height="6"
+                  rx="2"
+                  fill="#daf0e0"
+                />
+                <circle
+                  cx="52"
+                  cy="42"
+                  r="7"
+                  stroke="#2f855a"
+                  strokeWidth="2.5"
+                />
+                <path
+                  d="M52 38v4l2.5 2.5"
+                  stroke="#2f855a"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+            <h2 className={styles.emptyTitle}>Create your first CV</h2>
+            <p className={styles.emptyText}>
+              Start by creating a new CV, then customize sections, colors, and
+              download when ready.
+            </p>
+            <Button
+              variant="primary"
+              size="md"
+              onClick={handleCreateCv}
+              disabled={isCreating}
+            >
+              {isCreating ? "Creating..." : "Create CV"}
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div className={styles.grid}>
+          <button
+            onClick={handleCreateCv}
+            className={styles.createCard}
+            disabled={isCreating}
+          >
+            <div className={styles.plusIcon}>+</div>
+            <p>{isCreating ? "Creating..." : "Create CV"}</p>
+          </button>
+
+          {cvs.map((cv) => (
             <CvCard
               key={cv.id}
               cv={cv}
@@ -195,9 +279,9 @@ export default function Home() {
               onRequestDuplicate={(id) => setConfirmDuplicateId(id)}
               onPaywall={(id) => openPaywall(id)}
             />
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
 
       <BaseModal
         isOpen={!!confirmDeleteId}

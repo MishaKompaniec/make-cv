@@ -1,9 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { ReactNode } from "react";
 
 import { Button } from "@/components/ui/button/button";
+import { Logo } from "@/components/ui/logo/logo";
 
 import styles from "./main-header.module.scss";
 
@@ -11,9 +11,6 @@ interface MainHeaderProps {
   email: string;
   avatarUrl?: string | null;
   onLogout: () => void;
-  logoSrc?: string;
-  logoAlt?: string;
-  logoFallback?: ReactNode;
 }
 
 function getInitial(email?: string) {
@@ -22,29 +19,11 @@ function getInitial(email?: string) {
   return trimmed ? trimmed.charAt(0).toUpperCase() : "?";
 }
 
-export function MainHeader({
-  email,
-  avatarUrl,
-  onLogout,
-  logoSrc,
-  logoAlt = "Logo",
-  logoFallback = "Logo",
-}: MainHeaderProps) {
+export function MainHeader({ email, avatarUrl, onLogout }: MainHeaderProps) {
   return (
     <header className={styles.header}>
       <div className={styles.logoSlot}>
-        {logoSrc ? (
-          <Image
-            src={logoSrc}
-            alt={logoAlt}
-            width={100}
-            height={28}
-            className={styles.logoImage}
-            priority
-          />
-        ) : (
-          <div className={styles.logoPlaceholder}>{logoFallback}</div>
-        )}
+        <Logo />
       </div>
 
       <div className={styles.rightZone}>
@@ -58,12 +37,7 @@ export function MainHeader({
             getInitial(email)
           )}
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onLogout}
-          className={styles.logoutButton}
-        >
+        <Button variant="ghost" size="sm" onClick={onLogout}>
           Logout
         </Button>
       </div>
