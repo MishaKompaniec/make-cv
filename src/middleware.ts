@@ -3,45 +3,55 @@ import { NextResponse } from "next/server";
 import type { JWT } from "next-auth/jwt";
 import { getToken } from "next-auth/jwt";
 
-const AUTH_PAGES = new Set(["/welcome"]);
+const PUBLIC_ROUTES = new Set(["/welcome"]);
 
 function isValidToken(token: JWT | null): boolean {
   if (!token) return false;
   if (!token.sub || !token.email) return false;
-  if (typeof token.exp === "number" && Date.now() / 1000 > token.exp)
-    return false;
+
+  if (typeof token.exp === "number") {
+    if (Date.now() / 1000 > token.exp) return false;
+  }
+
   return true;
 }
 
 function isPublicFile(pathname: string): boolean {
-  const PUBLIC_FILES = ["/favicon.ico", "/robots.txt", "/sitemap.xml"];
   return (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
-    PUBLIC_FILES.includes(pathname)
+    pathname === "/favicon.ico" ||
+    pathname === "/robots.txt" ||
+    pathname === "/sitemap.xml"
   );
 }
 
 export async function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
 
-  if (isPublicFile(pathname)) return NextResponse.next();
+  if (isPublicFile(pathname)) {
+    return NextResponse.next();
+  }
 
-  const token = await getToken({ req });
+  const token = await getToken({
+    req,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
+
   const isAuthed = isValidToken(token);
 
-  if (!isAuthed && !AUTH_PAGES.has(pathname)) {
+  if (!isAuthed && !PUBLIC_ROUTES.has(pathname)) {
     const url = req.nextUrl.clone();
+
     url.pathname = "/welcome";
 
-    const fullPath = pathname + search;
-    url.searchParams.set("callbackUrl", fullPath);
+    url.searchParams.set("callbackUrl", pathname + search);
 
     return NextResponse.redirect(url);
   }
 
-  if (isAuthed && AUTH_PAGES.has(pathname)) {
-    return NextResponse.redirect(new URL("/", req.url));
+  if (isAuthed && PUBLIC_ROUTES.has(pathname)) {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
   return NextResponse.next();

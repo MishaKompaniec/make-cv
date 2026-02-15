@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { Sidebar } from "@/components/sidebar/sidebar";
+
 import { CvProvider } from "./provider";
 
 export default async function CvBuilderLayout({
@@ -10,5 +12,13 @@ export default async function CvBuilderLayout({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  return <CvProvider cvId={id}>{children}</CvProvider>;
+
+  return (
+    <div className="layout">
+      <Sidebar />
+      <main className="main-content">
+        <CvProvider cvId={id}>{children}</CvProvider>
+      </main>
+    </div>
+  );
 }
