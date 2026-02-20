@@ -29,6 +29,9 @@ export function Button({
   loading = false,
   ...props
 }: ButtonProps) {
+  const spinnerTone =
+    variant === "outline" || variant === "ghost" ? "accent" : "default";
+
   const classNames = [
     styles.button,
     styles[variant],
@@ -43,7 +46,7 @@ export function Button({
   return (
     <button className={classNames} disabled={disabled || loading} {...props}>
       {loading ? (
-        <ButtonSpinner size={20} />
+        <ButtonSpinner size={20} tone={spinnerTone} />
       ) : (
         <>
           {leftIcon}

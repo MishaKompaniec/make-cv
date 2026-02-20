@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button/button";
 import { BaseModal } from "@/components/ui/modal/base-modal";
@@ -68,11 +68,10 @@ export function PaywallModal({
               size={buttonSize}
               onClick={() => onStartCheckout("day")}
               disabled={!!checkoutPlanInFlight}
+              loading={checkoutPlanInFlight === "day"}
               fullWidth
             >
-              {checkoutPlanInFlight === "day"
-                ? "Redirecting..."
-                : "Choose Plan"}
+              Choose Plan
             </Button>
           </div>
 
@@ -101,11 +100,10 @@ export function PaywallModal({
               size={buttonSize}
               onClick={() => onStartCheckout("week")}
               disabled={!!checkoutPlanInFlight}
+              loading={checkoutPlanInFlight === "week"}
               fullWidth
             >
-              {checkoutPlanInFlight === "week"
-                ? "Redirecting..."
-                : "Choose Plan"}
+              Choose Plan
             </Button>
           </div>
 
@@ -135,11 +133,10 @@ export function PaywallModal({
               size={buttonSize}
               onClick={() => onStartCheckout("lifetime")}
               disabled={!!checkoutPlanInFlight}
+              loading={checkoutPlanInFlight === "lifetime"}
               fullWidth
             >
-              {checkoutPlanInFlight === "lifetime"
-                ? "Redirecting..."
-                : "Choose Plan"}
+              Choose Plan
             </Button>
           </div>
         </div>
