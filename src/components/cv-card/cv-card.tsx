@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button/button";
 import { Loader } from "@/components/ui/loader/loader";
 import { getArray, getSelectedSections } from "@/lib/cv-data";
+import { downloadPdf } from "@/lib/download-pdf";
 import type {
   CustomSectionPreviewItem,
   EducationPreviewItem,
@@ -178,6 +179,10 @@ export function CvCard({
   const isBusy = deletingId === cv.id || duplicatingId === cv.id;
   const [isExporting, setIsExporting] = useState(false);
 
+  const triggerPaywall = () => {
+    onPaywall(cv.id);
+  };
+
   return (
     <BlobProvider document={pdfReactDocument}>
       {({ url, loading, error, blob }) => {
@@ -247,41 +252,16 @@ export function CvCard({
                 size="sm"
                 fullWidth
                 onClick={() => {
-                  const run = async () => {
-                    if (!blob) return;
+                  if (isExporting) return;
 
+                  const run = async () => {
                     setIsExporting(true);
                     try {
-                      const res = await fetch("/api/export/permission", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                      await downloadPdf({
+                        cvId: cv.id,
+                        fileName,
+                        triggerPaywall,
                       });
-
-                      if (!res.ok) {
-                        onPaywall(cv.id);
-                        return;
-                      }
-
-                      const json = (await res.json()) as {
-                        allowed?: boolean;
-                      };
-
-                      if (!json.allowed) {
-                        onPaywall(cv.id);
-                        return;
-                      }
-
-                      const objectUrl = URL.createObjectURL(blob);
-                      const a = document.createElement("a");
-                      a.href = objectUrl;
-                      a.download = fileName;
-                      document.body.appendChild(a);
-                      a.click();
-                      a.remove();
-                      window.setTimeout(
-                        () => URL.revokeObjectURL(objectUrl),
-                        0,
-                      );
                     } finally {
                       setIsExporting(false);
                     }
@@ -291,7 +271,7 @@ export function CvCard({
                 }}
                 disabled={!blob || isBusy || isExporting}
               >
-                {isExporting ? "Checking..." : "Download PDF"}
+                {isExporting ? <Loader size={16} /> : "Download PDF"}
               </Button>
             }
           />

@@ -20,6 +20,7 @@ import {
 import { Loader } from "@/components/ui/loader/loader";
 import { usePreviewState } from "@/hooks/usePreviewState";
 import { getArray, getSelectedSections } from "@/lib/cv-data";
+import { downloadPdf } from "@/lib/download-pdf";
 import type {
   CustomSectionPreviewItem,
   EducationPreviewItem,
@@ -168,47 +169,28 @@ export default function FinalizePage() {
     void run();
   }, []);
 
-  const handleDownload = useCallback(() => {
-    const run = async () => {
-      const blob = blobRef.current;
-      if (!blob) return;
+  const triggerPaywall = useCallback(() => {
+    setIsPaywallOpen(true);
+  }, []);
 
+  const handleDownload = useCallback(() => {
+    if (isExporting) return;
+
+    const run = async () => {
       setIsExporting(true);
       try {
-        const res = await fetch("/api/export/permission", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+        await downloadPdf({
+          cvId,
+          fileName: defaultFileName,
+          triggerPaywall,
         });
-
-        if (!res.ok) {
-          setIsPaywallOpen(true);
-          return;
-        }
-
-        const json = (await res.json()) as { allowed?: boolean };
-
-        if (!json.allowed) {
-          setIsPaywallOpen(true);
-          return;
-        }
-
-        const objectUrl = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = objectUrl;
-        a.download = defaultFileName;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.setTimeout(() => {
-          URL.revokeObjectURL(objectUrl);
-        }, 0);
       } finally {
         setIsExporting(false);
       }
     };
 
     void run();
-  }, [defaultFileName]);
+  }, [cvId, defaultFileName, isExporting, triggerPaywall]);
 
   return (
     <div key={cvId} className={styles.pageContainer}>

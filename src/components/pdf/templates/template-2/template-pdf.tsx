@@ -30,39 +30,41 @@ const TEMPLATE_2_ACCENT_BY_SIDEBAR_COLOR: Record<string, string> = {
   "#f0ebf8": "#725ea8",
 };
 
-Font.register({
-  family: "Inter",
-  fonts: [
-    {
-      src: new URL(
-        "../../../../assets/fonts/Inter-Regular.ttf",
-        import.meta.url,
-      ).toString(),
-      fontWeight: 400,
-    },
-    {
-      src: new URL(
-        "../../../../assets/fonts/Inter-Medium.ttf",
-        import.meta.url,
-      ).toString(),
-      fontWeight: 500,
-    },
-    {
-      src: new URL(
-        "../../../../assets/fonts/Inter-SemiBold.ttf",
-        import.meta.url,
-      ).toString(),
-      fontWeight: 600,
-    },
-    {
-      src: new URL(
-        "../../../../assets/fonts/Inter-Bold.ttf",
-        import.meta.url,
-      ).toString(),
-      fontWeight: 700,
-    },
-  ],
-});
+if (typeof window !== "undefined") {
+  Font.register({
+    family: "Inter",
+    fonts: [
+      {
+        src: new URL(
+          "../../../../assets/fonts/Inter-Regular.ttf",
+          import.meta.url,
+        ).toString(),
+        fontWeight: 400,
+      },
+      {
+        src: new URL(
+          "../../../../assets/fonts/Inter-Medium.ttf",
+          import.meta.url,
+        ).toString(),
+        fontWeight: 500,
+      },
+      {
+        src: new URL(
+          "../../../../assets/fonts/Inter-SemiBold.ttf",
+          import.meta.url,
+        ).toString(),
+        fontWeight: 600,
+      },
+      {
+        src: new URL(
+          "../../../../assets/fonts/Inter-Bold.ttf",
+          import.meta.url,
+        ).toString(),
+        fontWeight: 700,
+      },
+    ],
+  });
+}
 
 const normalizeHex = (value: string) => value.trim().toLowerCase();
 
