@@ -210,12 +210,6 @@ export default function FinalizePage() {
     void run();
   }, [defaultFileName]);
 
-  const nextLabel = isGenerating
-    ? "Generating..."
-    : isExporting
-      ? "Checking access..."
-      : "Download CV";
-
   return (
     <div key={cvId} className={styles.pageContainer}>
       <PageHeader
@@ -275,8 +269,9 @@ export default function FinalizePage() {
 
       <NavigationFooter
         backHref={`/cv-builder/${cvId}/other-sections`}
-        nextLabel={nextLabel}
+        nextLabel="Download CV"
         nextDisabled={isCvLoading || isGenerating || !hasBlob || isExporting}
+        nextLoading={isGenerating || isExporting}
         onNextClick={handleDownload}
       />
 

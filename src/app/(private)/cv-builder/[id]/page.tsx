@@ -156,8 +156,9 @@ export default function ChooseTemplatePage() {
       </div>
 
       <NavigationFooter
-        nextLabel={isSaving ? "Saving..." : "Next Step"}
+        nextLabel="Next Step"
         nextDisabled={isCvLoading || !isInitialized || isSaving}
+        nextLoading={isSaving}
         onNextClick={handleNextClick}
         nextHref={`/cv-builder/${cvId}/contact-details`}
       />

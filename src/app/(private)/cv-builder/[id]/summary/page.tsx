@@ -137,8 +137,9 @@ export default function SummaryPage() {
       <NavigationFooter
         backHref={`/cv-builder/${cvId}/contact-details`}
         nextHref={`/cv-builder/${cvId}/work-experience`}
-        nextLabel={isSaving ? "Saving..." : "Next Step"}
+        nextLabel="Next Step"
         nextDisabled={isCvLoading || !didInitRef.current || isSaving}
+        nextLoading={isSaving}
         onNextClick={handleNextClick}
       />
     </div>

@@ -162,8 +162,9 @@ export default function EducationPage() {
       <NavigationFooter
         backHref={`/cv-builder/${cvId}/work-experience`}
         nextHref={`/cv-builder/${cvId}/skills`}
-        nextLabel={isSaving ? "Saving..." : "Next Step"}
+        nextLabel="Next Step"
         nextDisabled={isCvLoading || !didInitRef.current || isSaving}
+        nextLoading={isSaving}
         onNextClick={handleNextClick}
       />
     </div>

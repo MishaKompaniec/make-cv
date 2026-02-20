@@ -1,5 +1,7 @@
 import { ButtonHTMLAttributes, ReactNode } from "react";
 
+import { ButtonSpinner } from "@/components/ui/button-spinner/button-spinner";
+
 import styles from "./button.module.scss";
 
 type Variant = "primary" | "secondary" | "outline" | "ghost";
@@ -12,6 +14,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
   fullWidth?: boolean;
+  loading?: boolean;
 }
 
 export function Button({
@@ -23,6 +26,7 @@ export function Button({
   fullWidth = false,
   className = "",
   disabled = false,
+  loading = false,
   ...props
 }: ButtonProps) {
   const classNames = [
@@ -30,16 +34,23 @@ export function Button({
     styles[variant],
     size !== "md" ? styles[size] : "",
     fullWidth ? styles.fullWidth : "",
+    loading ? styles.loading : "",
     className,
   ]
     .filter(Boolean)
     .join(" ");
 
   return (
-    <button className={classNames} disabled={disabled} {...props}>
-      {leftIcon}
-      {children}
-      {rightIcon}
+    <button className={classNames} disabled={disabled || loading} {...props}>
+      {loading ? (
+        <ButtonSpinner size={20} />
+      ) : (
+        <>
+          {leftIcon}
+          {children}
+          {rightIcon}
+        </>
+      )}
     </button>
   );
 }

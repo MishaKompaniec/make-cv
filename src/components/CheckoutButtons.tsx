@@ -1,24 +1,42 @@
 "use client";
 
+import { useState } from "react";
+
+import { Button } from "@/components/ui/button/button";
+
 export default function CheckoutButtons() {
+  const [loading, setLoading] = useState<string | null>(null);
+
   async function buy(plan: "day" | "week" | "lifetime") {
-    const res = await fetch("/api/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ plan }),
-    });
+    setLoading(plan);
 
-    const data = (await res.json()) as { url?: string };
-    if (!data.url) return;
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan }),
+      });
 
-    window.location.href = data.url;
+      const data = (await res.json()) as { url?: string };
+      if (!data.url) return;
+
+      window.location.href = data.url;
+    } finally {
+      setLoading(null);
+    }
   }
 
   return (
     <div>
-      <button onClick={() => buy("day")}>24h — $2.99</button>
-      <button onClick={() => buy("week")}>7 days — $5.99</button>
-      <button onClick={() => buy("lifetime")}>Lifetime — $9.99</button>
+      <Button onClick={() => buy("day")} loading={loading === "day"}>
+        24h — $2.99
+      </Button>
+      <Button onClick={() => buy("week")} loading={loading === "week"}>
+        7 days — $5.99
+      </Button>
+      <Button onClick={() => buy("lifetime")} loading={loading === "lifetime"}>
+        Lifetime — $9.99
+      </Button>
     </div>
   );
 }

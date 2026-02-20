@@ -170,8 +170,9 @@ export default function WorkExperiencePage() {
       <NavigationFooter
         backHref={`/cv-builder/${cvId}/summary`}
         nextHref={`/cv-builder/${cvId}/education`}
-        nextLabel={isSaving ? "Saving..." : "Next Step"}
+        nextLabel="Next Step"
         nextDisabled={isCvLoading || !didInitRef.current || isSaving}
+        nextLoading={isSaving}
         onNextClick={handleNextClick}
       />
     </div>

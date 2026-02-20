@@ -117,4 +117,13 @@
   &.fullWidth {
     width: 100%;
   }
+
+  &.loading {
+    pointer-events: none;
+
+    &:hover {
+      box-shadow: none;
+      transform: none;
+    }
+  }
 }

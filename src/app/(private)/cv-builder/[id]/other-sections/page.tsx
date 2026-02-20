@@ -380,8 +380,9 @@ export default function OtherSectionsPage() {
       <NavigationFooter
         backHref={`/cv-builder/${cvId}/skills`}
         nextHref={`/cv-builder/${cvId}/finalize`}
-        nextLabel={isSaving ? "Saving..." : "Next Step"}
+        nextLabel="Next Step"
         nextDisabled={isCvLoading || !didInitRef.current || isSaving}
+        nextLoading={isSaving}
         onNextClick={handleNextClick}
       />
     </div>

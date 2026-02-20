@@ -574,8 +574,9 @@ export default function ContactDetailsPage() {
       <NavigationFooter
         backHref={`/cv-builder/${cvId}`}
         nextHref={`/cv-builder/${cvId}/summary`}
-        nextLabel={isSaving ? "Saving..." : "Next Step"}
+        nextLabel="Next Step"
         nextDisabled={isCvLoading || !didInitRef.current || isSaving}
+        nextLoading={isSaving}
         onNextClick={handleNextClick}
       />
     </div>

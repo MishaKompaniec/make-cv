@@ -9,11 +9,10 @@ import styles from "./navigation-footer.module.scss";
 interface NavigationFooterProps {
   backHref?: string;
   nextHref?: string;
-
   onNextClick?: () => void;
-
   nextLabel?: string;
   nextDisabled?: boolean;
+  nextLoading?: boolean;
 }
 
 export function NavigationFooter({
@@ -22,6 +21,7 @@ export function NavigationFooter({
   onNextClick,
   nextLabel = "Next Step",
   nextDisabled = false,
+  nextLoading = false,
 }: NavigationFooterProps) {
   const router = useRouter();
 
@@ -52,6 +52,7 @@ export function NavigationFooter({
           variant="primary"
           onClick={handleNextClick}
           disabled={nextDisabled}
+          loading={nextLoading}
         >
           {nextLabel}
         </Button>
