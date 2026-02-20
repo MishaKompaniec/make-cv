@@ -1,11 +1,12 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import { PageHeader } from "@/components/layout/builder-header/builder-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { PaywallModal } from "@/components/modals/PaywallModal";
+import { PreviewPanel } from "@/components/pdf/finalize/PreviewPanel";
 import { Pagination } from "@/components/pdf/pagination/pagination";
 import {
   TEMPLATE_1_COLORS,
@@ -36,83 +37,7 @@ const BlobProvider = dynamic(
   { ssr: false },
 );
 
-const PdfCanvasPreview = dynamic(
-  () =>
-    import("@/components/pdf-canvas-preview/pdf-canvas-preview").then(
-      (m) => m.PdfCanvasPreview,
-    ),
-  { ssr: false },
-);
-
 const stepTitle = "Finalize";
-
-function PreviewPanel({
-  url,
-  loading,
-  error,
-  blob,
-  pageNumber,
-  onNumPagesChange,
-  onHasBlobChange,
-  onIsGeneratingChange,
-}: {
-  url?: string | null;
-  loading: boolean;
-  error?: Error | null;
-  blob?: Blob | null;
-  pageNumber: number;
-  onNumPagesChange: (numPages: number) => void;
-  onHasBlobChange: (value: boolean) => void;
-  onIsGeneratingChange: (value: boolean) => void;
-}) {
-  useEffect(() => {
-    onHasBlobChange(!!blob);
-  }, [blob, onHasBlobChange]);
-
-  useEffect(() => {
-    onIsGeneratingChange(loading);
-  }, [loading, onIsGeneratingChange]);
-
-  return (
-    <div className={styles.previewContainer}>
-      <div className={styles.previewFrame}>
-        {loading ? (
-          <div
-            style={{
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Loader />
-          </div>
-        ) : error || !url ? (
-          <div
-            style={{
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#666",
-            }}
-          >
-            Failed to generate preview.
-          </div>
-        ) : (
-          <PdfCanvasPreview
-            url={url}
-            className={styles.previewCanvas}
-            pageNumber={pageNumber}
-            onNumPagesChange={onNumPagesChange}
-          />
-        )}
-      </div>
-    </div>
-  );
-}
 
 export default function FinalizePage() {
   const { cvId, cv: cvSnapshot, isLoading: isCvLoading } = useCv();
