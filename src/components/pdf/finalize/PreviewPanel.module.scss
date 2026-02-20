@@ -7,6 +7,7 @@
   padding: 2rem;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 
   @media (max-width: $breakpoint-tablet) {
     padding: 0.5rem;
@@ -16,7 +17,11 @@
 .previewFrame {
   flex: 1;
   border-radius: 0.75rem;
+  width: 100%;
+  max-width: 100%;
   min-height: 0;
+  min-width: 0;
+  aspect-ratio: 210 / 297;
   overflow: hidden;
   display: flex;
   justify-content: center;
@@ -29,4 +34,14 @@
   max-width: 100%;
   background: $white;
   overflow: hidden;
+}
+
+.previewCanvas :global(canvas) {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+.previewCanvas :global(.react-pdf__Page__canvas) {
+  max-width: 100% !important;
+  height: auto !important;
 }
