@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   type ChangeEvent,
   type FocusEvent,
+  type InputEvent,
   useCallback,
   useEffect,
   useRef,
@@ -72,6 +73,7 @@ export default function ContactDetailsPage() {
     register,
     handleSubmit,
     formState: { errors },
+    getValues,
     reset,
     watch,
     setValue,
@@ -134,8 +136,14 @@ export default function ContactDetailsPage() {
         field.onChange(e);
         schedulePatch(name, e.target.value);
       },
+      onInput: (e: InputEvent<HTMLInputElement>) => {
+        const value = e.currentTarget.value;
+        setValue(name, value, { shouldDirty: true, shouldValidate: true });
+        schedulePatch(name, value);
+      },
       onBlur: (e: FocusEvent<HTMLInputElement>) => {
         field.onBlur(e);
+        schedulePatch(name, e.target.value);
       },
     };
   };
@@ -144,6 +152,11 @@ export default function ContactDetailsPage() {
     if (!cvId) return;
     try {
       await patcher.flush();
+      await patchCv({
+        data: {
+          contactDetails: getValues(),
+        },
+      });
       router.push(`/cv-builder/${cvId}/summary`);
     } finally {
       // patcher manages isSaving via in-flight tracking
