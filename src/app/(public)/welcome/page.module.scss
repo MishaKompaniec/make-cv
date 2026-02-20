@@ -29,20 +29,12 @@
   position: relative;
 }
 
-.header {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
 .brand {
   width: 100px;
   height: auto;
   display: flex;
   align-items: center;
-  position: absolute;
-  top: 15px;
-  right: 15px;
+  margin: 0 auto 14px auto;
 }
 
 .title {
@@ -51,13 +43,7 @@
   line-height: 1.05;
   letter-spacing: -0.03em;
   color: $text-dark;
-}
-
-.subtitle {
-  margin: 0;
-  font-size: 18px;
-  color: $text;
-  max-width: 62ch;
+  text-align: center;
 }
 
 .grid {
@@ -149,11 +135,6 @@
 @media (max-width: $breakpoint-tablet) {
   .card {
     padding: 24px;
-  }
-
-  .brand {
-    position: static;
-    margin: 0 auto 14px auto;
   }
 
   .title {

@@ -109,14 +109,7 @@ export default function WelcomePage() {
             </text>
           </svg>
         </div>
-        <header className={styles.header}>
-          <h1 className={styles.title}>Create a professional CV in minutes</h1>
-          <p className={styles.subtitle}>
-            Choose a template, fill in your details, and export a polished
-            resume. You can even download one PDF for free.
-          </p>
-        </header>
-
+        <h1 className={styles.title}>Create a professional CV in minutes</h1>
         <div className={styles.grid}>
           <Features />
           <CallToAction />
