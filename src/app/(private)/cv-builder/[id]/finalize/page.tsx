@@ -1,10 +1,11 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { PageHeader } from "@/components/layout/builder-header/builder-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
+import { PaywallModal } from "@/components/modals/PaywallModal";
 import { Pagination } from "@/components/pdf/pagination/pagination";
 import {
   TEMPLATE_1_COLORS,
@@ -116,6 +117,12 @@ function PreviewPanel({
 export default function FinalizePage() {
   const { cvId, cv: cvSnapshot, isLoading: isCvLoading } = useCv();
 
+  const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const [checkoutPlanInFlight, setCheckoutPlanInFlight] = useState<
+    "day" | "week" | "lifetime" | null
+  >(null);
+  const [isExporting, setIsExporting] = useState(false);
+
   const {
     pageNumber,
     setPageNumber,
@@ -215,21 +222,74 @@ export default function FinalizePage() {
     [PdfDocument, previewData, selectedColor],
   );
 
-  const handleDownload = () => {
-    const blob = blobRef.current;
-    if (!blob) return;
+  const startCheckout = useCallback((plan: "day" | "week" | "lifetime") => {
+    const run = async () => {
+      setCheckoutPlanInFlight(plan);
+      try {
+        const res = await fetch("/api/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ plan }),
+        });
 
-    const objectUrl = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = objectUrl;
-    a.download = defaultFileName;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    window.setTimeout(() => {
-      URL.revokeObjectURL(objectUrl);
-    }, 0);
-  };
+        const data = (await res.json()) as { url?: string };
+        if (!data.url) return;
+        window.location.href = data.url;
+      } finally {
+        setCheckoutPlanInFlight(null);
+      }
+    };
+
+    void run();
+  }, []);
+
+  const handleDownload = useCallback(() => {
+    const run = async () => {
+      const blob = blobRef.current;
+      if (!blob) return;
+
+      setIsExporting(true);
+      try {
+        const res = await fetch("/api/export/permission", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (!res.ok) {
+          setIsPaywallOpen(true);
+          return;
+        }
+
+        const json = (await res.json()) as { allowed?: boolean };
+
+        if (!json.allowed) {
+          setIsPaywallOpen(true);
+          return;
+        }
+
+        const objectUrl = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = objectUrl;
+        a.download = defaultFileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.setTimeout(() => {
+          URL.revokeObjectURL(objectUrl);
+        }, 0);
+      } finally {
+        setIsExporting(false);
+      }
+    };
+
+    void run();
+  }, [defaultFileName]);
+
+  const nextLabel = isGenerating
+    ? "Generating..."
+    : isExporting
+      ? "Checking access..."
+      : "Download CV";
 
   return (
     <div key={cvId} className={styles.pageContainer}>
@@ -290,9 +350,16 @@ export default function FinalizePage() {
 
       <NavigationFooter
         backHref={`/cv-builder/${cvId}/other-sections`}
-        nextLabel={isGenerating ? "Generating..." : "Download CV"}
-        nextDisabled={isCvLoading || isGenerating || !hasBlob}
+        nextLabel={nextLabel}
+        nextDisabled={isCvLoading || isGenerating || !hasBlob || isExporting}
         onNextClick={handleDownload}
+      />
+
+      <PaywallModal
+        isOpen={isPaywallOpen}
+        onClose={() => setIsPaywallOpen(false)}
+        checkoutPlanInFlight={checkoutPlanInFlight}
+        onStartCheckout={startCheckout}
       />
     </div>
   );
