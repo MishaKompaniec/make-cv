@@ -5,6 +5,7 @@ import { signIn, useSession } from "next-auth/react";
 import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button/button";
+import { Logo } from "@/components/ui/logo/logo";
 
 import styles from "./page.module.scss";
 
@@ -21,8 +22,10 @@ export default function WelcomePage() {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
+        <div className={styles.brand}>
+          <Logo />
+        </div>
         <header className={styles.header}>
-          <div className={styles.brand}>Makemycv</div>
           <h1 className={styles.title}>Create a professional CV in minutes</h1>
           <p className={styles.subtitle}>
             Choose a template, fill in your details, and export a polished

@@ -3,7 +3,7 @@ export function Logo() {
     <svg
       width="100%"
       height="100%"
-      viewBox="0 0 160 43"
+      viewBox="0 0 134 43"
       xmlns="http://www.w3.org/2000/svg"
     >
       <rect x="0" y="3" width="35" height="45" rx="4" ry="4" fill="#2f855a" />

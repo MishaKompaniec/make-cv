@@ -28,6 +28,7 @@
   backdrop-filter: blur(10px);
   box-shadow: $shadow-md;
   border: 1px solid rgba(0, 0, 0, 0.06);
+  position: relative;
 }
 
 .header {
@@ -37,10 +38,13 @@
 }
 
 .brand {
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  font-size: 18px;
-  color: $text;
+  width: 100px;
+  height: auto;
+  display: flex;
+  align-items: center;
+  position: absolute;
+  top: 15px;
+  right: 15px;
 }
 
 .title {
@@ -147,6 +151,11 @@
 @media (max-width: $breakpoint-tablet) {
   .card {
     padding: 24px;
+  }
+
+  .brand {
+    position: static;
+    margin: 0 auto 14px auto;
   }
 
   .title {
