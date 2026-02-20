@@ -29,13 +29,13 @@ export default function CheckoutButtons() {
   return (
     <div>
       <Button onClick={() => buy("day")} loading={loading === "day"}>
-        24h — $2.99
+        24h — €2.99
       </Button>
       <Button onClick={() => buy("week")} loading={loading === "week"}>
-        7 days — $5.99
+        7 days — €5.99
       </Button>
       <Button onClick={() => buy("lifetime")} loading={loading === "lifetime"}>
-        Lifetime — $9.99
+        Lifetime — €9.99
       </Button>
     </div>
   );

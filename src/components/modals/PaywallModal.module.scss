@@ -1,33 +1,118 @@
 @use "../../styles/variables.scss" as *;
 
 .modal {
-  width: min(420px, calc(100vw - 2.5rem)) !important;
+  width: min(1200px, calc(100vw - 2.5rem)) !important;
 }
 
 .body {
   background: $white;
   border: 1px solid $border-light;
   border-radius: $border-radius;
-  padding: 1rem;
+  padding: 1rem 2rem 2rem 2rem;
+  max-height: 95vh;
+  overflow-y: auto;
 }
 
 .heading {
-  font-size: 1rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: $text-primary;
   margin-bottom: 0.75rem;
 }
 
-.text {
-  font-size: 0.875rem;
-  color: $text;
-  margin-bottom: 1.5rem;
-  line-height: 1.35;
+.plans {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    align-items: stretch;
+    height: 450px;
+  }
 }
 
-.actions {
+.plan {
+  flex: 1;
+  background: $white;
+  border: 1px solid $border-light;
+  border-radius: $border-radius;
+  padding: 1.5rem;
+  position: relative;
+  transition: all $transition;
   display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+}
+
+.planContent {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.popularBadge {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: $primary;
+  color: $white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.planHeader {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.planTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: $text-primary;
+  margin-bottom: 0.5rem;
+}
+
+.planPrice {
+  font-size: 2rem;
+  font-weight: 700;
+  color: $primary;
+}
+
+.planDescription {
+  color: $text;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.planFeatures {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  min-height: 12rem;
+
+  @media (max-width: #{$breakpoint-tablet - 1px}) {
+    min-height: fit-content;
+    margin-bottom: 1rem;
+  }
+
+  li {
+    color: $text;
+    font-size: 0.875rem;
+    padding: 0.5rem 0;
+    position: relative;
+    padding-left: 1.5rem;
+
+    &:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: $primary;
+      font-weight: 600;
+    }
+  }
 }
