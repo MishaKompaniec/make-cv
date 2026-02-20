@@ -1,0 +1,39 @@
+@use "../../styles/variables.scss" as *;
+
+.modal {
+  width: min(420px, calc(100vw - 2.5rem)) !important;
+}
+
+.body {
+  background: $white;
+  border: 1px solid rgba($error, 0.35);
+  border-radius: $border-radius;
+  padding: 1rem;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+}
+
+.heading {
+  font-size: 1rem;
+  font-weight: 700;
+  color: $error;
+  margin-bottom: 0.75rem;
+}
+
+.text {
+  font-size: 0.875rem;
+  color: $text;
+  margin-bottom: 1.5rem;
+  line-height: 1.35;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.ok {
+  border-color: rgba($error, 0.65) !important;
+  color: $error !important;
+}

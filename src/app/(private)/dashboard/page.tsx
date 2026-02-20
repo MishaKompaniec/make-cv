@@ -1,18 +1,25 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { CvGrid } from "@/components/cv-grid/CvGrid";
 import { EmptyState } from "@/components/empty-state/EmptyState";
 import { ConfirmModal } from "@/components/modals/ConfirmModal";
+import { PaymentErrorModal } from "@/components/modals/PaymentErrorModal";
 import { PaywallModal } from "@/components/modals/PaywallModal";
 import { useCvs } from "@/hooks/use-cvs";
+import {
+  CHECKOUT_QUERY_PARAM,
+  getCheckoutQueryType,
+} from "@/lib/checkout-query";
 
 import styles from "./page.module.scss";
 
 export default function Home() {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const {
     cvs,
@@ -33,6 +40,36 @@ export default function Home() {
   const [checkoutPlanInFlight, setCheckoutPlanInFlight] = useState<
     "day" | "week" | "lifetime" | null
   >(null);
+
+  const checkoutErrorType = useMemo(() => {
+    return getCheckoutQueryType(searchParams);
+  }, [searchParams]);
+
+  const [isPaymentErrorOpen, setIsPaymentErrorOpen] = useState(false);
+
+  useEffect(() => {
+    setIsPaymentErrorOpen(!!checkoutErrorType);
+  }, [checkoutErrorType]);
+
+  const closePaymentErrorModal = useCallback(() => {
+    setIsPaymentErrorOpen(false);
+
+    if (!checkoutErrorType) return;
+
+    // Analytics: log payment error modal close
+    console.warn("[Analytics] Payment error modal closed", {
+      type: checkoutErrorType,
+      timestamp: new Date().toISOString(),
+    });
+    // TODO: Replace with actual analytics service (e.g., amplitude, mixpanel)
+
+    const next = new URLSearchParams(searchParams.toString());
+    next.delete(CHECKOUT_QUERY_PARAM);
+    const suffix = next.toString();
+    router.replace(suffix ? `${pathname}?${suffix}` : pathname, {
+      scroll: false,
+    });
+  }, [checkoutErrorType, pathname, router, searchParams]);
 
   const handleCreateCv = useCallback(() => {
     const run = async () => {
@@ -181,6 +218,14 @@ export default function Home() {
         checkoutPlanInFlight={checkoutPlanInFlight}
         onStartCheckout={startCheckout}
       />
+
+      {checkoutErrorType && (
+        <PaymentErrorModal
+          isOpen={isPaymentErrorOpen}
+          onClose={closePaymentErrorModal}
+          type={checkoutErrorType}
+        />
+      )}
     </div>
   );
 }

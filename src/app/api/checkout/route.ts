@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
 import { getServerAuthSession } from "@/auth";
+import { buildCheckoutUrl } from "@/lib/checkout-query";
 
 export const runtime = "nodejs";
 
@@ -34,7 +35,7 @@ function isPlan(value: unknown): value is Plan {
 }
 
 export async function POST(req: Request) {
-  /* 1️⃣ Auth */
+  /* Auth */
   const session = await getServerAuthSession();
 
   const email = session?.user?.email;
@@ -43,7 +44,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  /* 2️⃣ Body */
+  /* Body */
   let body: unknown;
 
   try {
@@ -63,7 +64,12 @@ export async function POST(req: Request) {
   const plan = (body as RequestBody).plan;
   const priceId = PRICES[plan];
 
-  /* 3️⃣ Stripe Checkout */
+  const cancelUrl = buildCheckoutUrl(
+    `${process.env.NEXT_PUBLIC_URL}/dashboard`,
+    "failed",
+  );
+
+  /* Stripe Checkout */
   const checkout = await stripe.checkout.sessions.create({
     mode: "payment",
 
@@ -76,8 +82,8 @@ export async function POST(req: Request) {
 
     customer_email: email,
 
-    success_url: `${process.env.NEXT_PUBLIC_URL}`,
-    cancel_url: `${process.env.NEXT_PUBLIC_URL}`,
+    success_url: `${process.env.NEXT_PUBLIC_URL}/dashboard`,
+    cancel_url: cancelUrl.toString(),
 
     metadata: {
       plan,
@@ -85,7 +91,7 @@ export async function POST(req: Request) {
     },
   });
 
-  /* 4️⃣ Response */
+  /* Response */
   return NextResponse.json({
     url: checkout.url,
   });

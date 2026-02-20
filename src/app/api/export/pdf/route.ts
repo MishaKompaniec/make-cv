@@ -1,7 +1,8 @@
+import path from "node:path";
+
 import type { DocumentProps } from "@react-pdf/renderer";
 import { Font, renderToBuffer } from "@react-pdf/renderer";
 import { NextResponse } from "next/server";
-import path from "path";
 import React from "react";
 
 import { getServerAuthSession } from "@/auth";
