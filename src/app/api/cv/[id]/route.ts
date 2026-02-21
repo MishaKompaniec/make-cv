@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { getServerAuthSession } from "@/auth";
+import { isCvStepSlug } from "@/lib/cv-steps";
 import { prisma } from "@/lib/prisma";
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
@@ -111,6 +112,11 @@ export async function PATCH(
   if (typeof body?.templateId === "string") data.templateId = body.templateId;
   if (body?.templateColors !== undefined)
     data.templateColors = body.templateColors;
+
+  // Validate lastVisitedStep
+  if (isCvStepSlug(body?.lastVisitedStep)) {
+    data.lastVisitedStep = body.lastVisitedStep;
+  }
 
   const cv = await prisma.cv.update({
     where: { id },

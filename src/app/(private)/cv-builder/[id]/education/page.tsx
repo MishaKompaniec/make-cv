@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef } from "react";
 
 import { PageHeader } from "@/components/layout/builder-header/builder-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
+import { useLastVisitedStep } from "@/hooks/use-last-visited-step";
 import { useKeyedDebouncedCallback } from "@/hooks/useKeyedDebouncedCallback";
 import { useSectionList } from "@/hooks/useSectionList";
 import { educationItemSchema } from "@/lib/validations/cv-schema";
@@ -41,6 +42,7 @@ const validateEducation = (edu: EducationItem): EducationErrors => {
 export default function EducationPage() {
   const router = useRouter();
   const { cvId, cv, isLoading: isCvLoading, patchCv } = useCv();
+  const { updateLastVisitedStep } = useLastVisitedStep();
   const didInitRef = useRef(false);
   const skipAutosaveRef = useRef(true);
   const lastScheduledSnapshotRef = useRef<string>("");
@@ -108,10 +110,16 @@ export default function EducationPage() {
     schedulePatch();
   }, [schedulePatch]);
 
+  const handleBackClick = async () => {
+    await updateLastVisitedStep("work-experience");
+    router.push(`/cv-builder/${cvId}/work-experience`);
+  };
+
   const handleNextClick = async () => {
     if (!educationList.validateAll()) return;
     try {
       await patcher.flush();
+      await updateLastVisitedStep("skills");
       router.push(`/cv-builder/${cvId}/skills`);
     } finally {
       // patcher manages isSaving via in-flight tracking
@@ -160,12 +168,11 @@ export default function EducationPage() {
       </section>
 
       <NavigationFooter
-        backHref={`/cv-builder/${cvId}/work-experience`}
-        nextHref={`/cv-builder/${cvId}/skills`}
+        onBackClick={handleBackClick}
+        onNextClick={handleNextClick}
         nextLabel="Next Step"
         nextDisabled={isCvLoading || !didInitRef.current || isSaving}
         nextLoading={isSaving}
-        onNextClick={handleNextClick}
       />
     </div>
   );

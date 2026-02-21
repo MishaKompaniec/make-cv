@@ -18,6 +18,7 @@ import { PageHeader } from "@/components/layout/builder-header/builder-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { Input } from "@/components/ui/input/input";
 import { BaseModal } from "@/components/ui/modal/base-modal";
+import { useLastVisitedStep } from "@/hooks/use-last-visited-step";
 import { useKeyedDebouncedCallback } from "@/hooks/useKeyedDebouncedCallback";
 import {
   type ContactDetailsFormData,
@@ -56,6 +57,7 @@ const defaultContactDetails: ContactDetailsFormData = {
 export default function ContactDetailsPage() {
   const router = useRouter();
   const { cvId, cv, isLoading: isCvLoading, patchCv } = useCv();
+  const { updateLastVisitedStep } = useLastVisitedStep();
 
   const [avatarError, setAvatarError] = useState<string>("");
   const [isHydrated, setIsHydrated] = useState(false);
@@ -148,6 +150,11 @@ export default function ContactDetailsPage() {
     };
   };
 
+  const handleBackClick = async () => {
+    await updateLastVisitedStep("choose-template");
+    router.push(`/cv-builder/${cvId}`);
+  };
+
   const handleNextClick = handleSubmit(async () => {
     if (!cvId) return;
     try {
@@ -157,6 +164,7 @@ export default function ContactDetailsPage() {
           contactDetails: getValues(),
         },
       });
+      await updateLastVisitedStep("summary");
       router.push(`/cv-builder/${cvId}/summary`);
     } finally {
       // patcher manages isSaving via in-flight tracking
@@ -585,12 +593,11 @@ export default function ContactDetailsPage() {
       </section>
 
       <NavigationFooter
-        backHref={`/cv-builder/${cvId}`}
-        nextHref={`/cv-builder/${cvId}/summary`}
+        onBackClick={handleBackClick}
+        onNextClick={handleNextClick}
         nextLabel="Next Step"
         nextDisabled={isCvLoading || !didInitRef.current || isSaving}
         nextLoading={isSaving}
-        onNextClick={handleNextClick}
       />
     </div>
   );

@@ -8,6 +8,7 @@ import styles from "./navigation-footer.module.scss";
 
 interface NavigationFooterProps {
   backHref?: string;
+  onBackClick?: () => void;
   nextHref?: string;
   onNextClick?: () => void;
   nextLabel?: string;
@@ -17,6 +18,7 @@ interface NavigationFooterProps {
 
 export function NavigationFooter({
   backHref,
+  onBackClick,
   nextHref,
   onNextClick,
   nextLabel = "Next Step",
@@ -26,7 +28,9 @@ export function NavigationFooter({
   const router = useRouter();
 
   const handleBackClick = () => {
-    if (backHref) {
+    if (onBackClick) {
+      onBackClick();
+    } else if (backHref) {
       router.push(backHref);
     } else {
       router.push("/");

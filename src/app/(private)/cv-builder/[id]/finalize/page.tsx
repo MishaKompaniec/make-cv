@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useRef, useState } from "react";
 
 import { PageHeader } from "@/components/layout/builder-header/builder-header";
@@ -18,6 +19,7 @@ import {
   TemplatePdf2,
 } from "@/components/pdf/templates/template-2/template-pdf";
 import { Loader } from "@/components/ui/loader/loader";
+import { useLastVisitedStep } from "@/hooks/use-last-visited-step";
 import { usePreviewState } from "@/hooks/usePreviewState";
 import { getArray, getSelectedSections } from "@/lib/cv-data";
 import { downloadPdf } from "@/lib/download-pdf";
@@ -41,7 +43,9 @@ const BlobProvider = dynamic(
 const stepTitle = "Finalize";
 
 export default function FinalizePage() {
+  const router = useRouter();
   const { cvId, cv: cvSnapshot, isLoading: isCvLoading } = useCv();
+  const { updateLastVisitedStep } = useLastVisitedStep();
 
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
   const [checkoutPlanInFlight, setCheckoutPlanInFlight] = useState<
@@ -173,7 +177,12 @@ export default function FinalizePage() {
     setIsPaywallOpen(true);
   }, []);
 
-  const handleDownload = useCallback(() => {
+  const handleBackClick = async () => {
+    await updateLastVisitedStep("other-sections");
+    router.push(`/cv-builder/${cvId}/other-sections`);
+  };
+
+  const handleDownloadClick = async () => {
     if (isExporting) return;
 
     const run = async () => {
@@ -190,7 +199,7 @@ export default function FinalizePage() {
     };
 
     void run();
-  }, [cvId, defaultFileName, isExporting, triggerPaywall]);
+  };
 
   return (
     <div key={cvId} className={styles.pageContainer}>
@@ -250,11 +259,11 @@ export default function FinalizePage() {
       </section>
 
       <NavigationFooter
-        backHref={`/cv-builder/${cvId}/other-sections`}
+        onBackClick={handleBackClick}
+        onNextClick={handleDownloadClick}
         nextLabel="Download CV"
         nextDisabled={isCvLoading || isGenerating || !hasBlob || isExporting}
-        nextLoading={isGenerating || isExporting}
-        onNextClick={handleDownload}
+        nextLoading={isExporting}
       />
 
       <PaywallModal

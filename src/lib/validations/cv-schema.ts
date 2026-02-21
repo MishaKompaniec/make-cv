@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { CV_STEP_SLUGS } from "@/lib/cv-steps";
+
 const fullNameRegex = /^[\p{L}][\p{L} '\-]*$/u;
 const cityRegex = /^[\p{L}][\p{L} \-]*$/u;
 const nationalityRegex = /^[\p{L}][\p{L} ]*$/u;
@@ -303,6 +305,7 @@ export const cvSchema = z.object({
   summary: summarySchema,
   otherSections: otherSectionsSchema,
   finalize: finalizeSchema,
+  lastVisitedStep: z.enum(CV_STEP_SLUGS).default("choose-template"),
 });
 
 export type CvFormData = z.infer<typeof cvSchema>;

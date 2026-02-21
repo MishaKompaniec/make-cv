@@ -12,10 +12,11 @@ import {
 } from "@/components/pdf/templates/template-1/template-pdf";
 import { TEMPLATE_2_ID } from "@/components/pdf/templates/template-2/template-pdf";
 import { Loader } from "@/components/ui/loader/loader";
+import { useLastVisitedStep } from "@/hooks/use-last-visited-step";
 import { useKeyedDebouncedCallback } from "@/hooks/useKeyedDebouncedCallback";
 
-import styles from "./page.module.scss";
 import { useCv } from "../provider";
+import styles from "./page.module.scss";
 
 const TemplatePreview1 = dynamic(() =>
   import("@/components/pdf/templates/template-1/template-preview").then(
@@ -33,6 +34,7 @@ const stepTitle = "Choose template";
 export default function ChooseTemplatePage() {
   const router = useRouter();
   const { cvId, cv, isLoading: isCvLoading, patchCv } = useCv();
+  const { updateLastVisitedStep } = useLastVisitedStep();
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(
     null,
   );
@@ -52,11 +54,15 @@ export default function ChooseTemplatePage() {
   >(async (key, value) => {
     if (!cvId) return;
     if (key === "templateId") {
-      await patchCv({ templateId: value as string });
+      await patchCv({
+        templateId: value as string,
+      });
       return;
     }
 
-    await patchCv({ templateColors: value as Record<string, string> });
+    await patchCv({
+      templateColors: value as Record<string, string>,
+    });
   });
 
   const templates = [
@@ -81,6 +87,7 @@ export default function ChooseTemplatePage() {
   const handleNextClick = async () => {
     if (!cvId) return;
     await patcher.flush();
+    await updateLastVisitedStep("contact-details");
     router.push(`/cv-builder/${cvId}/contact-details`);
   };
 
@@ -160,7 +167,6 @@ export default function ChooseTemplatePage() {
         nextDisabled={isCvLoading || !isInitialized || isSaving}
         nextLoading={isSaving}
         onNextClick={handleNextClick}
-        nextHref={`/cv-builder/${cvId}/contact-details`}
       />
     </div>
   );

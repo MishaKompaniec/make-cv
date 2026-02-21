@@ -15,6 +15,7 @@ import { z } from "zod";
 import { PageHeader } from "@/components/layout/builder-header/builder-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { Textarea } from "@/components/ui/textarea/textarea";
+import { useLastVisitedStep } from "@/hooks/use-last-visited-step";
 import { useKeyedDebouncedCallback } from "@/hooks/useKeyedDebouncedCallback";
 
 import { useCv } from "../provider";
@@ -35,6 +36,7 @@ type SummaryFormData = z.infer<typeof summarySchema>;
 export default function SummaryPage() {
   const router = useRouter();
   const { cvId, cv, isLoading: isCvLoading, patchCv } = useCv();
+  const { updateLastVisitedStep } = useLastVisitedStep();
   const didInitRef = useRef(false);
 
   const {
@@ -97,10 +99,16 @@ export default function SummaryPage() {
     };
   };
 
+  const handleBackClick = async () => {
+    await updateLastVisitedStep("contact-details");
+    router.push(`/cv-builder/${cvId}/contact-details`);
+  };
+
   const handleNextClick = handleSubmit(async () => {
     if (!cvId) return;
     try {
       await patcher.flush();
+      await updateLastVisitedStep("work-experience");
       router.push(`/cv-builder/${cvId}/work-experience`);
     } finally {
     }
@@ -135,12 +143,11 @@ export default function SummaryPage() {
       </section>
 
       <NavigationFooter
-        backHref={`/cv-builder/${cvId}/contact-details`}
-        nextHref={`/cv-builder/${cvId}/work-experience`}
+        onBackClick={handleBackClick}
+        onNextClick={handleNextClick}
         nextLabel="Next Step"
         nextDisabled={isCvLoading || !didInitRef.current || isSaving}
         nextLoading={isSaving}
-        onNextClick={handleNextClick}
       />
     </div>
   );

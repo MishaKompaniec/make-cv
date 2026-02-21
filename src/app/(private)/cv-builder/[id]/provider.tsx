@@ -12,6 +12,7 @@ import {
 } from "react";
 
 import { TEMPLATE_1_ID } from "@/components/pdf/templates/template-1/template-pdf";
+import { type CvStepSlug } from "@/lib/cv-steps";
 
 type CvSnapshot = {
   id: string;
@@ -19,6 +20,7 @@ type CvSnapshot = {
   templateId: string;
   templateColors: Record<string, string>;
   data: Record<string, unknown>;
+  lastVisitedStep: CvStepSlug;
 };
 
 type CvApiResponse = {
@@ -28,6 +30,7 @@ type CvApiResponse = {
     templateId?: string | null;
     templateColors?: Record<string, string> | null;
     data?: Record<string, unknown> | null;
+    lastVisitedStep?: CvStepSlug;
   };
 };
 
@@ -36,6 +39,7 @@ type PatchPayload = {
   templateId?: string;
   templateColors?: Record<string, string>;
   data?: Record<string, unknown>;
+  lastVisitedStep?: CvStepSlug;
 };
 
 type CvContextValue = {
@@ -60,12 +64,14 @@ function normalizeCv(
   cv: CvApiResponse["cv"] | undefined | null,
 ): CvSnapshot | null {
   if (!cv) return null;
+
   return {
     id: cv.id,
     title: cv.title,
     templateId: cv.templateId ?? TEMPLATE_1_ID,
     templateColors: cv.templateColors ?? {},
     data: cv.data ?? {},
+    lastVisitedStep: cv.lastVisitedStep ?? "choose-template",
   };
 }
 

@@ -1,8 +1,8 @@
+import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import { getServerAuthSession } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return (
@@ -46,15 +46,6 @@ export async function GET() {
   const cvs = await prisma.cv.findMany({
     where: { userId },
     orderBy: { updatedAt: "desc" },
-    select: {
-      id: true,
-      title: true,
-      createdAt: true,
-      updatedAt: true,
-      templateId: true,
-      templateColors: true,
-      data: true,
-    },
   });
 
   return NextResponse.json({ cvs });
@@ -96,15 +87,6 @@ export async function POST(request: Request) {
       templateId,
       templateColors,
       data,
-    },
-    select: {
-      id: true,
-      title: true,
-      createdAt: true,
-      updatedAt: true,
-      templateId: true,
-      templateColors: true,
-      data: true,
     },
   });
 

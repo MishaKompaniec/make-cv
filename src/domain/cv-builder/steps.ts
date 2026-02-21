@@ -1,12 +1,6 @@
-export type CvStepSlug =
-  | "choose-template"
-  | "contact-details"
-  | "summary"
-  | "work-experience"
-  | "education"
-  | "skills"
-  | "other-sections"
-  | "finalize";
+import { CV_STEP_SLUGS } from "@/lib/cv-steps";
+
+export type CvStepSlug = (typeof CV_STEP_SLUGS)[number];
 
 export type CvStepConfig = {
   key: string;

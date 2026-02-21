@@ -13,6 +13,7 @@ import {
 import { PageHeader } from "@/components/layout/builder-header/builder-header";
 import { NavigationFooter } from "@/components/layout/navigation-footer/navigation-footer";
 import { Checkbox } from "@/components/ui/checkbox/checkbox";
+import { useLastVisitedStep } from "@/hooks/use-last-visited-step";
 import { useKeyedDebouncedCallback } from "@/hooks/useKeyedDebouncedCallback";
 import { useSectionList } from "@/hooks/useSectionList";
 import {
@@ -47,6 +48,7 @@ const DEFAULT_SELECTED_SECTIONS: SelectedSections = {
 export default function OtherSectionsPage() {
   const router = useRouter();
   const { cvId, cv, isLoading: isCvLoading, patchCv } = useCv();
+  const { updateLastVisitedStep } = useLastVisitedStep();
   const didInitRef = useRef(false);
   const autosaveStateRef = useRef({
     selectedSections: { skip: true, lastSnapshot: "" },
@@ -278,12 +280,18 @@ export default function OtherSectionsPage() {
     [customSectionsList, interestsList, languagesList],
   );
 
+  const handleBackClick = async () => {
+    await updateLastVisitedStep("skills");
+    router.push(`/cv-builder/${cvId}/skills`);
+  };
+
   const handleNextClick = async () => {
     for (const sec of sections) {
       if (selectedSections[sec.key] && !sec.list.validateAll()) return;
     }
     try {
       await patcher.flush();
+      await updateLastVisitedStep("finalize");
       router.push(`/cv-builder/${cvId}/finalize`);
     } finally {
       // patcher manages isSaving via in-flight tracking
@@ -378,12 +386,11 @@ export default function OtherSectionsPage() {
       </section>
 
       <NavigationFooter
-        backHref={`/cv-builder/${cvId}/skills`}
-        nextHref={`/cv-builder/${cvId}/finalize`}
+        onBackClick={handleBackClick}
+        onNextClick={handleNextClick}
         nextLabel="Next Step"
         nextDisabled={isCvLoading || !didInitRef.current || isSaving}
         nextLoading={isSaving}
-        onNextClick={handleNextClick}
       />
     </div>
   );
