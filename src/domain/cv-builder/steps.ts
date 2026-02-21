@@ -1,5 +1,5 @@
 export type CvStepSlug =
-  | ""
+  | "choose-template"
   | "contact-details"
   | "summary"
   | "work-experience"
@@ -15,7 +15,7 @@ export type CvStepConfig = {
 };
 
 export const CV_STEPS: readonly CvStepConfig[] = [
-  { key: "template", title: "Choose template", slug: "" },
+  { key: "template", title: "Choose template", slug: "choose-template" },
   { key: "contact", title: "Contact details", slug: "contact-details" },
   { key: "summary", title: "Summary", slug: "summary" },
   { key: "work", title: "Work experience", slug: "work-experience" },

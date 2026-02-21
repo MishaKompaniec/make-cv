@@ -26,9 +26,7 @@ export function useCvBuilderFlow(cvId?: string): CvBuilderFlow {
     if (!cvId) return [];
     return CV_STEPS.map((step) => ({
       ...step,
-      path: step.slug
-        ? `/cv-builder/${cvId}/${step.slug}`
-        : `/cv-builder/${cvId}`,
+      path: `/cv-builder/${cvId}/${step.slug}`,
     }));
   }, [cvId]);
 
