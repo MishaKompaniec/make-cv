@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { getServerAuthSession } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return (
@@ -82,7 +83,7 @@ export async function POST(request: Request) {
 
   const templateColorsRaw = body?.templateColors;
   const templateColors = isPlainObject(templateColorsRaw)
-    ? (templateColorsRaw as Record<string, unknown>)
+    ? (templateColorsRaw as Prisma.JsonObject)
     : templateIdProvided
       ? {}
       : { [templateId]: "#EFEAE2" };
